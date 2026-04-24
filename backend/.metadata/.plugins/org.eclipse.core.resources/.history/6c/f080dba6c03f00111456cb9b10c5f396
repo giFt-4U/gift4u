@@ -1,0 +1,13 @@
+package com.gift_4u.F4;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class Gift4uApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(Gift4uApplication.class, args);
+	}
+
+}

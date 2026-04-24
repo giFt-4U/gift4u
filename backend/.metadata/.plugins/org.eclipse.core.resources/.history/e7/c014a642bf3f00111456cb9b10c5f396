@@ -1,0 +1,4 @@
+spring.application.name=gift-4u
+
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
