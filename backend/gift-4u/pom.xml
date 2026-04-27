@@ -11,7 +11,7 @@
 	<groupId>com.gift_4u.F4</groupId>
 	<artifactId>gift-4u</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>gift-4u</name>
 	<description/>
 	<url/>
