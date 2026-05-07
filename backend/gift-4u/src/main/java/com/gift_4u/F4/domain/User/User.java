@@ -93,4 +93,7 @@ public class User {
 	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
 	
+	@Column(name = "friend_code", length = 20, unique = true)
+	private String friendCode;
+	
 }//class
