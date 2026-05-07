@@ -1,2 +1,3 @@
-2026/04/24-18:16:28.792 7d40 Creating DB D:\Ez\gift4u\backend\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Local Storage\leveldb since it was missing.
-2026/04/24-18:16:28.839 7d40 Reusing MANIFEST D:\Ez\gift4u\backend\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Local Storage\leveldb/MANIFEST-000001
+2026/04/27-13:09:01.286 4650 Reusing MANIFEST D:\Ez\gift4u\git4u\backend\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Local Storage\leveldb/MANIFEST-000001
+2026/04/27-13:09:01.297 4650 Recovering log #3
+2026/04/27-13:09:01.302 4650 Reusing old log D:\Ez\gift4u\git4u\backend\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Local Storage\leveldb/000003.log 
