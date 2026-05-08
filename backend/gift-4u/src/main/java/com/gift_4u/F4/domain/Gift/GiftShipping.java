@@ -47,8 +47,4 @@ public class GiftShipping {
 		this.zipCode = zipCode;
 	}
 	
-	public void updateAddress(String address) {
-		this.address = address;
-	}
-
 }

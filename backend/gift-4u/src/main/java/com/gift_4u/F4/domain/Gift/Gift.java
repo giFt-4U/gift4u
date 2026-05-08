@@ -33,8 +33,6 @@ public class Gift {
 	@Column(length = 500)
 	private String messageCardContent;
 	
-	private String address;
-	
 	@Builder.Default
 	@Enumerated(EnumType.STRING)
 	private GiftStatus status = GiftStatus.PENDING;
@@ -47,8 +45,9 @@ public class Gift {
 	
 	
 	// 주소 입력 시 status 상태 변경
-	public void acceptGift(String address) {
-		this.shipping.updateAddress(address);
+	public void acceptGift(String receiverName, String receiverPhone,
+						String address, String addressDetail, String zipCode) {
+		this.shipping.updateShippingInfo(receiverName, receiverPhone,address, addressDetail, zipCode);
 		this.status = GiftStatus.ACCEPTED;
 	}
 }
