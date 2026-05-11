@@ -6,7 +6,7 @@
 
 # 2. IDR 설정 파일
 .idea/
-*iml
+*.iml
 .vscode/
 .classpath
 .project
