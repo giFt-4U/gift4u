@@ -1,4 +1,4 @@
-package com.gift_4u.F4.domain.User;
+package com.gift_4u.F4.domain.User.entity;
 
 import java.time.LocalDateTime;
 
@@ -15,6 +15,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+
+import com.gift_4u.F4.domain.User.enums.LoginProvider;
+import com.gift_4u.F4.domain.User.enums.UserRole;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,16 +38,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class User {
-	
-	public enum LoginProvider {
-		LOCAL,
-		KAKAO
-	}
-	
-	public enum UserRole {
-		USER,
-		ADMIN
-	}
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_seq")
