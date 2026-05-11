@@ -21,6 +21,8 @@ Thumbs.db
 *.log
 application-local.properties
 .env
+.env.local
+.env.production
 
 # 5. 데이터베이스 파일
 *.mv.db

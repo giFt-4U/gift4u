@@ -8,8 +8,6 @@ export default function Router() {
         <BrowserRouter>
             <Routes>
                 <Route path='/' element={<App />} />
-                <Route path='/chat' element={<ChatListPage />} />
-                <Route path='/chat/:roomId' element={<ChatRoomPage />} />  {/* ← 추가 */}
             </Routes>
         </BrowserRouter>
     );
