@@ -1,1 +1,30 @@
+# 1. 발드 결과물
+/target/
+/build/
+/out/
 /.metadata/
+
+# 2. IDR 설정 파일
+.idea/
+*iml
+.vscode/
+.classpath
+.project
+.settings/
+bin/
+
+# 3. 운영체제 생성파일
+.DS_Store
+Thumbs.db
+
+# 4. 로컬환경 설정 및 로그
+*.log
+application-local.properties
+.env
+
+# 5. 데이터베이스 파일
+*.mv.db
+*.trace.db
+
+# 6. Maven 래퍼
+.maven
