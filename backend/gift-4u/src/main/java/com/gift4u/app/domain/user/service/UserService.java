@@ -13,6 +13,8 @@ import com.gift4u.app.domain.user.entity.User;
 import com.gift4u.app.domain.user.enums.LoginProvider;
 import com.gift4u.app.domain.user.enums.UserRole;
 import com.gift4u.app.domain.user.repository.UserRepository;
+import com.gift4u.app.global.exception.ErrorCode;
+import com.gift4u.app.global.exception.GlobalException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,16 +32,14 @@ public class UserService {
 
 	@Transactional
 	public SignupResponse signup(SignupRequest request) {
-		if(!Boolean.TRUE.equals(request.getTermsAgreed())) {
-			throw new IllegalArgumentException("약관에 동의해야 가입할 수 있습니다.");
+		if (!Boolean.TRUE.equals(request.getTermsAgreed())) {
+		    throw new GlobalException(ErrorCode.TERMS_AGREEMENT_REQUIRED);
 		}
-		
-		if(userRepository.existsByEmail(request.getEmail())) {
-			throw new IllegalStateException("이미 가입된 이메일입니다.");
+		if (userRepository.existsByEmail(request.getEmail())) {
+		    throw new GlobalException(ErrorCode.DUPLICATE_EMAIL);
 		}
-		
-		if(userRepository.existsByNickname(request.getNickname())) {
-			throw new IllegalStateException("이미 사용 중인 닉네임입니다.");
+		if (userRepository.existsByNickname(request.getNickname())) {
+		    throw new GlobalException(ErrorCode.DUPLICATE_NICKNAME);
 		}
 		
 		String friendCode = generateUniqueFriendCode();
@@ -73,7 +73,7 @@ public class UserService {
 				return code;
 			}
 		}
-		throw new IllegalStateException("친구 코드 생성에 실패했습니다. 다시 시도해 주세요.");
+		throw new GlobalException(ErrorCode.FRIEND_CODE_GENERATION_FAILED);
 	}
 	
 	private String randomFriendCode() {
