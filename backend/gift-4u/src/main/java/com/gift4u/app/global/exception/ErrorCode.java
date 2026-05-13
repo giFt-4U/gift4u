@@ -66,7 +66,9 @@ public enum ErrorCode {
     FRIEND_REQUEST_ALREADY_EXISTS(HttpStatus.CONFLICT, "FRIEND_REQUEST_ALREADY_EXISTS","이미 친구이거나 요청 대기 중입니다."),// 020, 021
     GIFT_ALREADY_RECEIVED(HttpStatus.CONFLICT, "GIFT_ALREADY_RECEIVED","이미 수령한 선물입니다."),							// 0XX
     
-    
+
+	/////////// 410 - 존재했지만 더 이상 유효하지 않음 ///////////															// REQ
+	GIFT_EXPIRED(HttpStatus.EXPECTATION_FAILED, "GFIT_EXPIRED","만료된 선물 입니다."),									// 014
     
     
 	/////////// 500 - 서버 내부 오류 ///////////
