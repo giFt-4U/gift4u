@@ -10,7 +10,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-
 import lombok.extern.slf4j.Slf4j;
 
 /** 서비스 전역 예외 처리 핸들러
@@ -82,7 +81,7 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.FORBIDDEN)
                 .body(ErrorResponse.of(ErrorCode.FORBIDDEN));
     }
-
+    
     
     /** 예상치 못한 모든 예외 -> 500
      * 사용자에게 내부 정보 절대 노출하지 않는다. 절대!
