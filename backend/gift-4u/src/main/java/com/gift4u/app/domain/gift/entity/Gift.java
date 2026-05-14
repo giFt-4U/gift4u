@@ -1,8 +1,10 @@
-package com.gift4u.app.domain.gift;
+package com.gift4u.app.domain.gift.entity;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.gift4u.app.domain.Product.entity.Product;
+import com.gift4u.app.domain.gift.enums.GiftStatus;
 import com.gift4u.app.domain.user.entity.User;
 import com.gift4u.app.global.exception.ErrorCode;
 import com.gift4u.app.global.exception.GlobalException;

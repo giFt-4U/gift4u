@@ -1,4 +1,4 @@
-package com.gift4u.app.domain.chat;
+package com.gift4u.app.domain.chat.enums;
 
 public enum MessageType {
 	TEXT,	// 채팅

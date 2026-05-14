@@ -2,7 +2,7 @@ package com.gift4u.app.domain.chat.dto;
 
 import java.time.LocalDateTime;
 
-import com.gift4u.app.domain.chat.ChatRoom;
+import com.gift4u.app.domain.chat.entity.ChatRoom;
 
 import lombok.Builder;
 import lombok.Getter;

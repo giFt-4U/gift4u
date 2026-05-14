@@ -1,4 +1,4 @@
-package com.gift4u.app.domain.gift;
+package com.gift4u.app.domain.gift.entity;
 
 import java.time.LocalDateTime;
 

@@ -2,8 +2,8 @@ package com.gift4u.app.domain.gift.dto;
 
 import java.time.LocalDateTime;
 
-import com.gift4u.app.domain.gift.Gift;
-import com.gift4u.app.domain.gift.GiftStatus;
+import com.gift4u.app.domain.gift.entity.Gift;
+import com.gift4u.app.domain.gift.enums.GiftStatus;
 
 import lombok.Builder;
 import lombok.Getter;

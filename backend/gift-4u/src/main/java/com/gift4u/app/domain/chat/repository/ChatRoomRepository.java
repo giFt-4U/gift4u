@@ -1,4 +1,4 @@
-package com.gift4u.app.domain.chat;
+package com.gift4u.app.domain.chat.repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import com.gift4u.app.domain.chat.entity.ChatRoom;
 
 public interface ChatRoomRepository extends JpaRepository <ChatRoom, Long>{
 	/** 두 유저 간 기존 채팅방 조회

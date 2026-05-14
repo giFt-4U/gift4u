@@ -1,4 +1,4 @@
-package com.gift4u.app.domain.gift;
+package com.gift4u.app.domain.gift.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.gift4u.app.domain.gift.dto.GiftCreateRequest;
 import com.gift4u.app.domain.gift.dto.GiftResponse;
 import com.gift4u.app.domain.gift.dto.GiftShippingRequest;
+import com.gift4u.app.domain.gift.service.GiftService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

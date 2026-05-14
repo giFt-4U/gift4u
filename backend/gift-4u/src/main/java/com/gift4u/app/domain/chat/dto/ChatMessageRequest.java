@@ -1,6 +1,6 @@
 package com.gift4u.app.domain.chat.dto;
 
-import com.gift4u.app.domain.chat.MessageType;
+import com.gift4u.app.domain.chat.enums.MessageType;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

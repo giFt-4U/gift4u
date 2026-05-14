@@ -1,11 +1,19 @@
-package com.gift4u.app.domain.gift;
+package com.gift4u.app.domain.gift.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.gift4u.app.domain.Product.entity.Product;
+import com.gift4u.app.domain.Product.repository.ProductRepository;
 import com.gift4u.app.domain.gift.dto.GiftCreateRequest;
 import com.gift4u.app.domain.gift.dto.GiftResponse;
 import com.gift4u.app.domain.gift.dto.GiftShippingRequest;
+import com.gift4u.app.domain.gift.entity.Gift;
+import com.gift4u.app.domain.gift.entity.GiftMessage;
+import com.gift4u.app.domain.gift.entity.GiftShipping;
+import com.gift4u.app.domain.gift.repository.GiftMessageRepository;
+import com.gift4u.app.domain.gift.repository.GiftRepository;
+import com.gift4u.app.domain.gift.repository.GiftShippingRepository;
 import com.gift4u.app.domain.user.entity.User;
 import com.gift4u.app.domain.user.repository.UserRepository;
 import com.gift4u.app.global.exception.ErrorCode;
@@ -46,12 +54,7 @@ public class GiftService {
 				.orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
 		
 		Product product = productRepository.findById(request.getProductId())
-				.orElseThrow(() -> new GlobalException(ErrorCode.PRODUCT_NOR_FOUND));
-		
-		// 비뢍성화 상품은 주문 불가
-		if(!product.isActive()) {
-			throw new GlobalException(ErrorCode.PRODUCT_INACTIVE);
-		}
+				.orElseThrow(() -> new GlobalException(ErrorCode.PRODUCT_NOT_FOUND));
 		
 		// 선물 생성
 		Gift gift = Gift.builder()

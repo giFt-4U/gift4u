@@ -1,6 +1,6 @@
-package com.gift4u.app.domain.chat;
+package com.gift4u.app.domain.chat.entity;
 
-import com.gift4u.app.domain.gift.Gift;
+import com.gift4u.app.domain.gift.entity.Gift;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
