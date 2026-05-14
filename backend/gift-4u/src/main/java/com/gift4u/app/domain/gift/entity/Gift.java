@@ -1,9 +1,11 @@
-package com.gift4u.app.domain.Gift;
+package com.gift4u.app.domain.gift.entity;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.gift4u.app.domain.Gift.exception.GiftException;
+import com.gift4u.app.domain.Product.entity.Product;
+import com.gift4u.app.domain.gift.enums.GiftStatus;
+import com.gift4u.app.domain.user.entity.User;
 import com.gift4u.app.global.exception.ErrorCode;
 import com.gift4u.app.global.exception.GlobalException;
 
@@ -22,6 +24,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/** 선물 엔티티
+ * 생명주기 : PENDING -> ACCEPTED(수령) / EXPIRED(만료)
+ * uuid : 외부에 노출되는 식별자. DB PK(id)는 내부용으로만 사용
+ * expiredAt: 생성 후 7일 이후 accept() 호출 시 GIFT_EXPIRED 예외.
+ */
 @Entity
 @Getter
 @NoArgsConstructor
@@ -35,13 +42,16 @@ public class Gift {
 	private String uuid;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	private User senderId;
+	@JoinColumn(name="sender_id")
+	private User sender;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	private User reciverId;
+	@JoinColumn(name="receiver_id")
+	private User receiver;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	private Product productId;
+	@JoinColumn(name="product_id")
+	private Product product;
 	
 	@Enumerated(EnumType.STRING)
 	private GiftStatus status;
@@ -50,16 +60,17 @@ public class Gift {
 	private LocalDateTime expiredAt;
 	
 	@Builder
-	public Gift(User senderId, User receiverId, Product productId) {
+	public Gift(User sender, User receiver, Product product) {
 		this.uuid = UUID.randomUUID().toString();
-		this.senderId = senderId;
-		this.reciverId = receiverId;
-		this.productId = productId;
-		this.status = status;
+		this.sender = sender;
+		this.receiver = receiver;
+		this.product = product;
+		this.status = GiftStatus.PENDING;
 		this.createAt = LocalDateTime.now();
 		this.expiredAt = LocalDateTime.now().plusDays(7); // 7일 후 만료
 	}
 	
+	// 수락처리.
 	public void accept() {
 		// 선물이 대기 상태가 아니라면 전송된 것
 		if(this.status != GiftStatus.PENDING) {
@@ -70,6 +81,13 @@ public class Gift {
 			throw new GlobalException(ErrorCode.GIFT_EXPIRED);
 		}
 		this.status = GiftStatus.ACCEPTED;
+	}
+	
+	// 만료처리. 스케쥴러 또는 조회 시점에 호출
+	public void expired() {
+		if(this.status == GiftStatus.PENDING) {
+			this.status = GiftStatus.EXPIRED;
+		}
 	}
 	
 	

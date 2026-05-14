@@ -1,6 +1,8 @@
-package com.gift4u.app.domain.Chat;
+package com.gift4u.app.domain.chat.entity;
 
 import java.time.LocalDateTime;
+
+import com.gift4u.app.domain.chat.enums.MessageType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

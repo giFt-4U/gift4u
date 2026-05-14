@@ -1,4 +1,4 @@
-package com.gift4u.app.domain.Gift;
+package com.gift4u.app.domain.gift.enums;
 
 public enum GiftStatus {
 	PENDING,	// 전송 후 수령 대기
