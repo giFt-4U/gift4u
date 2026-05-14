@@ -1,10 +1,9 @@
-package com.gift4u.app.domain.Chat;
+package com.gift4u.app.domain.chat.entity;
 
 import java.time.LocalDateTime;
 
-import com.gift4u.app.domain.Gift.GiftStatus;
-import com.gift4u.app.domain.Gift.Product;
-import com.gift4u.app.domain.Gift.User;
+
+import com.gift4u.app.domain.user.entity.User;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

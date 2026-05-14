@@ -1,6 +1,6 @@
-package com.gift4u.app.domain.Chat;
+package com.gift4u.app.domain.chat.entity;
 
-import java.time.LocalDateTime;
+import com.gift4u.app.domain.gift.entity.Gift;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -31,13 +32,13 @@ public class GiftChatLink {
 	private ChatRoom room;
 	
 	// system_message_id는 nullable (자동 발송 전 null 가능)
-	private Long systemMesageId;
+	private Long systemMessageId;
 	
 	@Builder
 	public GiftChatLink(Gift gift, ChatRoom room, Long systemMessageId) {
 		this.gift = gift;
 		this.room = room;
-		this.systemMesageId = systemMessageId;
+		this.systemMessageId = systemMessageId;
 	}
 
 }
