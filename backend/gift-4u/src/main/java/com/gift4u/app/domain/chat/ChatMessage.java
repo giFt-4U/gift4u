@@ -1,4 +1,4 @@
-package com.gift4u.app.domain.Chat;
+package com.gift4u.app.domain.chat;
 
 import java.time.LocalDateTime;
 
