@@ -14,14 +14,44 @@ export const MainContent = styled.div`
 `
 
 export const NavWrapper = styled.nav`
+
     width: 100%;
     height: 60px;
+
     display: flex;
-    align-itmes: center;
-    justify-content: center;
+    justify-content: space-between;
+    align-items: center;
+
     padding: 0 20px;
-    border-bootom: 1px solid #f0f0f0;
-    position: sticky;
-    backgraound-color: white;
-    z-index:10;
+
+    background-color: white;
+
+    box-sizing: border-box;
+
+    .nav-left img,
+    .nav-right img {
+
+        width: 24px;
+        height: 24px;
+
+        cursor: pointer;
+    }
+
+    .nav-right {
+
+        display: flex;
+        gap: 12px;
+    }
+
+    h1 {
+
+        font-size: 20px;
+        margin: 0;
+    }
+
+    h1 a {
+
+        text-decoration: none;
+        color: black;
+    }
 `;
