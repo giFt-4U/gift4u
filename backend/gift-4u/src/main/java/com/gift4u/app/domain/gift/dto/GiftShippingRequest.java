@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 public class GiftShippingRequest {
 
 	@NotBlank
-	private String recipientName;
+	private String receiverName;
 	
 	@NotBlank
-	private String recipientPhone;
+	private String receiverPhone;
 	
 	@NotBlank
 	private String address;

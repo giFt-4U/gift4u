@@ -19,6 +19,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,7 +36,9 @@ import lombok.NoArgsConstructor;
 @Table(name = "gifts")
 public class Gift {
 	
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "gifts_seq") 
+	@SequenceGenerator(name = "gifts_seq", sequenceName = "GIFTS_ID_SEQ", allocationSize = 1)
 	private Long id;
 	
 	@Column(nullable = false, unique = true, length = 36)
@@ -56,7 +59,7 @@ public class Gift {
 	@Enumerated(EnumType.STRING)
 	private GiftStatus status;
 	
-	private LocalDateTime createAt;
+	private LocalDateTime createdAt;
 	private LocalDateTime expiredAt;
 	
 	@Builder
@@ -66,7 +69,7 @@ public class Gift {
 		this.receiver = receiver;
 		this.product = product;
 		this.status = GiftStatus.PENDING;
-		this.createAt = LocalDateTime.now();
+		this.createdAt = LocalDateTime.now();
 		this.expiredAt = LocalDateTime.now().plusDays(7); // 7일 후 만료
 	}
 	
