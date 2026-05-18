@@ -11,9 +11,7 @@ import org.springframework.data.repository.query.Param;
 import com.gift4u.app.domain.chat.entity.ChatRoom;
 
 public interface ChatRoomRepository extends JpaRepository <ChatRoom, Long>{
-	/** 두 유저 간 기존 채팅방 조회
-	 * 채팅방 생성 전 중복 확인	(REQ-C02)
-	 */
+	/** 두 유저 간 기존 채팅방 조회 - 채팅방 생성 전 중복 확인 (REQ-C02) **/
 	@Query("SELECT r FROM ChatRoom r WHERE (r.userA.id = :userAId AND r.userB.id = :userBId)"
 			+ "OR (r.userA.id = :userBId AND r.userB.id = :userBId)")
 	Optional<ChatRoom> findRoomByTwoUsers(@Param("userAId")Long userAId, @Param("userBId") Long userBId);

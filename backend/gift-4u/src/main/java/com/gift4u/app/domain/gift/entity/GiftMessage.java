@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,7 +22,9 @@ import lombok.NoArgsConstructor;
 @Table(name = "gift_messages")
 public class GiftMessage {
 
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Id 
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "gift_messages_seq") 
+	@SequenceGenerator(name = "gift_messages_seq", sequenceName = "GIFT_MESSAGES_ID_SEQ", allocationSize = 1) 
 	private Long id;
 	
 	@OneToOne(fetch = FetchType.LAZY)

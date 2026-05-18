@@ -1,10 +1,13 @@
 package com.gift4u.app.domain.gift.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gift4u.app.domain.Product.entity.Product;
 import com.gift4u.app.domain.Product.repository.ProductRepository;
+import com.gift4u.app.domain.chat.servicer.ChatService;
 import com.gift4u.app.domain.gift.dto.GiftCreateRequest;
 import com.gift4u.app.domain.gift.dto.GiftResponse;
 import com.gift4u.app.domain.gift.dto.GiftShippingRequest;
@@ -37,6 +40,8 @@ public class GiftService {
 	private final GiftShippingRepository giftShippingRepository;
 	private final UserRepository userRepository;
 	private final ProductRepository productRepository;
+	private final ChatService chatService;
+	
 	
 	/** 선물 생성 (REQ-011 / 010)
 	 * 
@@ -46,15 +51,15 @@ public class GiftService {
 	 */
 	@Transactional
 	public GiftResponse createGift (Long senderId, GiftCreateRequest request) {
-		
-		User sender = userRepository.findById(senderId)
-				.orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
-		
-		User recevier = userRepository.findById(request.getReceiverId())
-				.orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
-		
-		Product product = productRepository.findById(request.getProductId())
-				.orElseThrow(() -> new GlobalException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        User sender = userRepository.findById(senderId) 
+            .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
+        
+        User recevier = userRepository.findById(request.getReceiverId()) 
+            .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
+
+	        Product product = productRepository.findById(request.getProductId()) 
+	            .orElseThrow(() -> new GlobalException(ErrorCode.PRODUCT_NOT_FOUND));
 		
 		// 선물 생성
 		Gift gift = Gift.builder()
@@ -72,6 +77,9 @@ public class GiftService {
 				.cardDesignType(request.getCardDesignType())
 				.build();
 		giftMessageRepository.save(giftMessage);
+		
+		// 선물 생성 시 채팅방에 GIFT 메시지 자동 전송 (REQ-C05)
+		chatService.sendGiftMessage(gift);
 		
 		return GiftResponse.from(gift);
 	}
@@ -103,8 +111,8 @@ public class GiftService {
 		
 		GiftShipping shipping = GiftShipping.builder()
 				.gift(gift)
-				.recipientName(request.getRecipientName())
-				.recipientPhone(request.getRecipientPhone())
+				.receiverName(request.getReceiverName())
+				.receiverPhone(request.getReceiverPhone())
 				.address(request.getAddress())
 				.addressDetail(request.getAddressDetail())
 				.zipCode(request.getZipCode())
@@ -112,6 +120,35 @@ public class GiftService {
 		giftShippingRepository.save(shipping);
 		
 		return GiftResponse.from(gift);
+	}
+	
+	
+	/** 선물 상세 조회 (uuid 기반, REQ-013)
+	 * 링크를 받은 사람이 수령 전 선물 내용을 확인할 때 사용
+	 * 만료된 선물도 조회는 가능하되 상태(EXPIRED)를 그대로 반환
+	 */
+	public GiftResponse getGift(String uuid) {
+		Gift gift = giftRepository.findByUuid(uuid)
+				.orElseThrow(() -> new GlobalException(ErrorCode.GIFT_LINK_INVALID));
+		return GiftResponse.from(gift);
+	}
+	
+	
+	/** 내가 보낸 선물 목록 조회 (REQ-012)	 **/
+	public List<GiftResponse> getSentGifts(Long senderId){
+		return giftRepository.findAllBySenderId(senderId)
+				.stream()
+				.map(GiftResponse::from)
+				.toList();
+	}
+	
+	
+	/** 내가 받은 선물 목록 조회 (REQ-013) **/
+	public List<GiftResponse> getReceivedGifts(Long receiverId){
+		return giftRepository.findAllByReceiverId(receiverId)
+				.stream()
+				.map(GiftResponse::from)
+				.toList();
 	}
 	
 }

@@ -34,7 +34,7 @@ public class GiftResponse {
 				.product(gift.getProduct().getId())
 				.productName(gift.getProduct().getName())
 				.status(gift.getStatus())
-				.createdAt(gift.getCreateAt())
+				.createdAt(gift.getCreatedAt())
 				.expiredAt(gift.getExpiredAt())
 				.build();
 	}

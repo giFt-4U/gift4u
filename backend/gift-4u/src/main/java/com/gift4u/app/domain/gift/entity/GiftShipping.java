@@ -27,26 +27,26 @@ public class GiftShipping {
 	@JoinColumn(name = "gift_id", nullable = false)
 	private Gift gift;
 	
-	private String recipientName;
-	private String recipientPhone;
+	private String receiverName;
+	private String receiverPhone;
 	private String address;
 	private String addressDetail;
 	private String zipCode;
 	private String trackingNumber;
 	private String carrier;
 	private LocalDateTime shippedAt;
-	private LocalDateTime createAt;
+	private LocalDateTime createdAt;
 	
 	@Builder
-	public GiftShipping(Gift gift, String recipientName, String recipientPhone,
+	public GiftShipping(Gift gift, String receiverName, String receiverPhone,
 						String address, String addressDetail, String zipCode) {
 		this.gift = gift;
-		this.recipientName = recipientName;
-		this.recipientPhone = recipientPhone;
+		this.receiverName = receiverName;
+		this.receiverPhone = receiverPhone;
 		this.address = address;
 		this.addressDetail = addressDetail;
 		this.zipCode = zipCode;
-		this.createAt = LocalDateTime.now();
+		this.createdAt = LocalDateTime.now();
 	}
 
 }

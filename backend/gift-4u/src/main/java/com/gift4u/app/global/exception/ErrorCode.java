@@ -27,6 +27,7 @@ public enum ErrorCode {
     ORDER_REQUIRED_FIELD_MISSING(HttpStatus.BAD_REQUEST,"ORDER_REQUIRED_FIELD_MISSING","주문 필수 항목이 누락되었습니다."),	// 011
     FRIEND_REQUEST_TO_SELF(HttpStatus.BAD_REQUEST,"FRIEND_REQUEST_TO_SELF","본인에게 친구 요청을 보낼 수 없습니다."),			// 020
     TERMS_AGREEMENT_REQUIRED(HttpStatus.BAD_REQUEST, "TERMS_AGREEMENT_REQUIRED", "약관에 동의해야 가입할 수 있습니다."),
+    CHAT_MESSAGE_BLANK(HttpStatus.BAD_REQUEST, "CHAT_MESSAGE_BLANK","메시지를 입력해주세요."),								// C04
     
     
     

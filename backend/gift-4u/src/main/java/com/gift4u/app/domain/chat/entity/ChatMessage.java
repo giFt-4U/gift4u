@@ -14,6 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,7 +26,9 @@ import lombok.NoArgsConstructor;
 @Table(name = "chat_messages")
 public class ChatMessage {
 
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Id 
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "chat_messages_seq") 
+	@SequenceGenerator(name = "chat_messages_seq", sequenceName = "CHAT_MESSAGES_ID_SEQ", allocationSize = 1) 
 	private Long id;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
