@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ProductCard from '../components/common/ProductCard';
 import { ProductGrid } from '../styles/HomeStyle';
 import axiosInstance from '../api/axiosInstance';
+import MainBanner from '../components/layout/MainBanner';
 
 const Home = () => {
 
@@ -26,6 +27,8 @@ const Home = () => {
 
     return (
         <div className='home-container' style={{ padding: '0 20px' }}>
+
+            <MainBanner />
 
             <h3>인기상품</h3>
 
