@@ -5,6 +5,7 @@ import GlobalStyle from './styles/GlobalStyle'
 import { MainContent, MobileContainer } from './styles/AppLayout'
 
 function App() {
+  const [count, setCount] = useState(0)
 
   return (
     <>
