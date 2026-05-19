@@ -1,4 +1,7 @@
+//HomeStyle.js
+
 import styled from "styled-components";
+import Home from "../pages/Home";
 
 export const ProductGrid = styled.div`
     display: grid;
@@ -26,4 +29,11 @@ export const BannerWrapper = styled.div`
 
         object-fit: cover;
     }
+`;
+
+export const ProductPageGrid = styled.div`
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    padding: 10px 0;
 `;
