@@ -1,3 +1,5 @@
+//Product.jsx
+
 import { useEffect, useState } from "react";
 import axiosInstance from "../api/axiosInstance";
 
@@ -26,7 +28,7 @@ function Product() {
     <div>
 
       <img
-        src={product.imageUrl}
+        src={product.prdImg}
         alt={product.name}
         width="300"
       />
@@ -35,7 +37,7 @@ function Product() {
 
       <p>{product.description}</p>
 
-      <h2>{product.price}원</h2>
+      <h2>{product.price?.toLocaleString()}원</h2>
 
     </div>
   );

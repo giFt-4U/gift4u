@@ -1,10 +1,20 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App.jsx'
+//main.jsx
 
-// 리액트 진입점
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+
+import Router from './router';
+
+ReactDOM.createRoot(
+
+  document.getElementById('root')
+
+).render(
+
+
+
+  <Router />
+
+
+
+);
