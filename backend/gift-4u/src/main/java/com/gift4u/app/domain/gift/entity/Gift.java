@@ -19,6 +19,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Builder;
@@ -62,6 +63,9 @@ public class Gift {
 	private LocalDateTime createdAt;
 	private LocalDateTime expiredAt;
 	
+	@OneToOne(mappedBy = "gift", fetch = FetchType.LAZY)
+	private GiftMessage giftMessage;
+	
 	@Builder
 	public Gift(User sender, User receiver, Product product) {
 		this.uuid = UUID.randomUUID().toString();
@@ -87,7 +91,7 @@ public class Gift {
 	}
 	
 	// 만료처리. 스케쥴러 또는 조회 시점에 호출
-	public void expired() {
+	public void expire() {
 		if(this.status == GiftStatus.PENDING) {
 			this.status = GiftStatus.EXPIRED;
 		}
