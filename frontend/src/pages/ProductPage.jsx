@@ -1,11 +1,11 @@
-//ProductPage.jsx
-
 import React, { useEffect, useState, useRef } from 'react';
 import axiosInstance from '../api/axiosInstance';
-import ProductCard from '../components/common/ProductCard';
+import { useNavigate } from 'react-router-dom';
 import { ProductPageGrid } from '../styles/HomeStyle';
 
 const ProductPage = () => {
+
+    const navigate = useNavigate();
 
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(0);
@@ -25,7 +25,7 @@ const ProductPage = () => {
 
                 setProducts((prev) => [...prev, ...newItems]);
 
-                // 마지막 페이지 체크 (백엔드 기준)
+                // 마지막 페이지 체크
                 if (newItems.length < 10) {
                     setHasMore(false);
                 }
@@ -35,7 +35,7 @@ const ProductPage = () => {
 
     }, [page]);
 
-    // Intersection Observer (스크롤 감지)
+    // 무한스크롤
     useEffect(() => {
 
         if (!hasMore) return;
@@ -59,7 +59,6 @@ const ProductPage = () => {
     }, [hasMore]);
 
     return (
-
         <div style={{ padding: '0 20px' }}>
 
             <h2>베스트 상품</h2>
@@ -67,17 +66,35 @@ const ProductPage = () => {
             <ProductPageGrid>
 
                 {products.map((product) => (
-
-                    <ProductCard
+                    <div
                         key={product.id}
-                        product={product}
-                    />
+                        onClick={() => navigate(`/products/${product.id}`)}
+                        style={{ cursor: 'pointer' }}
+                    >
 
+                        <img
+                            src={product.prdImg}
+                            alt={product.prdName}
+                            style={{
+                                width: '100%',
+                                height: '180px',
+                                objectFit: 'cover',
+                                borderRadius: '10px'
+                            }}
+                        />
+
+                        <h3>{product.prdName}</h3>
+
+                        <p>
+                            {product.prdPrice?.toLocaleString()}원
+                        </p>
+
+                    </div>
                 ))}
 
             </ProductPageGrid>
 
-            {/* 스크롤 감지 트리거 */}
+            {/* observer trigger */}
             {
                 hasMore && (
                     <div
@@ -87,7 +104,7 @@ const ProductPage = () => {
                 )
             }
 
-            {/* 끝 메시지 */}
+            {/* end message */}
             {
                 !hasMore && (
                     <p style={{ textAlign: 'center', padding: '20px' }}>
@@ -96,7 +113,7 @@ const ProductPage = () => {
                 )
             }
 
-        </div >
+        </div>
     );
 };
 
