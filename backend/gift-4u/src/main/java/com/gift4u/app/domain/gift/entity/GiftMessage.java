@@ -31,7 +31,7 @@ public class GiftMessage {
 	@JoinColumn(name ="gift_id", nullable=false)
 	private Gift gift;
 	
-	@Column(nullable = false, columnDefinition = "length=2000")
+	@Column(nullable = false, length=2000)
 	private String message;
 	
 	private Integer cardDesignType;
