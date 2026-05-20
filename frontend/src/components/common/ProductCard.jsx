@@ -1,34 +1,31 @@
+//ProductCard.jsx
+
 import React from 'react';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const ProductCard = ({ product }) => {
 
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
 
-    const {
-        id,
-        prdImg,
-        brandName,
-        prdName,
-        prdPrice
-    } = product;
+    const handleCardClick = () => {
 
-    // const handleCardClick = () => {
-    //     navigate(`/product/${id}`);
-    // }
+        navigate(`/product/${product.id}`);
+    };
 
     return (
 
         <div
             className='product-card'
             style={{ cursor: 'pointer' }}
+            onClick={handleCardClick}
         >
 
             <div className='product-image'>
 
                 <img
-                    src={prdImg}
-                    alt={prdName}
+                    src={product.prdImg}
+                    alt={product.Name}
+
                     style={{
                         width: '100%',
                         height: '220px',
@@ -41,15 +38,21 @@ const ProductCard = ({ product }) => {
             <div className='product-info'>
 
                 <p className='brand-name'>
-                    {brandName}
+
+                    {product.brandName}
+
                 </p>
 
                 <h4 className='product-name'>
-                    {prdName}
+
+                    {product.prdName}
+
                 </h4>
 
                 <p className='product-price'>
-                    {prdPrice.toLocaleString()}원
+
+                    {product.prdPrice?.toLocaleString()}원
+
                 </p>
 
             </div>

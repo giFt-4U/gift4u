@@ -1,23 +1,28 @@
-import { useState } from 'react'
+//App.jsx
 import Nav from './components/layout/Nav'
-import Home from './pages/Home'
 import GlobalStyle from './styles/GlobalStyle'
 import { MainContent, MobileContainer } from './styles/AppLayout'
+import { Outlet } from 'react-router-dom';
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <>
       <GlobalStyle />
+
       <MobileContainer>
+
         <Nav />
+
         <MainContent>
-          <Home />
+
+          <Outlet />
+
         </MainContent>
+
       </MobileContainer>
     </>
   )
 }
 
-export default App
+export default App;

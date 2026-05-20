@@ -1,3 +1,5 @@
+//MainBanner.jsx
+
 import React from 'react';
 import { BannerWrapper } from '../../styles/HomeStyle';
 

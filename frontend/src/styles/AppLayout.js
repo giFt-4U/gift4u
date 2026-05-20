@@ -1,4 +1,7 @@
+//AppLayout.js
+
 import styled from "styled-components";
+import App from "../App";
 
 export const MobileContainer = styled.div`
     width: 100%;
@@ -14,44 +17,34 @@ export const MainContent = styled.div`
 `
 
 export const NavWrapper = styled.nav`
-
-    width: 100%;
-    height: 60px;
-
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 12px 20px;
 
-    padding: 0 20px;
-
-    background-color: white;
-
-    box-sizing: border-box;
-
-    .nav-left img,
-    .nav-right img {
-
-        width: 24px;
-        height: 24px;
-
-        cursor: pointer;
-    }
-
+    .nav-left,
     .nav-right {
-
+        width: 60px;   /* ⭐ 핵심 */
         display: flex;
-        gap: 12px;
+        align-items: center;
+        justify-content: center;
+        gap: 8px; /* ⭐ 아이콘 간격 */
     }
 
     h1 {
-
-        font-size: 20px;
+        flex: 1;       /* ⭐ 가운데 고정 */
+        text-align: center;
         margin: 0;
     }
-
-    h1 a {
-
+        
+    .logo {
+        font-size: 20px;
+        font-weight: 700;
+        color: #f5c542;
         text-decoration: none;
-        color: black;
+        letter-spacing: 1px;
+
+        
     }
 `;
+
