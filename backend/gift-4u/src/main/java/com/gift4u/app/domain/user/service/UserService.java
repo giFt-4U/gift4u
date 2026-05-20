@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gift4u.app.domain.user.dto.SignupRequest;
 import com.gift4u.app.domain.user.dto.SignupResponse;
+import com.gift4u.app.domain.user.dto.UserProfileResponse;
 import com.gift4u.app.domain.user.entity.User;
 import com.gift4u.app.domain.user.enums.LoginProvider;
 import com.gift4u.app.domain.user.enums.UserRole;
@@ -66,6 +67,24 @@ public class UserService {
 				.build();	
 	}
 	
+	@Transactional(readOnly = true)
+	public UserProfileResponse getMyProfile(Long userId) {
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
+		if(user.getDeletedAt() != null) {
+			throw new GlobalException(ErrorCode.USER_NOT_FOUND);
+		}
+		return UserProfileResponse.builder()
+				.id(user.getId())
+				.email(user.getEmail())
+				.nickname(user.getNickname())
+				.phone(user.getPhone())
+				.friendCode(user.getFriendCode())
+				.loginProvider(user.getLoginProvider())
+				.marketingAgreed(user.getMarketingAgreed())
+				.profileImage(user.getProfileImage())
+				.build();
+	}
 	private String generateUniqueFriendCode() {
 		for(int attempt = 0; attempt < FRIEND_CODE_MAX_ATTEMPTS; attempt++) {
 			String code = randomFriendCode();
