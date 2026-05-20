@@ -45,6 +45,7 @@ public class ChatRoom {
 		this.userA = userA;
 		this.userB = userB;
 		this.createdAt = LocalDateTime.now();
+		this.lastMessageAt = LocalDateTime.now();
 	}
 	
 	public void updateLastMessageAt() {

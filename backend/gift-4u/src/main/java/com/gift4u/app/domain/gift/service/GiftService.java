@@ -2,6 +2,7 @@ package com.gift4u.app.domain.gift.service;
 
 import java.util.List;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +41,8 @@ public class GiftService {
 	private final GiftShippingRepository giftShippingRepository;
 	private final UserRepository userRepository;
 	private final ProductRepository productRepository;
+	
+	@Lazy // ChatService <> GiftService 순환참조방지
 	private final ChatService chatService;
 	
 	
@@ -85,11 +88,24 @@ public class GiftService {
 	}
 	
 	
+	/** 선물 상세 조회 (uuid 기반, REQ-013)
+	 * 링크를 받은 사람이 수령 전 선물 내용을 확인할 때 사용
+	 * 만료된 선물도 조회는 가능하되 상태(EXPIRED)를 그대로 반환
+	 */
+	public GiftResponse getGift(String uuid) {
+		Gift gift = giftRepository.findByUuid(uuid)
+				.orElseThrow(() -> new GlobalException(ErrorCode.GIFT_LINK_INVALID));
+		return GiftResponse.from(gift);
+	}
+	
+	
 	/** 선물 수령 (REQ-014)
 	 * 1. uuid 선물 조회
 	 * 2. 수령자 본인 확인
 	 * 3. Gift.accept() 호출 - 상태/만료 검증은 엔티티 내부에서 처리
 	 * 4. 배송지 중복 저장 방지 후 GiftShipping 저장
+	 * 
+	 * + 수령 완료 응답 후에도 메시지 카드를 다시 볼 수 있도록
 	 */
 	@Transactional
 	public GiftResponse acceptGift(Long currentUserId, String uuid, GiftShippingRequest request) {
@@ -119,18 +135,10 @@ public class GiftService {
 				.build();
 		giftShippingRepository.save(shipping);
 		
-		return GiftResponse.from(gift);
-	}
-	
-	
-	/** 선물 상세 조회 (uuid 기반, REQ-013)
-	 * 링크를 받은 사람이 수령 전 선물 내용을 확인할 때 사용
-	 * 만료된 선물도 조회는 가능하되 상태(EXPIRED)를 그대로 반환
-	 */
-	public GiftResponse getGift(String uuid) {
-		Gift gift = giftRepository.findByUuid(uuid)
-				.orElseThrow(() -> new GlobalException(ErrorCode.GIFT_LINK_INVALID));
-		return GiftResponse.from(gift);
+		// 수령완료 응답 메시지 카드 정보 포함
+		GiftMessage giftMessage = giftMessageRepository.findByGiftId(gift.getId()).orElse(null);
+		
+		return GiftResponse.from(gift, giftMessage);
 	}
 	
 	
@@ -138,7 +146,11 @@ public class GiftService {
 	public List<GiftResponse> getSentGifts(Long senderId){
 		return giftRepository.findAllBySenderId(senderId)
 				.stream()
-				.map(GiftResponse::from)
+				.map(gift->{
+					GiftMessage giftMessage = giftMessageRepository.findByGiftId(gift.getId())
+							.orElseThrow(()-> new GlobalException(ErrorCode.INTERNAL_SERVER_ERROR));
+					return GiftResponse.from(gift, giftMessage);
+				})
 				.toList();
 	}
 	
@@ -147,7 +159,11 @@ public class GiftService {
 	public List<GiftResponse> getReceivedGifts(Long receiverId){
 		return giftRepository.findAllByReceiverId(receiverId)
 				.stream()
-				.map(GiftResponse::from)
+				.map(gift-> {
+					GiftMessage giftMessage = giftMessageRepository.findByGiftId(gift.getId())
+							.orElseThrow(()-> new GlobalException(ErrorCode.INTERNAL_SERVER_ERROR));
+					return GiftResponse.from(gift, giftMessage);
+				})
 				.toList();
 	}
 	
