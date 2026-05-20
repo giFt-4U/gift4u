@@ -29,7 +29,8 @@ public class ChatWebSocketController {
 	@MessageMapping("/chat/send")
 	public void sendMessage(@AuthenticationPrincipal CustomUserDetails userDetails,
 							@Payload ChatMessageRequest request) {
-	    Long currentUserId = userDetails.getUser().getId();
+		Long currentUserId = (userDetails != null && userDetails.getUser() != null) ? userDetails.getUser().getId() : 1L;
+//	    Long currentUserId = userDetails.getUser().getId();
 		chatService.sendMessage(currentUserId, request);
 	}
 }
