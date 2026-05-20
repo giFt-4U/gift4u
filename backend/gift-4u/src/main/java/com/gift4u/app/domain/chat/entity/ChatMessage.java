@@ -38,7 +38,7 @@ public class ChatMessage {
 	@Column(nullable = false)
 	private Long senderId;
 	
-	@Column(nullable=false, columnDefinition = "TEXT")
+	@Column(nullable=false, length=4000)
 	private String content;
 	
 	@Enumerated(EnumType.STRING)
