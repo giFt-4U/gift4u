@@ -9,7 +9,7 @@ const ProductCard = ({ product }) => {
 
     const handleCardClick = () => {
 
-        navigate(`/product/${product.id}`);
+        navigate(`/products/${product.id}`);
     };
 
     return (
