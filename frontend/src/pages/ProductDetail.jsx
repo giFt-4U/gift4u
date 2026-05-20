@@ -1,78 +1,58 @@
-//ProductDetail.jsx
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import axiosInstance from '../api/axiosInstance';
+import { DetailWrapper, LogoArea, ImageArea, BuyBox, DescArea } from '../styles/ProductDetailStyle';
 
-import products from '../data/products';
-
-import {
-    DetailContainer,
-    ProductImage,
-    ProductInfo,
-    ProductName,
-    ProductPrice,
-    BuyButton,
-    DescriptionBox
-} from '../styles/ProductDetailStyle';
-
-const ProductDetailPage = () => {
+const ProductDetail = () => {
 
     const { id } = useParams();
+    const [product, setProduct] = useState(null);
 
-    // URL의 id와 일치하는 상품 찾기
-    const product = products.find(
-        item => item.id === Number(id)
-    );
+    useEffect(() => {
 
-    // 상품 없을 때
+        axiosInstance
+            .get(`/api/products?page=0&size=30`)
+            .then((res) => {
+
+                const list = res.data.content;
+
+                const found = list.find(
+                    item => item.id === Number(id)
+                );
+
+                setProduct(found);
+
+            })
+            .catch((err) => console.error(err));
+
+    }, [id]);
+
     if (!product) {
-        return <div>상품이 존재하지 않습니다.</div>;
+        return <div>로딩중...</div>;
     }
 
     return (
-        <>
+        <DetailWrapper>
 
 
-            <DetailContainer>
-
-                {/* 상품 이미지 */}
-                <ProductImage
-                    src={product.image_url}
-                    alt={product.name}
+            <ImageArea>
+                <img
+                    src={product.prdImg}
+                    alt={product.prdName}
                 />
+            </ImageArea>
 
-                {/* 상품 정보 */}
-                <ProductInfo>
+            <BuyBox>
+                <button>구매하기</button>
+            </BuyBox>
 
-                    <ProductName>
-                        {product.name}
-                    </ProductName>
+            <DescArea>
+                <h3>상품 상세 설명</h3>
+                <p>{product.description}</p>
+            </DescArea>
 
-                    <ProductPrice>
-                        {product.price.toLocaleString()}원
-                    </ProductPrice>
-
-                </ProductInfo>
-
-                {/* 구매 버튼 */}
-                <BuyButton>
-                    구매하기
-                </BuyButton>
-
-                {/* 상품 설명 */}
-                <DescriptionBox>
-
-                    <h2>상품 상세 설명</h2>
-
-                    <p>
-                        {product.description}
-                    </p>
-
-                </DescriptionBox>
-
-            </DetailContainer>
-        </>
+        </DetailWrapper>
     );
 };
 
-export default ProductDetailPage;
+export default ProductDetail;

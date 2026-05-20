@@ -25,7 +25,7 @@ public class ProductController {
             @RequestParam(defaultValue = "latest")
             String sort
     ) {
-
+    	
         return productService.getProducts(
                 page,
                 size,
