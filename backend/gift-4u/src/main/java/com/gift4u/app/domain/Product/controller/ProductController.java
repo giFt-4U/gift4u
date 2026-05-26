@@ -13,23 +13,21 @@ public class ProductController {
 
     private final ProductService productService;
 
+    // 📌 리스트 + 검색 통합 API
     @GetMapping
     public Page<ProductResponse> getProducts(
 
-            @RequestParam(defaultValue = "0")
-            int page,
-
-            @RequestParam(defaultValue = "10")
-            int size,
-
-            @RequestParam(defaultValue = "latest")
-            String sort
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "popular") String sort
     ) {
-    	
-        return productService.getProducts(
-                page,
-                size,
-                sort
-        );
+        return productService.getProducts(keyword, page, size, sort);
+    }
+
+    // 📌 상세
+    @GetMapping("/{id}")
+    public ProductResponse getProduct(@PathVariable Long id) {
+        return productService.getProduct(id);
     }
 }
