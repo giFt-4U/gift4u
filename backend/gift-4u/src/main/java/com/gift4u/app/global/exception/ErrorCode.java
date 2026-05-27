@@ -21,6 +21,7 @@ public enum ErrorCode {
 	/////////// 400 - 클라이언트가 잘못된 값을 보낸 경우 ///////////															// REQ
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "INVALID_INPUT_VALUE", "입력값이 올바르지 않습니다."),
     INVALID_TYPE_VALUE(HttpStatus.BAD_REQUEST, "INVALID_TYPE_VALUE", "타입이 올바르지 않습니다."),
+    INVALID_FRIENDSHIP_STATUS(HttpStatus.BAD_REQUEST, "INVALID_FRIENDSHIP_STATUS", "처리할 수 없는 친구 요청 상태입니다."),	// REQ-034
     
     MESSAGE_TEXT_BLANK(HttpStatus.BAD_REQUEST,"MESSAGE_TEXT_BLANK","메시지를 입력해주세요."),								// 010
     MESSAGE_TOO_LONG(HttpStatus.BAD_REQUEST,"MESSAGE_TOO_LONG","메시지는 200자를 초과할 수 없습니다."),						// +010
@@ -58,7 +59,7 @@ public enum ErrorCode {
     FRIEND_CODE_NOT_FOUND(HttpStatus.NOT_FOUND, "FRIEND_CODE_NOT_FOUND","사용자를 찾을 수 없습니다."),						// 020
     CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "CHAT_ROOM_NOT_FOUND","채팅방을 찾을 수 없습니다."),							// C02~C05
     PRODUCT_INACTIVE(HttpStatus.NOT_FOUND, "PRODUCT_INACTIVE","판매가 종료된 상품입니다."),								// 022 soft delete
-    
+    FRIENDSHIP_NOT_FOUND(HttpStatus.NOT_FOUND, "FRIENDSHIP_NOT_FOUND", "친구 요청을 찾을 수 없습니다."), 				// REQ-034 수락/거절, 잘못 된 id
     
 
     

@@ -15,4 +15,5 @@ public interface UserRepository extends JpaRepository<User, Long>{
 	
 	boolean existsByFriendCode(String friendCode);
 	
+	Optional<User> findByFriendCode(String friendCode);
 }//interface
