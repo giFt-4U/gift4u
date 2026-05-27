@@ -17,34 +17,58 @@ export const MainContent = styled.div`
 `
 
 export const NavWrapper = styled.nav`
+    position: relative;
+
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 12px 20px;
+    justify-content: space-between;
+
+    height: 64px;
+    padding: 0 20px;
 
     .nav-left,
     .nav-right {
-        width: 60px;   /* ⭐ 핵심 */
+        width: 60px;
+
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px; /* ⭐ 아이콘 간격 */
+
+        gap: 10px;
     }
 
     h1 {
-        flex: 1;       /* ⭐ 가운데 고정 */
-        text-align: center;
+        position: absolute;
+
+        top: 50%;
+        left: 50%;
+
+        transform: translate(-50%, -50%);
+
         margin: 0;
+        padding: 0;
+
+        line-height: 1;
     }
-        
+
     .logo {
-        font-size: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 22px;
         font-weight: 700;
+
         color: #f5c542;
         text-decoration: none;
-        letter-spacing: 1px;
 
-        
+        line-height: 1;
+    }
+
+    svg {
+        width: 24px;
+        height: 24px;
+
+        display: block;
     }
 `;
-

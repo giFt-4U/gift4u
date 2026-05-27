@@ -1,50 +1,58 @@
-//ProductDetail.jsx
-
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
+import { DetailWrapper, ImageArea, BuyBox, DescArea } from '../styles/ProductDetailStyle';
 
 const ProductDetail = () => {
 
     const { id } = useParams();
-
     const [product, setProduct] = useState(null);
 
     useEffect(() => {
 
         axiosInstance
-            .get(`/api/products/${id}`)
-            .then((response) => {
+            .get(`/api/products?page=0&size=30`)
+            .then((res) => {
 
-                setProduct(response.data);
+                const list = res.data.content;
+
+                const found = list.find(
+                    item => item.id === Number(id)
+                );
+
+                setProduct(found);
 
             })
-            .catch((error) => {
-
-                console.error(error);
-
-            });
+            .catch((err) => console.error(err));
 
     }, [id]);
 
     if (!product) {
-
         return <div>로딩중...</div>;
     }
 
     return (
+        <DetailWrapper>
 
-        <div>
 
-            <img src={product.prdImg} alt={product.name} width="100%" />
 
-            <h1>{product.name}</h1>
+            <ImageArea>
+                <img
+                    src={product.imageUrl}
+                    alt={product.name}
+                />
+            </ImageArea>
 
-            <p>{product.description}</p>
+            <BuyBox>
+                <button>구매하기</button>
+            </BuyBox>
 
-            <h2>{product.price?.toLocaleString()}원</h2>
+            <DescArea>
+                <h3>상품 상세 설명</h3>
+                <p>{product.description}</p>
+            </DescArea>
 
-        </div>
+        </DetailWrapper>
     );
 };
 

@@ -6,7 +6,7 @@ import { ProductGrid } from '../styles/HomeStyle';
 import axiosInstance from '../api/axiosInstance';
 import MainBanner from '../components/layout/MainBanner';
 import { useNavigate } from 'react-router-dom';
-
+import CategorySection from '../components/layout/CategorySection';
 const Home = () => {
 
     const [productList, setProductList] = useState([]);
@@ -42,6 +42,9 @@ const Home = () => {
 
             {/* 메인 배너 */}
             <MainBanner />
+
+            {/* 카테고리 */}
+            <CategorySection />
 
             {/* 제목 + 전체보기 */}
             <div

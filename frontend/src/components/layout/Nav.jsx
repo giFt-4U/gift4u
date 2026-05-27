@@ -1,6 +1,4 @@
-// Nav.jsx
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { NavWrapper } from '../../styles/AppLayout';
 
@@ -8,7 +6,21 @@ const Nav = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
+    const [keyword, setKeyword] = useState('');
+
     const isProductPage = location.pathname === '/products';
+
+    // 검색 실행
+    const onSearch = () => {
+        if (!keyword.trim()) return;
+        navigate(`/search?keyword=${keyword}`);
+    };
+
+    const onKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            onSearch();
+        }
+    };
 
     return (
         <NavWrapper>
@@ -28,6 +40,7 @@ const Nav = () => {
                         src="/assets/icons/search.png"
                         alt='검색'
                         style={{ cursor: 'pointer' }}
+                        onClick={() => navigate('/search')}
                     />
                 )}
 
