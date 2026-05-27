@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
-import { DetailWrapper, LogoArea, ImageArea, BuyBox, DescArea } from '../styles/ProductDetailStyle';
+import { DetailWrapper, ImageArea, BuyBox, DescArea } from '../styles/ProductDetailStyle';
 
 const ProductDetail = () => {
 
@@ -38,8 +38,8 @@ const ProductDetail = () => {
 
             <ImageArea>
                 <img
-                    src={product.prdImg}
-                    alt={product.prdName}
+                    src={product.imageUrl}
+                    alt={product.name}
                 />
             </ImageArea>
 

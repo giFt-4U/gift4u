@@ -73,8 +73,8 @@ const ProductPage = () => {
                     >
 
                         <img
-                            src={product.prdImg}
-                            alt={product.prdName}
+                            src={product.imageUrl}
+                            alt={product.name}
                             style={{
                                 width: '100%',
                                 height: '180px',
@@ -83,10 +83,10 @@ const ProductPage = () => {
                             }}
                         />
 
-                        <h3>{product.prdName}</h3>
+                        <h3>{product.name}</h3>
 
                         <p>
-                            {product.prdPrice?.toLocaleString()}원
+                            {product.price?.toLocaleString()}원
                         </p>
 
                     </div>
