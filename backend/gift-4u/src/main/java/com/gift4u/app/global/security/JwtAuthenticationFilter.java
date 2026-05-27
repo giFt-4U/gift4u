@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -32,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 	private static final String BEARER_PREFIX = "Bearer ";
 	
 	private final JwtTokenProvider jwtTokenProvider;
-	private final UserDetailsService userDetailsService;
+	private final CustomUserDetailsService customUserDetailsService;
 	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -52,10 +51,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 		
 		try {
 			Claims claims = jwtTokenProvider.parseClaims(token);
-			String email = claims.get("email", String.class);
+			String userIdStr = claims.getSubject();
 			
-			if(email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-				UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+			if(userIdStr != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+				Long userId = Long.valueOf(userIdStr);
+				UserDetails userDetails = customUserDetailsService.loadUserById(userId);
 				UsernamePasswordAuthenticationToken authentication = 
 						new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

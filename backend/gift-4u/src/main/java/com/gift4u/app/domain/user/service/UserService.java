@@ -85,7 +85,7 @@ public class UserService {
 				.profileImage(user.getProfileImage())
 				.build();
 	}
-	private String generateUniqueFriendCode() {
+	public String generateUniqueFriendCode() {
 		for(int attempt = 0; attempt < FRIEND_CODE_MAX_ATTEMPTS; attempt++) {
 			String code = randomFriendCode();
 			if(!userRepository.existsByFriendCode(code)) {

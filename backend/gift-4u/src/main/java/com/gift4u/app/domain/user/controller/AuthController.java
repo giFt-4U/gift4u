@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gift4u.app.domain.user.dto.LoginRequest;
 import com.gift4u.app.domain.user.dto.LoginResponse;
+import com.gift4u.app.domain.user.dto.KakaoLoginRequest;
 import com.gift4u.app.domain.user.service.AuthService;
 
 import jakarta.validation.Valid;
@@ -22,5 +23,10 @@ public class AuthController {
 	public LoginResponse login(@Valid @RequestBody LoginRequest request) {
 		
 		return authService.login(request);
+	}
+	
+	@PostMapping("/api/auth/kakao")
+	public LoginResponse kakaoLogin(@Valid @RequestBody KakaoLoginRequest request) {
+		return authService.kakaoLogin(request);
 	}
 }
