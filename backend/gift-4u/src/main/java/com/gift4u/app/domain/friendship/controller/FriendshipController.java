@@ -1,4 +1,4 @@
-package com.gift4u.app.domain.user.controller;
+package com.gift4u.app.domain.friendship.controller;
 
 import java.util.List;
 
