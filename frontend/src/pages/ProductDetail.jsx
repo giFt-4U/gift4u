@@ -37,7 +37,7 @@ const ProductDetail = () => {
                     }}
                     style={{
                         width: "100%",
-                        height: "180px",      // 🔥 핵심 (고정)
+                        height: "360px",      // 🔥 핵심 (고정)
                         objectFit: "cover",
                         borderRadius: "10px",
                         backgroundColor: "#f5f5f5"

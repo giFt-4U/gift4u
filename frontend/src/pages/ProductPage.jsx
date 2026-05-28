@@ -14,9 +14,6 @@ const ProductPage = () => {
     const [hasMore, setHasMore] = useState(true);
     const observerRef = useRef(null);
 
-
-    // ?°?´?„° ë¡œë”©
-
     useEffect(() => {
 
         if (!hasMore) return;
@@ -34,9 +31,6 @@ const ProductPage = () => {
 
                 setProducts((prev) => [...prev, ...newItems]);
 
-
-                // ë§ˆì?ë§? ?˜?´ì§? ì²´í¬
-
                 if (newItems.length < 10) {
                     setHasMore(false);
                 }
@@ -45,9 +39,6 @@ const ProductPage = () => {
             .catch(console.error);
 
     }, [page]);
-
-
-    // ë¬´í•œ?Š¤?¬ë¡?
 
     useEffect(() => {
 
@@ -72,7 +63,7 @@ const ProductPage = () => {
     return (
         <div style={{ padding: '0 20px' }}>
 
-            <h2>ë² ìŠ¤?Š¸ ?ƒ?’ˆ</h2>
+            <h2>ë² ìŠ¤íŠ¸ ìƒí’ˆ</h2>
 
             <ProductPageGrid>
 
@@ -92,7 +83,7 @@ const ProductPage = () => {
                             }}
                             style={{
                                 width: "100%",
-                                height: "180px",      // ?Ÿ”? ?•µ?‹¬ (ê³ ì •)
+                                height: "180px",      // ğŸ”¥ í•µì‹¬ (ê³ ì •)
                                 objectFit: "cover",
                                 borderRadius: "10px",
                                 backgroundColor: "#f5f5f5"
@@ -101,11 +92,7 @@ const ProductPage = () => {
 
                         <h3>{product.name}</h3>
 
-
-                        <p>
-                            {product.prdPrice?.toLocaleString()}?›
-                        </p>
-
+                        <p>{product.price?.toLocaleString()}ì›</p>
 
                     </div>
                 ))}
@@ -114,22 +101,11 @@ const ProductPage = () => {
 
             {hasMore && <div ref={observerRef} style={{ height: '50px' }} />}
 
-
-            {/* end message */}
-            {
-                !hasMore && (
-                    <p style={{ textAlign: 'center', padding: '20px' }}>
-                        ë§ˆì?ë§? ?ƒ?’ˆ?…?‹ˆ?‹¤
-                    </p>
-                )
-            }
-=======
             {!hasMore && (
                 <p style={{ textAlign: 'center', padding: '20px' }}>
-                    ë§ˆì?ë§? ?ƒ?’ˆ?…?‹ˆ?‹¤
+                    ë§ˆì§€ë§‰ ìƒí’ˆì…ë‹ˆë‹¤
                 </p>
             )}
-
 
         </div>
     );
