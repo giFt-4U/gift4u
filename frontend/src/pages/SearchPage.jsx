@@ -1,3 +1,5 @@
+//SearchPage.jsx
+
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
@@ -29,13 +31,11 @@ const SearchPage = () => {
 
     const trending = ['유모차', '기저귀', '분유', '아기침대'];
 
-    // 📌 최근 검색어 불러오기
     useEffect(() => {
         const saved = JSON.parse(localStorage.getItem('recentSearch') || '[]');
         setRecent(saved);
     }, []);
 
-    // 📌 검색 실행 (debounce)
     useEffect(() => {
         if (!keyword.trim()) return;
 
@@ -46,7 +46,6 @@ const SearchPage = () => {
         return () => clearTimeout(timer);
     }, [keyword]);
 
-    // 📌 검색 API
     const fetchSearch = (value) => {
         setLoading(true);
 
@@ -57,11 +56,9 @@ const SearchPage = () => {
                 saveRecent(value);
                 setSearchParams({ keyword: value });
             })
-            .catch((err) => console.error(err))
             .finally(() => setLoading(false));
     };
 
-    // 📌 최근 검색어 저장
     const saveRecent = (value) => {
         let updated = [value, ...recent.filter(v => v !== value)];
         updated = updated.slice(0, 5);
@@ -70,7 +67,6 @@ const SearchPage = () => {
         localStorage.setItem('recentSearch', JSON.stringify(updated));
     };
 
-    // 📌 인기/최근 클릭 검색
     const onSearchClick = (value) => {
         setKeyword(value);
     };
@@ -78,14 +74,12 @@ const SearchPage = () => {
     return (
         <PageWrapper>
 
-            {/* 검색창 */}
             <SearchInput
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
                 placeholder="상품을 검색하세요"
             />
 
-            {/* 인기 검색어 */}
             <Section>
                 <h4>🔥 인기 검색어</h4>
                 <TagBox>
@@ -97,7 +91,6 @@ const SearchPage = () => {
                 </TagBox>
             </Section>
 
-            {/* 최근 검색어 */}
             <Section>
                 <h4>🕘 최근 검색어</h4>
                 <TagBox>
@@ -109,10 +102,8 @@ const SearchPage = () => {
                 </TagBox>
             </Section>
 
-            {/* 로딩 */}
             {loading && <p>검색중...</p>}
 
-            {/* 결과 */}
             <Grid>
                 {results.map((item) => (
                     <Card
@@ -121,8 +112,18 @@ const SearchPage = () => {
                     >
 
                         <ProductImg
-                            src={`${item.imageUrl}`}
+                            src={item.imageUrl}
                             alt={item.name}
+                            onError={(e) => {
+                                e.target.src = "/images/default.png";
+                            }}
+                            style={{
+                                width: "100%",
+                                height: "180px",      // 🔥 핵심 (고정)
+                                objectFit: "cover",
+                                borderRadius: "10px",
+                                backgroundColor: "#f5f5f5"
+                            }}
                         />
 
                         <InfoBox>
