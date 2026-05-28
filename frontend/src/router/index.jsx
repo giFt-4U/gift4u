@@ -6,6 +6,7 @@ import Home from '../pages/Home';
 import ProductPage from '../pages/ProductPage';
 import ProductDetail from '../pages/ProductDetail';
 import SearchPage from '../pages/SearchPage';
+import CartPage from '../pages/CartPage';
 
 export default function Router() {
 
@@ -38,6 +39,11 @@ export default function Router() {
                     <Route
                         path="search"
                         element={<SearchPage />}
+                    />
+
+                    <Route
+                        path="cart"
+                        element={<CartPage />}
                     />
 
                 </Route>

@@ -9,6 +9,11 @@ const Nav = () => {
     const [keyword, setKeyword] = useState('');
 
     const isProductPage = location.pathname === '/products';
+    const isCartPage = location.pathname === '/cart';
+
+    if (isCartPage) {
+        return null; // 장바구니 페이지에서는 Nav 숨김
+    }
 
     // 검색 실행
     const onSearch = () => {

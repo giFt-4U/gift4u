@@ -14,6 +14,8 @@ const ProductPage = () => {
     const [hasMore, setHasMore] = useState(true);
     const observerRef = useRef(null);
 
+
+
     useEffect(() => {
 
         if (!hasMore) return;

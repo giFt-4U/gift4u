@@ -10,6 +10,8 @@ const ProductDetail = () => {
     const { id } = useParams();
     const [product, setProduct] = useState(null);
 
+
+
     useEffect(() => {
 
         axiosInstance

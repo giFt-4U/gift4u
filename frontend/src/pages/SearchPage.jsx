@@ -31,6 +31,7 @@ const SearchPage = () => {
 
     const trending = ['유모차', '기저귀', '분유', '아기침대'];
 
+
     useEffect(() => {
         const saved = JSON.parse(localStorage.getItem('recentSearch') || '[]');
         setRecent(saved);
@@ -45,6 +46,7 @@ const SearchPage = () => {
 
         return () => clearTimeout(timer);
     }, [keyword]);
+
 
     const fetchSearch = (value) => {
         setLoading(true);
