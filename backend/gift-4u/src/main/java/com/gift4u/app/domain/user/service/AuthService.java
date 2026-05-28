@@ -12,6 +12,13 @@ import com.gift4u.app.global.exception.ErrorCode;
 import com.gift4u.app.global.exception.GlobalException;
 import com.gift4u.app.global.security.JwtTokenProvider;
 
+import java.time.LocalDateTime;
+import com.gift4u.app.domain.user.dto.client.KakaoOAuthClient;
+import com.gift4u.app.domain.user.dto.client.KakaoUserProfile;
+import com.gift4u.app.domain.user.dto.KakaoLoginRequest;
+import com.gift4u.app.domain.user.entity.User;
+import com.gift4u.app.domain.user.enums.UserRole;
+
 import lombok.RequiredArgsConstructor;
 
 //LOCAL 로그인 : 비밀번호 검증 후 JWT 발급
@@ -22,6 +29,9 @@ public class AuthService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtTokenProvider jwtTokenProvider;
+	
+	private final KakaoOAuthClient kakaoOAuthClient;
+	private final UserService userService;
 	
 	public LoginResponse login(LoginRequest request) {
 		var user = userRepository.findByEmail(request.getEmail())
@@ -44,5 +54,47 @@ public class AuthService {
 		
 		String token = jwtTokenProvider.createAccessToken(user.getId(), user.getEmail(), user.getRole());
 		return LoginResponse.of(token, jwtTokenProvider.getAccessTokenValidityMs());
+	}
+	
+	@Transactional
+	public LoginResponse kakaoLogin(KakaoLoginRequest request) {
+		KakaoUserProfile profile = kakaoOAuthClient.getUserProfile(request.getCode());
+		
+		String kakaoId = String.valueOf(profile.getKakaoId());
+		
+		User user = userRepository.findByKakaoId(kakaoId)
+				.orElseGet(() -> createKakaoUser(profile, kakaoId));
+		if(user.getDeletedAt() != null) {
+			throw new GlobalException(ErrorCode.KAKAO_AUTH_FAILED);
+		}
+		
+		String token = jwtTokenProvider.createAccessToken(user.getId(), user.getEmail(), user.getRole());
+		
+		return LoginResponse.of(token, jwtTokenProvider.getAccessTokenValidityMs());
+	}
+	
+	private User createKakaoUser(KakaoUserProfile profile, String kakaoId) {
+		String nickname = resolveUniqueNickname(profile.getNickname());
+		
+		User user = User.builder()
+				.kakaoId(kakaoId)
+				.nickname(nickname)
+				.email(profile.getEmail())
+				.profileImage(profile.getProfileImageUrl())
+				.loginProvider(LoginProvider.KAKAO)
+				.role(UserRole.USER)
+				.friendCode(userService.generateUniqueFriendCode())
+				.termsAgreedAt(LocalDateTime.now())
+				.marketingAgreed(false)
+				.build();
+		
+		return userRepository.save(user);
+	}
+	
+	private String resolveUniqueNickname(String nickname) {
+		if(!userRepository.existsByNickname(nickname)) {
+			return nickname;
+		}
+		return nickname + "_" + System.currentTimeMillis();
 	}
 }//class

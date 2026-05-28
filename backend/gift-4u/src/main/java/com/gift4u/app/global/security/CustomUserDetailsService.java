@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.gift4u.app.domain.user.repository.UserRepository;
+import com.gift4u.app.domain.user.entity.User;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +25,15 @@ public class CustomUserDetailsService implements UserDetailsService {
 				.orElseThrow(() -> new UsernameNotFoundException(username));
 		if(user.getDeletedAt() != null) {
 			throw new UsernameNotFoundException(username);
+		}
+		return new CustomUserDetails(user);
+	}
+	
+	public UserDetails loadUserById(Long userId) {
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new UsernameNotFoundException("userId=" + userId));
+		if(user.getDeletedAt() != null) {
+			throw new UsernameNotFoundException("userId=" + userId);
 		}
 		return new CustomUserDetails(user);
 	}
