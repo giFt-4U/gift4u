@@ -1,3 +1,5 @@
+//ProductDetail.jsx
+
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
@@ -11,19 +13,11 @@ const ProductDetail = () => {
     useEffect(() => {
 
         axiosInstance
-            .get(`/api/products?page=0&size=30`)
+            .get(`/api/products/${id}`)
             .then((res) => {
-
-                const list = res.data.content;
-
-                const found = list.find(
-                    item => item.id === Number(id)
-                );
-
-                setProduct(found);
-
+                setProduct(res.data);
             })
-            .catch((err) => console.error(err));
+            .catch(console.error);
 
     }, [id]);
 
@@ -34,12 +28,20 @@ const ProductDetail = () => {
     return (
         <DetailWrapper>
 
-
-
             <ImageArea>
                 <img
                     src={product.imageUrl}
                     alt={product.name}
+                    onError={(e) => {
+                        e.target.src = "/images/default.png";
+                    }}
+                    style={{
+                        width: "100%",
+                        height: "180px",      // 🔥 핵심 (고정)
+                        objectFit: "cover",
+                        borderRadius: "10px",
+                        backgroundColor: "#f5f5f5"
+                    }}
                 />
             </ImageArea>
 

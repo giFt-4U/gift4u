@@ -1,5 +1,3 @@
-//Home.jsx
-
 import React, { useEffect, useState } from 'react';
 import ProductCard from '../components/common/ProductCard';
 import { ProductGrid } from '../styles/HomeStyle';
@@ -7,55 +5,44 @@ import axiosInstance from '../api/axiosInstance';
 import MainBanner from '../components/layout/MainBanner';
 import { useNavigate } from 'react-router-dom';
 import CategorySection from '../components/layout/CategorySection';
+
 const Home = () => {
 
-    const [productList, setProductList] = useState([]);
-
+    const [products, setProducts] = useState([]); // ⭐ 하나만 사용
+    const [categoryId, setCategoryId] = useState(0);
     const navigate = useNavigate();
 
     useEffect(() => {
 
         axiosInstance
-            .get("/api/products?page=0&size=10&sort=popular")
-            .then((response) => {
+            .get("/api/products", {
+                params: {
+                    page: 0,
+                    size: 10,
+                    sort: "popular",
 
-                console.log(response.data.content);
-
-                setProductList(response.data.content);
-
-
+                    ...(categoryId !== 0 && { categoryId })
+                }
             })
-            .catch((error) => {
-
-                console.error(error);
-
+            .then((res) => {
+                setProducts(res.data.content);
             });
 
-    }, []);
+    }, [categoryId]);
 
     return (
+        <div className='home-container' style={{ padding: '0 20px' }}>
 
-        <div
-            className='home-container'
-            style={{ padding: '0 20px' }}
-        >
-
-            {/* 메인 배너 */}
             <MainBanner />
 
-            {/* 카테고리 */}
-            <CategorySection />
+            <CategorySection onSelectCategory={setCategoryId} />
 
-            {/* 제목 + 전체보기 */}
-            <div
-                style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: '16px'
-                }}
-            >
-
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '16px'
+            }}>
                 <h3>인기상품</h3>
 
                 <button
@@ -69,26 +56,20 @@ const Home = () => {
                 >
                     전체보기
                 </button>
-
             </div>
 
-            {/* 상품 리스트 */}
-            <div className='product-list-popular'>
+            <ProductGrid>
 
-                <ProductGrid>
+                {products.map((product) => (
 
-                    {productList.map((product) => (
+                    <ProductCard
+                        key={product.id}
+                        product={product}
+                    />
 
-                        <ProductCard
-                            key={product.id}
-                            product={product}
-                        />
+                ))}
 
-                    ))}
-
-                </ProductGrid>
-
-            </div>
+            </ProductGrid>
 
         </div>
     );
