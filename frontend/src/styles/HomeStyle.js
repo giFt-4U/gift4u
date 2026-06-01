@@ -6,8 +6,9 @@ import Home from "../pages/Home";
 export const ProductGrid = styled.div`
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    padding: 10px 0;
+    gap: 16px;
+
+    
 `;
 
 export const BannerWrapper = styled.div`
@@ -34,6 +35,6 @@ export const BannerWrapper = styled.div`
 export const ProductPageGrid = styled.div`
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    padding: 10px 0;
+    gap: 16px;
+    
 `;

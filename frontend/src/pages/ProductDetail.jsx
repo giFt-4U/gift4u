@@ -4,11 +4,14 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
 import { DetailWrapper, ImageArea, BuyBox, DescArea } from '../styles/ProductDetailStyle';
+import HeartButton from '../components/common/HeartButton';
 
 const ProductDetail = () => {
 
     const { id } = useParams();
     const [product, setProduct] = useState(null);
+
+
 
     useEffect(() => {
 
@@ -28,7 +31,14 @@ const ProductDetail = () => {
     return (
         <DetailWrapper>
 
-            <ImageArea>
+            <ImageArea
+                style={{
+                    position: 'relative'
+                }}
+            >
+
+                <HeartButton product={product} />
+
                 <img
                     src={product.imageUrl}
                     alt={product.name}
@@ -37,9 +47,9 @@ const ProductDetail = () => {
                     }}
                     style={{
                         width: "100%",
-                        height: "180px",      // 🔥 핵심 (고정)
+                        aspectRatio: "1 / 1",
                         objectFit: "cover",
-                        borderRadius: "10px",
+                        borderRadius: "12px",
                         backgroundColor: "#f5f5f5"
                     }}
                 />

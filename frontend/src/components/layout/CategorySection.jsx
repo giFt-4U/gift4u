@@ -1,3 +1,5 @@
+// CategorySection.jsx
+
 import React, { useState } from "react";
 
 const categories = [
@@ -24,7 +26,12 @@ const CategorySection = ({ onSelectCategory }) => {
     };
 
     return (
-        <div style={{ padding: "20px 0 40px 0" }}>
+        <div
+            style={{
+                padding: "20px 0 40px 0",
+                minHeight: "220px"
+            }}
+        >
 
             <div
                 style={{

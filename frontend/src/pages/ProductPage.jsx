@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import axiosInstance from '../api/axiosInstance';
 import { useNavigate } from 'react-router-dom';
 import { ProductPageGrid } from '../styles/HomeStyle';
+import HeartButton from '../components/common/HeartButton';
 
 const ProductPage = () => {
 
@@ -13,6 +14,8 @@ const ProductPage = () => {
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const observerRef = useRef(null);
+
+
 
     useEffect(() => {
 
@@ -71,9 +74,13 @@ const ProductPage = () => {
 
                     <div
                         key={product.id}
+                        style={{
+                            cursor: 'pointer',
+                            position: 'relative'
+                        }}
                         onClick={() => navigate(`/products/${product.id}`)}
-                        style={{ cursor: 'pointer' }}
                     >
+                        <HeartButton product={product} />
 
                         <img
                             src={product.imageUrl}
@@ -83,9 +90,9 @@ const ProductPage = () => {
                             }}
                             style={{
                                 width: "100%",
-                                height: "180px",      // 🔥 핵심 (고정)
+                                aspectRatio: "1 / 1",
                                 objectFit: "cover",
-                                borderRadius: "10px",
+                                borderRadius: "12px",
                                 backgroundColor: "#f5f5f5"
                             }}
                         />
