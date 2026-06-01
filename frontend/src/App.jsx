@@ -1,4 +1,5 @@
 //App.jsx
+
 import Nav from './components/layout/Nav'
 import GlobalStyle from './styles/GlobalStyle'
 import { MainContent, MobileContainer } from './styles/AppLayout'

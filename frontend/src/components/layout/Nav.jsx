@@ -1,87 +1,95 @@
-import React, { useState } from 'react';
+// Nav.jsx
+import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { NavWrapper } from '../../styles/AppLayout';
 
 const Nav = () => {
+
     const location = useLocation();
     const navigate = useNavigate();
 
-    const [keyword, setKeyword] = useState('');
+    const path = location.pathname;
 
-    const isProductPage = location.pathname === '/products';
-    const isCartPage = location.pathname === '/cart';
+    const isHome =
+        path === '/';
 
-    if (isCartPage) {
-        return null; // 장바구니 페이지에서는 Nav 숨김
-    }
+    const isProduct =
+        path === '/products';
 
-    // 검색 실행
-    const onSearch = () => {
-        if (!keyword.trim()) return;
-        navigate(`/search?keyword=${keyword}`);
-    };
+    const isDetail =
+        path.includes('/products/');
 
-    const onKeyDown = (e) => {
-        if (e.key === 'Enter') {
-            onSearch();
-        }
-    };
+    const isCart =
+        path === '/cart';
 
     return (
+
         <NavWrapper>
 
             {/* LEFT */}
             <div className='nav-left'>
 
-                {isProductPage ? (
+                {(isProduct || isCart) ? (
+
                     <img
                         src="/assets/icons/back.png"
-                        alt='뒤로가기'
+                        alt="뒤로가기"
                         onClick={() => navigate(-1)}
-                        style={{ cursor: 'pointer' }}
                     />
+
                 ) : (
+
                     <img
                         src="/assets/icons/search.png"
-                        alt='검색'
-                        style={{ cursor: 'pointer' }}
+                        alt="검색"
                         onClick={() => navigate('/search')}
                     />
+
                 )}
 
             </div>
 
-            {/* CENTER LOGO */}
+            {/* CENTER */}
             <h1>
-                <Link to="/" className="logo">
+
+                <Link
+                    to="/"
+                    className='logo'
+                >
                     따숨품
                 </Link>
+
             </h1>
 
             {/* RIGHT */}
             <div className='nav-right'>
 
-                {isProductPage ? (
+                {isCart ? (
+
+                    <div className='empty-space' />
+
+                ) : isProduct ? (
+
                     <img
                         src="/assets/icons/shopping_cart.png"
                         alt="장바구니"
                         onClick={() => navigate('/cart')}
-                        style={{ cursor: 'pointer' }}
                     />
+
                 ) : (
+
                     <>
                         <img
                             src="/assets/icons/bell.png"
-                            alt='알림'
-                            style={{ cursor: 'pointer' }}
+                            alt="알림"
                         />
 
                         <img
                             src="/assets/icons/user.png"
-                            alt='유저'
-                            style={{ cursor: 'pointer' }}
+                            alt="유저"
                         />
                     </>
+
                 )}
 
             </div>

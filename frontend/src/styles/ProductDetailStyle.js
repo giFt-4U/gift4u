@@ -1,3 +1,5 @@
+// ProductDetailStyle.js
+
 import styled from "styled-components";
 
 /* 전체 레이아웃 */
@@ -7,16 +9,6 @@ export const DetailWrapper = styled.div`
     margin: 0 auto;
 `;
 
-/* 상단 로고 영역 */
-export const LogoArea = styled.div`
-    text-align: center;
-    margin-bottom: 20px;
-
-    h1 {
-        font-size: 22px;
-        font-weight: bold;
-    }
-`;
 
 /* 이미지 영역 */
 export const ImageArea = styled.div`

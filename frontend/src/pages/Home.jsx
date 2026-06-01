@@ -1,3 +1,5 @@
+//Home.jsx
+
 import React, { useEffect, useState } from 'react';
 import ProductCard from '../components/common/ProductCard';
 import { ProductGrid } from '../styles/HomeStyle';
@@ -41,7 +43,7 @@ const Home = () => {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                marginBottom: '16px'
+
             }}>
                 <h3>인기상품</h3>
 
@@ -58,18 +60,27 @@ const Home = () => {
                 </button>
             </div>
 
-            <ProductGrid>
+            <div
+                style={{
+                    minHeight: '700px'
+                }}
+            >
 
-                {products.map((product) => (
+                <ProductGrid>
 
-                    <ProductCard
-                        key={product.id}
-                        product={product}
-                    />
+                    {products.map((product) => (
 
-                ))}
+                        <ProductCard
+                            key={product.id}
+                            product={product}
+                        />
 
-            </ProductGrid>
+                    ))}
+
+                </ProductGrid>
+
+            </div>
+
 
         </div>
     );
