@@ -28,7 +28,7 @@ function Product() {
     <div>
 
       <img
-        src={product.prdImg}
+        src={product.imageUrl}
         alt={product.name}
         width="300"
       />

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import axiosInstance from '../api/axiosInstance';
 import { useNavigate } from 'react-router-dom';
 import { ProductPageGrid } from '../styles/HomeStyle';
+import HeartButton from '../components/common/HeartButton';
 
 const ProductPage = () => {
 
@@ -12,7 +13,6 @@ const ProductPage = () => {
     const [hasMore, setHasMore] = useState(true);
     const observerRef = useRef(null);
 
-    // ?°?´?„° ë¡œë”©
     useEffect(() => {
 
         if (!hasMore) return;
@@ -21,21 +21,24 @@ const ProductPage = () => {
             .get(`/api/products?page=${page}&size=10&sort=popular`)
             .then((res) => {
 
-                const newItems = res.data.content;
+                const newItems = res.data.content || [];
+
+                if (newItems.length === 0) {
+                    setHasMore(false);
+                    return;
+                }
 
                 setProducts((prev) => [...prev, ...newItems]);
 
-                // ë§ˆì?ë§? ?˜?´ì§? ì²´í¬
                 if (newItems.length < 10) {
                     setHasMore(false);
                 }
 
             })
-            .catch((err) => console.error(err));
+            .catch(console.error);
 
     }, [page]);
 
-    // ë¬´í•œ?Š¤?¬ë¡?
     useEffect(() => {
 
         if (!hasMore) return;
@@ -46,13 +49,11 @@ const ProductPage = () => {
                 setPage((prev) => prev + 1);
             }
 
-        }, {
-            threshold: 1.0
-        });
+        }, { threshold: 1.0 });
 
-        if (observerRef.current) {
-            observer.observe(observerRef.current);
-        }
+        const target = observerRef.current;
+
+        if (target) observer.observe(target);
 
         return () => observer.disconnect();
 
@@ -61,57 +62,53 @@ const ProductPage = () => {
     return (
         <div style={{ padding: '0 20px' }}>
 
-            <h2>ë² ìŠ¤?Š¸ ?ƒ?’ˆ</h2>
+            <h2>ë² ìŠ¤íŠ¸ ìƒí’ˆ</h2>
 
             <ProductPageGrid>
 
                 {products.map((product) => (
+
                     <div
                         key={product.id}
+                        style={{
+                            cursor: 'pointer',
+                            position: 'relative'
+                        }}
                         onClick={() => navigate(`/products/${product.id}`)}
-                        style={{ cursor: 'pointer' }}
                     >
+                        <HeartButton product={product} />
 
                         <img
-                            src={product.prdImg}
-                            alt={product.prdName}
+                            src={product.imageUrl}
+                            alt={product.name}
+                            onError={(e) => {
+                                e.target.src = "/images/default.png";
+                            }}
                             style={{
-                                width: '100%',
-                                height: '180px',
-                                objectFit: 'cover',
-                                borderRadius: '10px'
+                                width: "100%",
+                                aspectRatio: "1 / 1",
+                                objectFit: "cover",
+                                borderRadius: "12px",
+                                backgroundColor: "#f5f5f5"
                             }}
                         />
 
-                        <h3>{product.prdName}</h3>
+                        <h3>{product.name}</h3>
 
-                        <p>
-                            {product.prdPrice?.toLocaleString()}?›
-                        </p>
+                        <p>{product.price?.toLocaleString()}ì›</p>
 
                     </div>
                 ))}
 
             </ProductPageGrid>
 
-            {/* observer trigger */}
-            {
-                hasMore && (
-                    <div
-                        ref={observerRef}
-                        style={{ height: '50px' }}
-                    />
-                )
-            }
+            {hasMore && <div ref={observerRef} style={{ height: '50px' }} />}
 
-            {/* end message */}
-            {
-                !hasMore && (
-                    <p style={{ textAlign: 'center', padding: '20px' }}>
-                        ë§ˆì?ë§? ?ƒ?’ˆ?…?‹ˆ?‹¤
-                    </p>
-                )
-            }
+            {!hasMore && (
+                <p style={{ textAlign: 'center', padding: '20px' }}>
+                    ë§ˆì§€ë§‰ ìƒí’ˆì…ë‹ˆë‹¤
+                </p>
+            )}
 
         </div>
     );

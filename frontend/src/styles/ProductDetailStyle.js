@@ -1,3 +1,5 @@
+// ProductDetailStyle.js
+
 import styled from "styled-components";
 
 /* 전체 레이아웃 */

@@ -8,8 +8,12 @@ import lombok.Setter;
 public class ProductCreateRequest {
 
     private String name;
+
     private String description;
+
     private Long price;
+
     private Long stock;
+
     private String imageUrl;
 }

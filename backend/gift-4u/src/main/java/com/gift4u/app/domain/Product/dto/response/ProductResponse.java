@@ -10,22 +10,22 @@ public class ProductResponse {
 
     private Long id;
 
-    private String prdImg;
+    private String name;
 
-    private String brandName;
+    private String description;
 
-    private String prdName;
+    private int price;
 
-    private Long prdPrice;
+    private String imageUrl;
 
     public static ProductResponse from(Product product) {
 
         return ProductResponse.builder()
                 .id(product.getId())
-                .prdImg(product.getImageUrl())
-                .brandName("gift4u")
-                .prdName(product.getName())
-                .prdPrice(product.getPrice())
+                .name(product.getName())
+                .description(product.getDescription())
+                .price(product.getPrice())
+                .imageUrl(product.getImageUrl())
                 .build();
     }
 }
