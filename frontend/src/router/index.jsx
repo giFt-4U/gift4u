@@ -7,6 +7,7 @@ import ProductPage from '../pages/ProductPage';
 import ProductDetail from '../pages/ProductDetail';
 import SearchPage from '../pages/SearchPage';
 import CartPage from '../pages/CartPage';
+import OrderPage from '../pages/OrderPage';
 
 export default function Router() {
 
@@ -44,7 +45,10 @@ export default function Router() {
                         path="cart"
                         element={<CartPage />}
                     />
-
+                    <Route
+                        path="order"
+                        element={<OrderPage />}
+                    />
 
                 </Route>
 
