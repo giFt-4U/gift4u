@@ -1,4 +1,4 @@
-//HeartButton.jsx
+// HeartButton.jsx
 
 import React, { useEffect, useState } from "react";
 
@@ -13,28 +13,24 @@ const HeartButton = ({ product }) => {
     const [liked, setLiked] = useState(false);
 
     useEffect(() => {
-
-        setLiked(
-            isInCart(product.id)
-        );
-
+        setLiked(isInCart(product.id));
     }, [product.id]);
 
     const handleClick = (e) => {
-
         e.stopPropagation();
 
         if (liked) {
             removeFromCart(product.id);
+            setLiked(false);
         } else {
             addToCart(product);
+            setLiked(true);
         }
-
-        setLiked(!liked);
     };
 
     return (
         <button
+            type="button"
             onClick={handleClick}
             style={{
                 position: "absolute",
@@ -45,7 +41,6 @@ const HeartButton = ({ product }) => {
                 height: "36px",
 
                 border: "none",
-
                 borderRadius: "50%",
 
                 background: "white",
