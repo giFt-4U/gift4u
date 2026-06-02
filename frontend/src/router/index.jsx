@@ -17,43 +17,33 @@ export default function Router() {
         <BrowserRouter>
 
             <Routes>
+                <Route path="/" element={<App />}>
+                    <Route index element={<Home />} />
 
-                <Route
-                    path="/"
-                    element={<App />}
-                >
 
-                    <Route
-                        index
-                        element={<Home />}
-                    />
 
-                    <Route
-                        path="products"
-                        element={<ProductPage />}
-                    />
+                    {/* PRODUCT */}
+                    <Route path="products" element={<ProductPage />} />
+                    <Route path="products/:id" element={<ProductDetail />} />
 
-                    <Route
-                        path="products/:id"
-                        element={<ProductDetail />}
-                    />
 
-                    <Route
-                        path="search"
-                        element={<SearchPage />}
-                    />
-                    <Route
-                        path="cart"
-                        element={<CartPage />}
-                    />
-                    <Route
-                        path="order"
-                        element={<OrderPage />}
-                    />
-                    <Route
-                        path="wishlist"
-                        element={<WishlistPage />}
-                    />
+                    {/* CHAT */}
+                    <Route path='chat' element={<ChatList />} />
+                    <Route path='chat/add' element={<ChatAddFriend />} />
+                    <Route path='chat/:roomId' element={<ChatRoom />} />du
+
+
+                    {/* GIFT */}
+                    <Route path='gifts/card' element={<GiftCard />} />
+                    <Route path='gifts/card/preview' element={<GiftCardView />} />
+                    <Route path='gifts/:uuid' element={<GiftCardView />} /> {/* 받는 사람 링크 */}
+                    <Route path='gifts/:uuid/address' element={<GiftAddress />} />
+                    <Route path='gifts/:uuid/accept' element={<GiftAccept />} />
+
+                    {/* SEARCH */}
+                    <Route path="search" element={<SearchPage />} />
+
+
 
                 </Route>
 
