@@ -8,6 +8,7 @@ import ProductDetail from '../pages/ProductDetail';
 import SearchPage from '../pages/SearchPage';
 import CartPage from '../pages/CartPage';
 import OrderPage from '../pages/OrderPage';
+import WishlistPage from '../pages/WishlistPage';
 
 export default function Router() {
 
@@ -48,6 +49,10 @@ export default function Router() {
                     <Route
                         path="order"
                         element={<OrderPage />}
+                    />
+                    <Route
+                        path="wishlist"
+                        element={<WishlistPage />}
                     />
 
                 </Route>

@@ -14,8 +14,14 @@ const Nav = () => {
     // 상품 목록 페이지
     const isProduct = path === '/products';
 
+    // 상품 상세 페이지
+    const isProductDetail = path.startsWith('/products/');
+
     // 장바구니 페이지
     const isCart = path === '/cart';
+
+    // 위시리스트 페이지
+    const isWishlist = path === '/wishlist';
 
     return (
 
@@ -24,8 +30,11 @@ const Nav = () => {
             {/* 왼쪽 영역 */}
             <div className='nav-left'>
 
-                {/* 상품페이지와 장바구니 페이지는 뒤로가기 아이콘 사용 */}
-                {(isProduct || isCart) ? (
+                {/* 
+                    상품페이지 / 상품상세페이지 / 장바구니 / 위시리스트는
+                    이전 페이지로 돌아갈 수 있도록 뒤로가기 아이콘 사용
+                */}
+                {(isProduct || isProductDetail || isCart || isWishlist) ? (
 
                     <img
                         src="/assets/icons/back.png"
@@ -35,7 +44,7 @@ const Nav = () => {
 
                 ) : (
 
-                    // 메인 / 상세 / 검색 계열은 검색 아이콘 사용
+                    // 메인 / 검색 계열은 검색 아이콘 사용
                     <img
                         src="/assets/icons/search.png"
                         alt="검색"
@@ -61,12 +70,12 @@ const Nav = () => {
 
                 {isCart ? (
 
-                    // 장바구니 페이지는 오른쪽을 비워두되, 정렬을 위해 공간만 확보
+                    // 장바구니 페이지는 오른쪽 공백
                     <div className='empty-space' />
 
-                ) : isProduct ? (
+                ) : (isProduct || isProductDetail || isWishlist) ? (
 
-                    // 상품 목록 페이지는 장바구니 아이콘
+                    // 상품 목록 / 상품 상세 / 위시리스트 페이지는 장바구니 아이콘
                     <img
                         src="/assets/icons/shopping_cart.png"
                         alt="장바구니"
@@ -75,7 +84,7 @@ const Nav = () => {
 
                 ) : (
 
-                    // 메인 / 상품상세 페이지는 알림 + 유저 아이콘
+                    // 메인 / 검색 페이지는 알림 + 유저 아이콘
                     <>
                         <img
                             src="/assets/icons/bell.png"
