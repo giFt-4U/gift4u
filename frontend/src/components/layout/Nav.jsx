@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { NavWrapper } from '../../styles/AppLayout';
+import useAuthStore from '../../store/authStore';
 
 const Nav = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const { token } = useAuthStore();
 
     const [keyword, setKeyword] = useState('');
 
     const isProductPage = location.pathname === '/products';
+    const isAuthPage = ['/login', '/signup'].includes(location.pathname);
 
     // 검색 실행
     const onSearch = () => {
@@ -28,7 +31,7 @@ const Nav = () => {
             {/* LEFT */}
             <div className='nav-left'>
 
-                {isProductPage ? (
+                {(isProductPage || isAuthPage) ? (
                     <img
                         src="/assets/icons/back.png"
                         alt='뒤로가기'
@@ -75,6 +78,7 @@ const Nav = () => {
                             src="/assets/icons/user.png"
                             alt='유저'
                             style={{ cursor: 'pointer' }}
+                            onClick={() => navigate(token ? '/mypage' : '/login')}
                         />
                     </>
                 )}
