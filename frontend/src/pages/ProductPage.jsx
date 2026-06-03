@@ -66,7 +66,16 @@ const ProductPage = () => {
     return (
         <div style={{ padding: '0 20px' }}>
 
-            <h2>베스트 상품</h2>
+            <h2
+                style={{
+                    fontSize: '18px',
+                    fontWeight: 600,
+                    lineHeight: '22px',
+                    marginBottom: '18px',
+                }}
+            >
+                베스트 상품
+            </h2>
 
             <ProductPageGrid>
 
@@ -97,9 +106,27 @@ const ProductPage = () => {
                             }}
                         />
 
-                        <h3>{product.name}</h3>
+                        <h3
+                            style={{
+                                marginTop: '10px',
+                                fontSize: '14px',
+                                fontWeight: 500,
+                                lineHeight: '20px',
+                            }}
+                        >
+                            {product.name}
+                        </h3>
 
-                        <p>{product.price?.toLocaleString()}원</p>
+                        <p
+                            style={{
+                                marginTop: '6px',
+                                fontSize: '14px',
+                                fontWeight: 600,
+                                lineHeight: '18px',
+                            }}
+                        >
+                            {product.price?.toLocaleString()}원
+                        </p>
 
                     </div>
                 ))}

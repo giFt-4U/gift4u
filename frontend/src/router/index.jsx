@@ -7,6 +7,7 @@ import ProductPage from '../pages/ProductPage';
 import ProductDetail from '../pages/ProductDetail';
 import SearchPage from '../pages/SearchPage';
 import CartPage from '../pages/CartPage';
+import OrderPage from '../pages/OrderPage';
 
 export default function Router() {
 
@@ -17,6 +18,7 @@ export default function Router() {
             <Routes>
                 <Route path="/" element={<App />}>
                     <Route index element={<Home />} />
+
 
                     {/* PRODUCT */}
                     <Route path="products" element={<ProductPage />} />
@@ -38,6 +40,7 @@ export default function Router() {
 
                     {/* SEARCH */}
                     <Route path="search" element={<SearchPage />} />
+
 
 
                 </Route>

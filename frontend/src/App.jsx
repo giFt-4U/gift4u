@@ -9,8 +9,13 @@ function App() {
 
   const location = useLocation();
 
-  // 장바구니 페이지에서는 MainContent padding을 제거하기 위한 조건
-  const isCartPage = location.pathname === '/cart';
+  // 장바구니 페이지와 주문 페이지에서는 MainContent padding 제거
+  const isCartPage =
+    location.pathname === '/cart' ||
+    location.pathname === '/order';
+
+  // 주문 페이지는 자체 상단바를 사용하므로 공통 Nav 숨김
+  const isOrderPage = location.pathname === '/order';
 
   return (
     <>
@@ -18,10 +23,8 @@ function App() {
 
       <MobileContainer>
 
-        {/* 모든 페이지에서 공통으로 사용하는 상단 Nav */}
-        <Nav />
+        {!isOrderPage && <Nav />}
 
-        {/* 장바구니 페이지는 피그마 UI처럼 내부에서 직접 여백을 관리 */}
         <MainContent $noPadding={isCartPage}>
 
           <Outlet />

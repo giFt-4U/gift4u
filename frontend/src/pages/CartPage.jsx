@@ -1,6 +1,7 @@
 // CartPage.jsx
 
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import {
     PageWrapper,
@@ -48,6 +49,7 @@ import {
 } from "../utils/Cart";
 
 const CartPage = () => {
+    const navigate = useNavigate();
 
     const MAX_QUANTITY = 99;
 
@@ -55,6 +57,19 @@ const CartPage = () => {
     const [selectedItems, setSelectedItems] = useState([]);
 
     useEffect(() => {
+        const isLogin = localStorage.getItem("token");
+
+        // 비로그인 상태로 장바구니에 들어오면 기존 임시 데이터 초기화
+        if (!isLogin) {
+            localStorage.removeItem("cartItems");
+            localStorage.removeItem("orderItems");
+
+            setCartItems([]);
+            setSelectedItems([]);
+
+            return;
+        }
+
         const items = getCartItems();
 
         setCartItems(items);
@@ -166,6 +181,61 @@ const CartPage = () => {
 
     const deliveryPrice = 0;
     const finalPrice = totalPrice + deliveryPrice;
+
+    // 비로그인 상태일 때 장바구니/주문 데이터 초기화
+    const clearCartForGuest = () => {
+        localStorage.removeItem("cartItems");
+        localStorage.removeItem("orderItems");
+
+        setCartItems([]);
+        setSelectedItems([]);
+    };
+
+    // 선택상품 주문
+    const handleSelectedOrder = () => {
+        const isLogin = localStorage.getItem("token");
+
+        if (!isLogin) {
+            alert("로그인 후 이용할 수 있습니다.");
+            clearCartForGuest();
+            return;
+        }
+
+        if (selectedProducts.length === 0) {
+            alert("주문할 상품을 선택해주세요.");
+            return;
+        }
+
+        localStorage.setItem(
+            "orderItems",
+            JSON.stringify(selectedProducts)
+        );
+
+        navigate("/order");
+    };
+
+    // 전체상품 주문
+    const handleAllOrder = () => {
+        const isLogin = localStorage.getItem("token");
+
+        if (!isLogin) {
+            alert("로그인 후 이용할 수 있습니다.");
+            clearCartForGuest();
+            return;
+        }
+
+        if (cartItems.length === 0) {
+            alert("주문할 상품이 없습니다.");
+            return;
+        }
+
+        localStorage.setItem(
+            "orderItems",
+            JSON.stringify(cartItems)
+        );
+
+        navigate("/order");
+    };
 
     return (
         <PageWrapper>
@@ -357,11 +427,18 @@ const CartPage = () => {
 
                 <ButtonRow>
 
-                    <OrderButton type="button">
+                    <OrderButton
+                        type="button"
+                        onClick={handleSelectedOrder}
+                    >
                         선택상품주문
                     </OrderButton>
 
-                    <OrderButton type="button" $primary>
+                    <OrderButton
+                        type="button"
+                        $primary
+                        onClick={handleAllOrder}
+                    >
                         전체상품
                     </OrderButton>
 
