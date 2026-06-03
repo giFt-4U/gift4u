@@ -7,6 +7,7 @@ import axiosInstance from '../api/axiosInstance';
 import MainBanner from '../components/layout/MainBanner';
 import { useNavigate } from 'react-router-dom';
 import CategorySection from '../components/layout/CategorySection';
+import FloatingChatButton from '../components/common/FloatingChatButton';
 
 const Home = () => {
 
@@ -93,7 +94,7 @@ const Home = () => {
 
             </div>
 
-
+            <FloatingChatButton />
         </div>
     );
 };
