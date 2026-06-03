@@ -1,14 +1,12 @@
 // KakaoCallbackPage.jsx
-// 카카오 로그인 후 리다이렉트 되는 페이지
-// URL: /kakao/auth-code?code=...
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useAuthStore from '../store/authStore';
-import { kakaoLogin } from '../api/auth';
+import useAuthStore from '../../store/authStore';
+import { kakaoLogin, getMe } from '../../api/auth';
 
 const KakaoCallbackPage = () => {
     const navigate = useNavigate();
-    const { setToken } = useAuthStore();
+    const { setToken, setUser } = useAuthStore();
 
     useEffect(() => {
         const code = new URLSearchParams(window.location.search).get('code');
@@ -19,8 +17,14 @@ const KakaoCallbackPage = () => {
         }
 
         kakaoLogin(code)
-            .then((res) => {
+            .then(async (res) => {
                 setToken(res.data.accessToken);
+                try {
+                    const meRes = await getMe();
+                    setUser(meRes.data);
+                } catch {
+                    // 유저 정보 실패해도 로그인은 유지
+                }
                 navigate('/');
             })
             .catch(() => {

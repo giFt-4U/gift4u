@@ -5,21 +5,14 @@ import { MainContent, MobileContainer } from './styles/AppLayout'
 import { Outlet } from 'react-router-dom';
 
 function App() {
-
   return (
     <>
       <GlobalStyle />
-
       <MobileContainer>
-
         <Nav />
-
         <MainContent>
-
           <Outlet />
-
         </MainContent>
-
       </MobileContainer>
     </>
   )

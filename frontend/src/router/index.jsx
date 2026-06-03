@@ -6,9 +6,11 @@ import Home from '../pages/Home';
 import ProductPage from '../pages/ProductPage';
 import ProductDetail from '../pages/ProductDetail';
 import SearchPage from '../pages/SearchPage';
-import LoginPage from '../pages/LoginPage';
-import SignupPage from '../pages/SignupPage';
-import KakaoCallbackPage from '../pages/KakaoCallbackPage';
+import CartPage from '../pages/CartPage';
+import LoginPage from '../pages/user/LoginPage';
+import SignupPage from '../pages/user/SignupPage';
+import KakaoCallbackPage from '../pages/user/KakaoCallbackPage';
+import MyPage from '../pages/user/MyPage';
 
 export default function Router() {
 
@@ -20,29 +22,33 @@ export default function Router() {
                 <Route path="/" element={<App />}>
                     <Route index element={<Home />} />
 
-
                     {/* PRODUCT */}
                     <Route path="products" element={<ProductPage />} />
                     <Route path="products/:id" element={<ProductDetail />} />
 
 
-                    {/* CHAT / GIFT — import·컴포넌트 미완성이라 임시 주석 (팀 lane 작업 후 해제) */}
-                    {/* <Route path='chat' element={<ChatList />} /> */}
-                    {/* <Route path='chat/add' element={<ChatAddFriend />} /> */}
-                    {/* <Route path='chat/:roomId' element={<ChatRoom />} /> */}
-                    {/* <Route path='gifts/card' element={<GiftCard />} /> */}
-                    {/* <Route path='gifts/card/preview' element={<GiftCardView />} /> */}
-                    {/* <Route path='gifts/:uuid' element={<GiftCardView />} /> */}
-                    {/* <Route path='gifts/:uuid/address' element={<GiftAddress />} /> */}
-                    {/* <Route path='gifts/:uuid/accept' element={<GiftAccept />} /> */}
+                    {/* CHAT */}
+                    <Route path='chat' element={<ChatList />} />
+                    <Route path='chat/add' element={<ChatAddFriend />} />
+                    <Route path='chat/:roomId' element={<ChatRoom />} />du
+
+
+                    {/* GIFT */}
+                    <Route path='gifts/card' element={<GiftCard />} />
+                    <Route path='gifts/card/preview' element={<GiftCardView />} />
+                    <Route path='gifts/:uuid' element={<GiftCardView />} /> {/* 받는 사람 링크 */}
+                    <Route path='gifts/:uuid/address' element={<GiftAddress />} />
+                    <Route path='gifts/:uuid/accept' element={<GiftAccept />} />
 
                     {/* AUTH */}
                     <Route path="login" element={<LoginPage />} />
                     <Route path="signup" element={<SignupPage />} />
                     <Route path="kakao/auth-code" element={<KakaoCallbackPage />} />
+                    <Route path="mypage" element={<MyPage />} />
 
                     {/* SEARCH */}
                     <Route path="search" element={<SearchPage />} />
+
 
                 </Route>
 

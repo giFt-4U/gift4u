@@ -1,8 +1,8 @@
 // LoginPage.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useAuthStore from '../store/authStore';
-import { login } from '../api/auth';
+import useAuthStore from '../../store/authStore';
+import { login, getMe } from '../../api/auth';
 import {
     AuthContainer,
     AuthHeader,
@@ -16,7 +16,7 @@ import {
     PrimaryButton,
     ErrorMsg,
     BottomLink,
-} from '../styles/AuthStyle';
+} from '../../styles/AuthStyle';
 
 const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
 const KAKAO_REDIRECT_URI = 'http://localhost:5173/kakao/auth-code';
@@ -29,7 +29,7 @@ const KakaoIcon = () => (
 
 const LoginPage = () => {
     const navigate = useNavigate();
-    const { setToken } = useAuthStore();
+    const { setToken, setUser } = useAuthStore();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -61,6 +61,8 @@ const LoginPage = () => {
         try {
             const res = await login(email, password);
             setToken(res.data.accessToken);
+            const meRes = await getMe();
+            setUser(meRes.data);
             navigate('/');
         } catch {
             setError('이메일 또는 비밀번호가 올바르지 않습니다.');
@@ -74,7 +76,7 @@ const LoginPage = () => {
             <AuthHeader>
                 <AuthTitle>로그인</AuthTitle>
                 <AuthSubtitle>
-                    {'아이디와 비밀번호 입력이 귀찮으신가요?\n빠른 회원가입으로 입력없이 간편하게 로그인하세요.'}
+                    {'카카오로 간편하게 로그인하거나\n이메일로 직접 로그인할 수 있어요.'}
                 </AuthSubtitle>
             </AuthHeader>
 

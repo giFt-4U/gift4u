@@ -1,7 +1,7 @@
 // SignupPage.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signup } from '../api/auth';
+import { signup } from '../../api/auth';
 import {
     AuthContainer,
     AuthHeader,
@@ -17,7 +17,7 @@ import {
     CheckRow,
     CheckSection,
     BottomLink,
-} from '../styles/AuthStyle';
+} from '../../styles/AuthStyle';
 
 const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
 const KAKAO_REDIRECT_URI = 'http://localhost:5173/kakao/auth-code';

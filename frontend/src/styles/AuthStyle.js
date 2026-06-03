@@ -4,11 +4,11 @@ import styled from 'styled-components';
 export const AuthContainer = styled.div`
     display: flex;
     flex-direction: column;
-    padding: 24px 0 40px;
+    padding: 16px 0 40px;
 `;
 
 export const AuthHeader = styled.div`
-    margin-bottom: 28px;
+    margin-bottom: 32px;
 `;
 
 export const AuthTitle = styled.h2`

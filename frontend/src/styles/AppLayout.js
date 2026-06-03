@@ -1,7 +1,6 @@
 //AppLayout.js
 
 import styled from "styled-components";
-import App from "../App";
 
 export const MobileContainer = styled.div`
     width: 100%;
@@ -13,7 +12,7 @@ export const MobileContainer = styled.div`
 `;
 
 export const MainContent = styled.div`
-    padding:20px;
+    padding: 20px;
 `
 
 export const NavWrapper = styled.nav`
