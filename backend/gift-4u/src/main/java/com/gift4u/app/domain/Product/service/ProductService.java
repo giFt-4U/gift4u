@@ -13,8 +13,6 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
-    // 📌 상품 리스트 + 검색 + 카테고리 통합
-    // HomePage / ProductPage / SearchPage 공통 사용
     public Page<ProductResponse> getProducts(
             String keyword,
             Long categoryId,
@@ -23,96 +21,56 @@ public class ProductService {
             String sort
     ) {
 
-        // 📌 정렬 조건
-        Pageable pageable;
+        int safePage = Math.max(page, 0);
+        int safeSize = size <= 0 ? 10 : size;
 
-        // 인기순
-        if ("popular".equals(sort)) {
-
-            pageable = PageRequest.of(
-                    page,
-                    size,
-                    Sort.by("salesCount").descending()
-            );
-
-        }
-        // 최신순
-        else {
-
-            pageable = PageRequest.of(
-                    page,
-                    size,
-                    Sort.by("id").descending()
-            );
-        }
+        Pageable pageable = PageRequest.of(
+                safePage,
+                safeSize,
+                getSort(sort)
+        );
 
         Page<Product> result;
 
-        // ==================================================
-        // 📌 검색 + 카테고리 같이 사용하는 경우
-        // ex) 기저귀 검색 + 위생 카테고리
-        // ==================================================
-        if (
-                keyword != null
-                && !keyword.trim().isEmpty()
-                && categoryId != null
-                && categoryId != 0
-        ) {
+        boolean hasKeyword =
+                keyword != null && !keyword.trim().isEmpty();
+
+        boolean hasCategory =
+                categoryId != null && categoryId != 0;
+
+        if (hasKeyword && hasCategory) {
 
             result = productRepository
                     .findByNameContainingIgnoreCaseAndCategoryId(
-                            keyword,
+                            keyword.trim(),
                             categoryId,
                             pageable
                     );
-        }
 
-        // ==================================================
-        // 📌 검색만 사용하는 경우
-        // ex) 기저귀 검색
-        // ==================================================
-        else if (
-                keyword != null
-                && !keyword.trim().isEmpty()
-        ) {
+        } else if (hasKeyword) {
 
             result = productRepository
                     .findByNameContainingIgnoreCase(
-                            keyword,
+                            keyword.trim(),
                             pageable
                     );
-        }
 
-        // ==================================================
-        // 📌 카테고리만 사용하는 경우
-        // ex) 위생 카테고리 클릭
-        // ==================================================
-        else if (
-                categoryId != null
-                && categoryId != 0
-        ) {
+        } else if (hasCategory) {
 
             result = productRepository
                     .findByCategoryId(
                             categoryId,
                             pageable
                     );
-        }
 
-        // ==================================================
-        // 📌 전체 상품 조회
-        // ex) 메인페이지 전체 상품
-        // ==================================================
-        else {
+        } else {
 
             result = productRepository.findAll(pageable);
         }
 
-        // 📌 Entity → Response DTO 변환
         return result.map(ProductResponse::from);
     }
 
-    // 📌 상품 상세 조회
     public ProductResponse getProduct(Long id) {
 
         Product product = productRepository
@@ -122,5 +80,18 @@ public class ProductService {
                 );
 
         return ProductResponse.from(product);
+    }
+
+    private Sort getSort(String sort) {
+
+        if ("popular".equals(sort)) {
+            return Sort.by("salesCount").descending();
+        }
+
+        if ("latest".equals(sort)) {
+            return Sort.by("id").descending();
+        }
+
+        return Sort.by("id").descending();
     }
 }

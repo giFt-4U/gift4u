@@ -1,3 +1,5 @@
+//Home.jsx
+
 import React, { useEffect, useState } from 'react';
 import ProductCard from '../components/common/ProductCard';
 import { ProductGrid } from '../styles/HomeStyle';
@@ -5,6 +7,7 @@ import axiosInstance from '../api/axiosInstance';
 import MainBanner from '../components/layout/MainBanner';
 import { useNavigate } from 'react-router-dom';
 import CategorySection from '../components/layout/CategorySection';
+import FloatingChatButton from '../components/common/FloatingChatButton';
 
 const Home = () => {
 
@@ -37,13 +40,23 @@ const Home = () => {
 
             <CategorySection onSelectCategory={setCategoryId} />
 
-            <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '16px'
-            }}>
-                <h3>인기상품</h3>
+            <div
+                style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '18px',
+                }}
+            >
+                <h3
+                    style={{
+                        fontSize: '18px',
+                        fontWeight: 600,
+                        lineHeight: '22px',
+                    }}
+                >
+                    인기상품
+                </h3>
 
                 <button
                     onClick={() => navigate('/products')}
@@ -51,26 +64,37 @@ const Home = () => {
                         border: 'none',
                         background: 'none',
                         cursor: 'pointer',
-                        color: '#666'
+                        color: '#666',
+                        fontSize: '14px',
+                        lineHeight: '18px',
                     }}
                 >
                     전체보기
                 </button>
             </div>
 
-            <ProductGrid>
+            <div
+                style={{
+                    minHeight: '700px'
+                }}
+            >
 
-                {products.map((product) => (
+                <ProductGrid>
 
-                    <ProductCard
-                        key={product.id}
-                        product={product}
-                    />
+                    {products.map((product) => (
 
-                ))}
+                        <ProductCard
+                            key={product.id}
+                            product={product}
+                        />
 
-            </ProductGrid>
+                    ))}
 
+                </ProductGrid>
+
+            </div>
+
+            <FloatingChatButton />
         </div>
     );
 };

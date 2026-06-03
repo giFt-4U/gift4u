@@ -1,73 +1,91 @@
-//AppLayout.js
+// AppLayout.js
 
 import styled from "styled-components";
 
 export const MobileContainer = styled.div`
     width: 100%;
     max-width: 500px;
+    min-width: 360px;
+
     min-height: 100vh;
+
     background-color: white;
+
     margin: 0 auto;
+
     position: relative;
+
+    overflow-x: hidden;
 `;
 
-export const MainContent = styled.div`
-    padding: 20px;
-`
+export const MainContent = styled.main`
+    width: 100%;
+
+    padding: ${({ $noPadding }) => ($noPadding ? "0" : "20px")};
+`;
 
 export const NavWrapper = styled.nav`
-    position: relative;
+    height: 64px;
 
     display: flex;
     align-items: center;
-    justify-content: space-between;
 
-    height: 64px;
     padding: 0 20px;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #f2f2f2;
 
     .nav-left,
     .nav-right {
-        width: 60px;
+        flex: 1;
 
         display: flex;
         align-items: center;
-        justify-content: center;
+    }
 
-        gap: 10px;
+    .nav-left {
+        justify-content: flex-start;
+    }
+
+    .nav-right {
+        justify-content: flex-end;
+        gap: 12px;
     }
 
     h1 {
-        position: absolute;
+        flex: 1;
 
-        top: 50%;
-        left: 50%;
-
-        transform: translate(-50%, -50%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
         margin: 0;
-        padding: 0;
-
-        line-height: 1;
     }
 
     .logo {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
+        font-family: 'Pretendard Variable', Pretendard, sans-serif;
         font-size: 22px;
-        font-weight: 700;
+        font-weight: 500;
+        line-height: 23px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
 
         color: #f5c542;
-        text-decoration: none;
 
-        line-height: 1;
+        text-decoration: none;
     }
 
-    svg {
+    img {
         width: 24px;
         height: 24px;
 
+        cursor: pointer;
         display: block;
+    }
+
+    .empty-space {
+        width: 24px;
+        height: 24px;
     }
 `;

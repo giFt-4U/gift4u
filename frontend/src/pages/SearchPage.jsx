@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
+import HeartButton from '../components/common/HeartButton';
 
 import {
     PageWrapper,
@@ -31,6 +32,7 @@ const SearchPage = () => {
 
     const trending = ['유모차', '기저귀', '분유', '아기침대'];
 
+
     useEffect(() => {
         const saved = JSON.parse(localStorage.getItem('recentSearch') || '[]');
         setRecent(saved);
@@ -45,6 +47,7 @@ const SearchPage = () => {
 
         return () => clearTimeout(timer);
     }, [keyword]);
+
 
     const fetchSearch = (value) => {
         setLoading(true);
@@ -109,7 +112,15 @@ const SearchPage = () => {
                     <Card
                         key={item.id}
                         onClick={() => navigate(`/products/${item.id}`)}
+
+                        style={{
+                            cursor: 'pointer',
+                            position: 'relative'
+                        }}
+
+
                     >
+                        <HeartButton product={item} />
 
                         <ProductImg
                             src={item.imageUrl}
@@ -119,9 +130,9 @@ const SearchPage = () => {
                             }}
                             style={{
                                 width: "100%",
-                                height: "180px",      // 🔥 핵심 (고정)
+                                aspectRatio: "1 / 1",
                                 objectFit: "cover",
-                                borderRadius: "10px",
+                                borderRadius: "12px",
                                 backgroundColor: "#f5f5f5"
                             }}
                         />

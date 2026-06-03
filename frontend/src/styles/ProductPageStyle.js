@@ -1,3 +1,5 @@
+// ProductPageStyle.js
+
 import styled from 'styled-components';
 
 export const ProductImg = styled.img`

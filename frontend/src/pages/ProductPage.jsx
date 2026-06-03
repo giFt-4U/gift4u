@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import axiosInstance from '../api/axiosInstance';
 import { useNavigate } from 'react-router-dom';
 import { ProductPageGrid } from '../styles/HomeStyle';
+import HeartButton from '../components/common/HeartButton';
 
 const ProductPage = () => {
 
@@ -13,6 +14,8 @@ const ProductPage = () => {
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const observerRef = useRef(null);
+
+
 
     useEffect(() => {
 
@@ -63,7 +66,16 @@ const ProductPage = () => {
     return (
         <div style={{ padding: '0 20px' }}>
 
-            <h2>베스트 상품</h2>
+            <h2
+                style={{
+                    fontSize: '18px',
+                    fontWeight: 600,
+                    lineHeight: '22px',
+                    marginBottom: '18px',
+                }}
+            >
+                베스트 상품
+            </h2>
 
             <ProductPageGrid>
 
@@ -71,9 +83,13 @@ const ProductPage = () => {
 
                     <div
                         key={product.id}
+                        style={{
+                            cursor: 'pointer',
+                            position: 'relative'
+                        }}
                         onClick={() => navigate(`/products/${product.id}`)}
-                        style={{ cursor: 'pointer' }}
                     >
+                        <HeartButton product={product} />
 
                         <img
                             src={product.imageUrl}
@@ -83,16 +99,34 @@ const ProductPage = () => {
                             }}
                             style={{
                                 width: "100%",
-                                height: "180px",      // 🔥 핵심 (고정)
+                                aspectRatio: "1 / 1",
                                 objectFit: "cover",
-                                borderRadius: "10px",
+                                borderRadius: "12px",
                                 backgroundColor: "#f5f5f5"
                             }}
                         />
 
-                        <h3>{product.name}</h3>
+                        <h3
+                            style={{
+                                marginTop: '10px',
+                                fontSize: '14px',
+                                fontWeight: 500,
+                                lineHeight: '20px',
+                            }}
+                        >
+                            {product.name}
+                        </h3>
 
-                        <p>{product.price?.toLocaleString()}원</p>
+                        <p
+                            style={{
+                                marginTop: '6px',
+                                fontSize: '14px',
+                                fontWeight: 600,
+                                lineHeight: '18px',
+                            }}
+                        >
+                            {product.price?.toLocaleString()}원
+                        </p>
 
                     </div>
                 ))}
