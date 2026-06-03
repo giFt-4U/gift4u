@@ -10,6 +10,7 @@ import {
     DescArea
 } from '../styles/ProductDetailStyle';
 import HeartButton from '../components/common/HeartButton';
+import { addToCart } from '../utils/Cart';
 
 const ProductDetail = () => {
 
@@ -19,15 +20,26 @@ const ProductDetail = () => {
     const [product, setProduct] = useState(null);
 
     useEffect(() => {
-
         axiosInstance
             .get(`/api/products/${id}`)
             .then((res) => {
                 setProduct(res.data);
             })
             .catch(console.error);
-
     }, [id]);
+
+    const handleAddCart = () => {
+        const isLogin = localStorage.getItem("token");
+
+        if (!isLogin) {
+            alert("로그인 후 장바구니를 이용할 수 있습니다.");
+            return;
+        }
+
+        addToCart(product);
+
+        alert("장바구니에 담겼습니다.");
+    };
 
     const handleBuyClick = () => {
         const isLogin = localStorage.getItem("token");
@@ -62,7 +74,6 @@ const ProductDetail = () => {
                     position: 'relative'
                 }}
             >
-
                 <HeartButton product={product} />
 
                 <img
@@ -82,6 +93,13 @@ const ProductDetail = () => {
             </ImageArea>
 
             <BuyBox>
+                <button
+                    type="button"
+                    onClick={handleAddCart}
+                >
+                    장바구니 담기
+                </button>
+
                 <button
                     type="button"
                     onClick={handleBuyClick}

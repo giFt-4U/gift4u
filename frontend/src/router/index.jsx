@@ -8,6 +8,7 @@ import ProductDetail from '../pages/ProductDetail';
 import SearchPage from '../pages/SearchPage';
 import CartPage from '../pages/CartPage';
 import OrderPage from '../pages/OrderPage';
+import WishlistPage from '../pages/WishlistPage';
 
 export default function Router() {
 
@@ -18,6 +19,7 @@ export default function Router() {
             <Routes>
                 <Route path="/" element={<App />}>
                     <Route index element={<Home />} />
+
 
 
                     {/* PRODUCT */}
