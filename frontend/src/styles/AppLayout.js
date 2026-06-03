@@ -1,3 +1,5 @@
+// AppLayout.js
+
 import styled from "styled-components";
 
 export const MobileContainer = styled.div`
@@ -18,17 +20,19 @@ export const MobileContainer = styled.div`
 
 export const MainContent = styled.main`
     width: 100%;
-    padding: 20px;
+
+    padding: ${({ $noPadding }) => ($noPadding ? "0" : "20px")};
 `;
 
 export const NavWrapper = styled.nav`
-
     height: 64px;
 
     display: flex;
     align-items: center;
 
     padding: 0 20px;
+
+    background: #ffffff;
 
     border-bottom: 1px solid #f2f2f2;
 
@@ -54,13 +58,18 @@ export const NavWrapper = styled.nav`
 
         display: flex;
         justify-content: center;
+        align-items: center;
 
         margin: 0;
     }
 
     .logo {
+        font-family: 'Pretendard Variable', Pretendard, sans-serif;
         font-size: 22px;
-        font-weight: 700;
+        font-weight: 500;
+        line-height: 23px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
 
         color: #f5c542;
 
@@ -72,6 +81,7 @@ export const NavWrapper = styled.nav`
         height: 24px;
 
         cursor: pointer;
+        display: block;
     }
 
     .empty-space {

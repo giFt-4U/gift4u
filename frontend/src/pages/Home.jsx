@@ -7,6 +7,7 @@ import axiosInstance from '../api/axiosInstance';
 import MainBanner from '../components/layout/MainBanner';
 import { useNavigate } from 'react-router-dom';
 import CategorySection from '../components/layout/CategorySection';
+import FloatingChatButton from '../components/common/FloatingChatButton';
 
 const Home = () => {
 
@@ -39,13 +40,23 @@ const Home = () => {
 
             <CategorySection onSelectCategory={setCategoryId} />
 
-            <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-
-            }}>
-                <h3>인기상품</h3>
+            <div
+                style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '18px',
+                }}
+            >
+                <h3
+                    style={{
+                        fontSize: '18px',
+                        fontWeight: 600,
+                        lineHeight: '22px',
+                    }}
+                >
+                    인기상품
+                </h3>
 
                 <button
                     onClick={() => navigate('/products')}
@@ -53,7 +64,9 @@ const Home = () => {
                         border: 'none',
                         background: 'none',
                         cursor: 'pointer',
-                        color: '#666'
+                        color: '#666',
+                        fontSize: '14px',
+                        lineHeight: '18px',
                     }}
                 >
                     전체보기
@@ -81,7 +94,7 @@ const Home = () => {
 
             </div>
 
-
+            <FloatingChatButton />
         </div>
     );
 };
