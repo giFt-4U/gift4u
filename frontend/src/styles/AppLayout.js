@@ -88,4 +88,24 @@ export const NavWrapper = styled.nav`
         width: 24px;
         height: 24px;
     }
+
+    .plus-button {
+        width: 24px;
+        height: 24px;
+
+        border: none;
+        background: transparent;
+        padding: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 28px;
+        font-weight: 300;
+        line-height: 1;
+
+        color: #111;
+        cursor: pointer;
+    }
 `;
