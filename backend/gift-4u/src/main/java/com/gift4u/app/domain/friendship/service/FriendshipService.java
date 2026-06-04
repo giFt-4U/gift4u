@@ -105,6 +105,17 @@ public class FriendshipService {
 				.toList();
 	}
 	
+	public List<FriendMemberResponse> listReceivedRequests(Long userId) {
+		return friendshipRepository.findAllPendingReceivedByAddresseeId(userId).stream()
+				.map(f -> FriendMemberResponse.builder()
+						.friendshipId(f.getId())
+						.userId(f.getRequester().getId())
+						.nickname(f.getRequester().getNickname())
+						.friendCode(f.getRequester().getFriendCode())
+						.build())
+				.toList();
+	}
+	
 	private FriendMemberResponse toFriendMember(Friendship f, Long myId) {
 		User friend = f.getRequester().getId().equals(myId) ? f.getAddressee() : f.getRequester();
 		
