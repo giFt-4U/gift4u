@@ -9,6 +9,7 @@ export const DetailWrapper = styled.div`
     margin: 0 auto;
 `;
 
+
 /* 이미지 영역 */
 export const ImageArea = styled.div`
     width: 100%;

@@ -1,5 +1,3 @@
-//ProductPage.jsx
-
 import React, { useEffect, useState, useRef } from 'react';
 import axiosInstance from '../api/axiosInstance';
 import { useNavigate } from 'react-router-dom';
@@ -14,8 +12,6 @@ const ProductPage = () => {
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const observerRef = useRef(null);
-
-
 
     useEffect(() => {
 
