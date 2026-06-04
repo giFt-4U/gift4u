@@ -30,5 +30,13 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long>{
 	
 	List<Friendship> findAllAcceptedByUserId(@Param("userId") Long userId);
 	
+	@Query("""
+			SELECT f FROM Friendship f
+			WHERE f.status = 'PENDING'
+			 AND f.addressee.id = :userId
+			ORDER BY f.createdAt DESC
+			""")
+	List<Friendship> findAllPendingReceivedByAddresseeId(@Param("userId") Long userId);
+	
 	boolean existsByRequesterIdAndAddresseeIdAndStatus(Long requesterId, Long addresseeId, FriendshipStatus status);
 }//interface
