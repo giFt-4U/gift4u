@@ -17,4 +17,5 @@ public class ChatMessageRequest {
 	private String content;
 	private MessageType messageType;	// TEXT or GIFT
 	private Long giftId;				// GIFT 타입일 때만 사용
+	private Long senderId;
 }

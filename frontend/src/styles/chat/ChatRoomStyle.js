@@ -4,8 +4,9 @@ import styled from "styled-components";
 export const Container = styled.div`
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 89vh;
     background: #fff;
+    overflow: hidden;
 `;
 
 export const BackButton = styled.button`
@@ -23,6 +24,7 @@ export const Title = styled.h1`
     color: #FF8C00;
     margin: 0;
 `;
+
 
 export const MessageList = styled.div`
     flex: 1;
@@ -101,7 +103,8 @@ export const InputArea = styled.div`
     gap: 8px;
     padding: 12px 16px;
     border-top: 1px solid #f0f0f0;
-    flex-shrink: 0;
+    flex-shrink: 0; 
+    background: #fff;
 `;
 
 export const TextInput = styled.input`

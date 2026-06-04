@@ -5,6 +5,7 @@ import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { getMessages } from '../../api/chatApi';
 import * as S from '../../styles/chat/ChatRoomStyle';
+import useAuthStore from '../../store/authStore';
 
 /**
  * 실시간 채팅방 페이지 (REQ-C03, REQ-C04)
@@ -34,7 +35,8 @@ const ChatRoom = () => {
     // 메시지 목록 맨 아래로 자동 스크롤
     const bottomRef = useRef(null);
     // 현재 로그인한 userId (localStorage에서 파싱)
-    const myUserId = Number(localStorage.getItem('userId'));
+    const { user } = useAuthStore();
+    const myUserId = user?.id || user?.userId;
 
     // ── 1. 과거 메시지 조회 ─────────────────────────────
     useEffect(() => {
@@ -110,6 +112,7 @@ const ChatRoom = () => {
                 roomId: Number(roomId),
                 content: trimmed,
                 messageType: 'TEXT',
+                senderId: myUserId,
             }),
         });
 

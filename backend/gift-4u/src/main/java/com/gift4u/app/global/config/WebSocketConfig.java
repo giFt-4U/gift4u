@@ -19,7 +19,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
  */
 @Configuration
 @EnableWebSocketMessageBroker
-public class webSocketConfig implements WebSocketMessageBrokerConfigurer {
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	
 	/** 메시지 브로커 설정
 	 * 
@@ -46,7 +46,7 @@ public class webSocketConfig implements WebSocketMessageBrokerConfigurer {
 	 */
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/ws-stomp")		// WS 연결 엔드포인트
+		registry.addEndpoint("/ws")		// WS 연결 엔드포인트
 				.setAllowedOriginPatterns("*")
 				.withSockJS();					// SockJS fallback
 	}

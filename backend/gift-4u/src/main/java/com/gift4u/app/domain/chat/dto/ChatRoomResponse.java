@@ -17,12 +17,13 @@ public class ChatRoomResponse {
 	private Long opponentId;
 	private String opponentNickname;
 	private LocalDateTime lastMessageAt;
+	private String lastMessage;
 	
 	/** ChatRoom은 userA, userB를 가지고 있음
 	 * 현재 로그인한 유저가 userA인지 userB인지에 따라
 	 * "상대방"이 달라지므로 currentUserId를 받아서 판단 필요
 	 */
-	public static ChatRoomResponse of(ChatRoom room, Long currentUserId) {
+	public static ChatRoomResponse of(ChatRoom room, Long currentUserId,String lastMessage) {
 		// 내가 userA면 상대방은 userB, 내가 userB면 상대방은 userA
 		boolean isUserA = room.getUserA().getId().equals(currentUserId);
 		
@@ -31,6 +32,7 @@ public class ChatRoomResponse {
 				.opponentId(isUserA ? room.getUserB().getId() : room.getUserA().getId())
 				.opponentNickname(isUserA ? room.getUserB().getNickname() : room.getUserA().getNickname())
 				.lastMessageAt(room.getLastMessageAt())
+	            .lastMessage(lastMessage)
 				.build();
 	}
 }

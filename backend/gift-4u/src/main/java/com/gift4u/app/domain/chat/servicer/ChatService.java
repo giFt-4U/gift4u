@@ -79,7 +79,7 @@ public class ChatService {
 		
 		// 기존 채팅방 있으면 그대로 반환 (중복 생성 방지)
 		return chatRoomRepository.findRoomByTwoUsers(currentUserId, opponentId)
-				.map(room -> ChatRoomResponse.of(room, currentUserId))
+				.map(room -> ChatRoomResponse.of(room, currentUserId, "기존 대화방 연결"))
 				.orElseGet(()-> {
 					// 없으면 신규 생성 - userA: 요청자, userB: 상대방으로 고정
 					ChatRoom newRoom = ChatRoom.builder()
@@ -87,7 +87,8 @@ public class ChatService {
 							.userB(oppenent)
 							.build();
 					chatRoomRepository.save(newRoom);
-					return ChatRoomResponse.of(newRoom, currentUserId);
+					
+					return ChatRoomResponse.of(newRoom, currentUserId, "새로운 채팅방이 개설되었습니다.");
 				});
 	}
 	
@@ -96,12 +97,19 @@ public class ChatService {
 	 * lastMessageAt 최신순 정렬
 	 * @EntityGraph userA/userB 즉시 로딩 > N+1 없음
 	 */
-	public List<ChatRoomResponse> getRooms(Long currentUserId){
-		return chatRoomRepository
-				.findByUserAIdOrUserBIdOrderByLastMessageAtDesc(currentUserId, currentUserId)
-				.stream()
-				.map(room -> ChatRoomResponse.of(room, currentUserId))
-				.toList();
+	public List<ChatRoomResponse> getRooms(Long currentUserId) {
+	    return chatRoomRepository
+	            .findByUserAIdOrUserBIdOrderByLastMessageAtDesc(currentUserId, currentUserId)
+	            .stream()
+	            .map(room -> {
+	                // 마지막 메시지 조회
+	                String lastMessage = chatMessageRepository
+	                        .findTopByRoomIdOrderByCreatedAtDesc(room.getId())
+	                        .map(ChatMessage::getContent)
+	                        .orElse(null);
+	                return ChatRoomResponse.of(room, currentUserId, lastMessage);
+	            })
+	            .toList();
 	}
 	
 	

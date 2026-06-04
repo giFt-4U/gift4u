@@ -75,6 +75,10 @@ const MyPage = () => {
                     친구 관리
                     <span className="arrow">›</span>
                 </MenuItem>
+                <MenuItem onClick={() => navigate('/friends/requestList')}>
+                    친구 요청 목록
+                    <span className="arrow">›</span>
+                </MenuItem>
             </MenuSection>
 
             <LogoutButton onClick={onLogout}>로그아웃</LogoutButton>
