@@ -10,6 +10,12 @@ import CartPage from '../pages/CartPage';
 import OrderPage from '../pages/OrderPage';
 import WishlistPage from '../pages/WishlistPage';
 
+import LoginPage from '../pages/user/LoginPage';
+import SignupPage from '../pages/user/SignupPage';
+import KakaoCallbackPage from '../pages/user/KakaoCallbackPage';
+import MyPage from '../pages/user/MyPage';
+
+
 export default function Router() {
 
     return (
@@ -19,7 +25,6 @@ export default function Router() {
             <Routes>
                 <Route path="/" element={<App />}>
                     <Route index element={<Home />} />
-
 
 
                     {/* PRODUCT */}
@@ -40,9 +45,14 @@ export default function Router() {
                     <Route path='gifts/:uuid/address' element={<GiftAddress />} />
                     <Route path='gifts/:uuid/accept' element={<GiftAccept />} />
 
+                    {/* AUTH */}
+                    <Route path="login" element={<LoginPage />} />
+                    <Route path="signup" element={<SignupPage />} />
+                    <Route path="kakao/auth-code" element={<KakaoCallbackPage />} />
+                    <Route path="mypage" element={<MyPage />} />
+
                     {/* SEARCH */}
                     <Route path="search" element={<SearchPage />} />
-
 
 
                 </Route>

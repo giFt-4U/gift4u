@@ -3,16 +3,21 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { NavWrapper } from '../../styles/AppLayout';
+import useAuthStore from '../../store/authStore';
 
 const Nav = () => {
 
     const location = useLocation();
     const navigate = useNavigate();
+    const { token } = useAuthStore();
 
     const path = location.pathname;
 
     // 상품 목록 페이지
     const isProduct = path === '/products';
+
+    // 로그인 / 회원가입 페이지
+    const isAuthPage = ['/login', '/signup'].includes(path);
 
     // 상품 상세 페이지
     const isProductDetail = path.startsWith('/products/');
@@ -31,12 +36,11 @@ const Nav = () => {
             <div className='nav-left'>
 
                 {/* 
-                    상품페이지 / 상품상세페이지 / 장바구니 / 위시리스트는
+                    상품페이지 / 상품상세페이지 / 장바구니 / 위시리스트 / 로그인 / 회원가입은
                     이전 페이지로 돌아갈 수 있도록 뒤로가기 아이콘 사용
                 */}
-                {(isProduct || isProductDetail || isCart || isWishlist) ? (
-
-                    <img
+                {(isProduct || isProductDetail || isCart || isWishlist || isAuthPage) ? (
+                     <img
                         src="/assets/icons/back.png"
                         alt="뒤로가기"
                         onClick={() => navigate(-1)}
@@ -93,7 +97,9 @@ const Nav = () => {
 
                         <img
                             src="/assets/icons/user.png"
-                            alt="유저"
+                            alt='유저'
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => navigate(token ? '/mypage' : '/login')}
                         />
                     </>
 
