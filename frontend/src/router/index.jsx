@@ -10,6 +10,14 @@ import CartPage from '../pages/CartPage';
 import OrderPage from '../pages/OrderPage';
 import WishlistPage from '../pages/WishlistPage';
 
+import ChatAddFriend from '../pages/chat/ChatAddFriend';
+import ChatList from '../pages/chat/ChatList';
+import ChatRoom from '../pages/chat/ChatRoom';
+import GiftCard from '../pages/gift/GiftCard';
+import GiftCardView from '../pages/gift/GiftCardView';
+import GiftAddress from '../pages/gift/GiftAddress';
+import GiftAccept from '../pages/gift/GiftAccept';
+
 import LoginPage from '../pages/user/LoginPage';
 import SignupPage from '../pages/user/SignupPage';
 import KakaoCallbackPage from '../pages/user/KakaoCallbackPage';
@@ -33,9 +41,9 @@ export default function Router() {
 
 
                     {/* CHAT */}
-                    <Route path='chat' element={<ChatList />} />
                     <Route path='chat/add' element={<ChatAddFriend />} />
-                    <Route path='chat/:roomId' element={<ChatRoom />} />du
+                    <Route path='chat' element={<ChatList />} />
+                    <Route path='chat/:roomId' element={<ChatRoom />} />
 
 
                     {/* GIFT */}

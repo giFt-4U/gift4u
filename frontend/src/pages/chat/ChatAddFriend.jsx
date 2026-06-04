@@ -34,26 +34,28 @@ const ChatAddFriend = () => {
         setError(null);
 
         try {
-            // 친구 코드로 상대방 정보 조회
-            // 친구 담당자 API 완성 후 실제 경로로 교체
+            // 1. 친구 코드로 상대방 정보 조회
             const userRes = await axiosInstance.get(`/api/friends/code/${friendCode.trim()}`);
             const opponentId = userRes.data.id;
 
-            // 채팅방 생성 or 기존 방 조회
+            // 2. 채팅방 생성 or 기존 방 조회
             const roomRes = await getOrCreateRoom(opponentId);
             const roomId = roomRes.data.roomId;
 
-            setModal({ type: 'success', message: '친구 요청이 전송되었습니다.' });
-
-            // 모달 확인 후 채팅방으로 이동
-            setTimeout(() => navigate(`/chat/${roomId}`), 1000);
+            alert('친구 요청이 전송되었습니다.');
+            // 변경된 라우터 주소 구조(/chat/room/:roomId) 적용
+            navigate(`/chat/room/${roomId}`);
 
         } catch (e) {
-            const code = e.response?.data?.error?.code;
-            if (code === 'FRIEND_CODE_NOT_FOUND') {
-                setModal({ type: 'error', message: '사용자를 찾을 수 없습니다.' });
+            const errStatus = e.response?.status;
+            const serverResponse = e.response?.data;
+            const backendErrorCode = serverResponse?.code || serverResponse?.error?.code;
+
+            // 백엔드가 401을 보내더라도, '사용자를 찾을 수 없는 비즈니스 에러'라면 튕기지 않게 방어
+            if (backendErrorCode === 'FRIEND_CODE_NOT_FOUND' || errStatus === 404 || errStatus === 401) {
+                alert('사용자를 찾을 수 없습니다.');
             } else {
-                setModal({ type: 'error', message: '오류가 발생했습니다. 다시 시도해주세요.' });
+                alert('오류가 발생했습니다. 다시 시도해주세요.');
             }
         } finally {
             setLoading(false);
