@@ -3,18 +3,20 @@
 import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
-
-    * {
+    *{
         box-sizing: border-box;
         margin: 0;
         padding: 0;
     }
 
+
     html,
     body,
     #root {
+        width: 100%;
         min-height: 100vh;
     }
+
 
     body {
         background-color: #f0f0f4;
@@ -94,6 +96,13 @@ const GlobalStyle = createGlobalStyle`
         line-height: 16px;
         letter-spacing: 1.5px;
         text-transform: uppercase;
+    }
+
+    #root {
+        width: 100%;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
     }
 `;
 
