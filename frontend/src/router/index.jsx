@@ -33,9 +33,9 @@ export default function Router() {
 
 
                     {/* CHAT */}
-                    <Route path='chat' element={<ChatList />} />
                     <Route path='chat/add' element={<ChatAddFriend />} />
-                    <Route path='chat/:roomId' element={<ChatRoom />} />du
+                    <Route path='chat' element={<ChatList />} />
+                    <Route path='chat/:roomId' element={<ChatRoom />} />
 
 
                     {/* GIFT */}
