@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import axiosInstance from '../../api/axiosInstance';
-import { getOrCreateRoom } from '../../api/chatApi';
+import { sendFriendRequest } from '../../api/chatApi';
 import * as S from '../../styles/chat/ChatAddFriendStyle';
 
 /**
@@ -34,29 +34,26 @@ const ChatAddFriend = () => {
         setError(null);
 
         try {
-            // 1. 친구 코드로 상대방 정보 조회
-            const userRes = await axiosInstance.get(`/api/friends/code/${friendCode.trim()}`);
-            const opponentId = userRes.data.id;
-
-            // 2. 채팅방 생성 or 기존 방 조회
-            const roomRes = await getOrCreateRoom(opponentId);
-            const roomId = roomRes.data.roomId;
+            await sendFriendRequest(friendCode.trim());
 
             alert('친구 요청이 전송되었습니다.');
-            // 변경된 라우터 주소 구조(/chat/room/:roomId) 적용
             navigate(`/chat/room/${roomId}`);
 
         } catch (e) {
-            const errStatus = e.response?.status;
+            // 2. 백엔드에서 에러 응답 객체 데이터 추출
             const serverResponse = e.response?.data;
+            // 3. 백엔드가 리턴한 에러 코드가 'FRIEND_REQUEST_ALREADY_EXISTS'인지 체크
             const backendErrorCode = serverResponse?.code || serverResponse?.error?.code;
+            // 4. 백엔드 글로벌 에러에서 지정한 실제 멘트("이미 친구이거나 요청 대기 중입니다.") 추출
+            const globalMessage = serverResponse?.message || serverResponse?.error?.message;
 
-            // 백엔드가 401을 보내더라도, '사용자를 찾을 수 없는 비즈니스 에러'라면 튕기지 않게 방어
-            if (backendErrorCode === 'FRIEND_CODE_NOT_FOUND' || errStatus === 404 || errStatus === 401) {
-                alert('사용자를 찾을 수 없습니다.');
+            if (backendErrorCode === 'FRIEND_REQUEST_ALREADY_EXISTS' || globalMessage) {
+                // 🚨 백엔드 멘트 그대로 alert 창에 띄우기
+                alert(globalMessage);
             } else {
-                alert('오류가 발생했습니다. 다시 시도해주세요.');
+                alert('사용자를 찾을 수 없습니다.');
             }
+            setFriendCode('');
         } finally {
             setLoading(false);
         }

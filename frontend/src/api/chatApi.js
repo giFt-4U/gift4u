@@ -9,3 +9,7 @@ export const getOrCreateRoom = (opponentId) => axiosInstance.post('/api/chat/roo
 // 과거 메시지 페이징 조회 (REQ-C03)
 export const getMessages = (roomId, page = 0, size = 30) =>
     axiosInstance.get(`/api/chat/rooms/${roomId}/messages?page=${page}&size=${size}`);
+
+// 친구 코드로 요청(REQ-027)
+export const sendFriendRequest = (friendCode) =>
+    axiosInstance.post('/api/friendships/request', { friendCode }); 
