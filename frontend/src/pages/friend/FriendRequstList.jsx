@@ -25,7 +25,7 @@ const FriendRequestList = () => {
             alert('친구 요청을 수락했습니다.');
 
             // 수락 성공 후 화면 목록에서 삭제 처리
-            setRequests((prev) => prev.filter((req) => req.id !== id));
+            setRequests((prev) => prev.filter((req) => req.friendshipId !== id));
         } catch (e) {
             const globalMessage = e.response?.data?.message;
             alert(globalMessage || '처리에 실패했습니다. 다시 시도해주세요.');
@@ -41,7 +41,7 @@ const FriendRequestList = () => {
             alert('친구 요청을 거절했습니다.');
 
             // 거절 성공 후 화면 목록에서 삭제 처리
-            setRequests((prev) => prev.filter((req) => req.id !== id));
+            setRequests((prev) => prev.filter((req) => req.friendshipId !== id));
         } catch (e) {
             const globalMessage = e.response?.data?.message;
             alert(globalMessage || '처리에 실패했습니다. 다시 시도해주세요.');
@@ -59,19 +59,17 @@ const FriendRequestList = () => {
             ) : (
                 <RequestList>
                     {requests.map((req) => (
-                        <RequestItem key={req.id}>
-                            {/* 상대방 이름 혹은 정보 정보 출력 (백엔드 DTO 속성 매칭) */}
+                        <RequestItem key={req.friendshipId}>
                             <UserInfo>
-                                <Nickname>{req.senderNickname || '사용자'}</Nickname>
+                                <Nickname>{req.nickname || '사용자'}</Nickname>
                                 <SubText>친구 요청을 보냈습니다.</SubText>
                             </UserInfo>
 
-                            {/* 버튼 제어 영역 */}
                             <ButtonArea>
-                                <AcceptButton onClick={() => handleAccept(req.id)}>
+                                <AcceptButton onClick={() => handleAccept(req.friendshipId)}>
                                     수락
                                 </AcceptButton>
-                                <RejectButton onClick={() => handleReject(req.id)}>
+                                <RejectButton onClick={() => handleReject(req.friendshipId)}>
                                     거절
                                 </RejectButton>
                             </ButtonArea>
