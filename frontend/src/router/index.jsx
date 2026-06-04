@@ -13,8 +13,7 @@ import CartPage from '../pages/CartPage';
 import OrderPage from '../pages/OrderPage';
 import WishlistPage from '../pages/WishlistPage';
 
-<<<<<<< HEAD
-=======
+
 // CHAT
 import ChatList from '../pages/chat/ChatList';
 import ChatAddFriend from '../pages/chat/ChatAddFriend';
@@ -25,7 +24,7 @@ import GiftCard from '../pages/gift/GiftCard';
 import GiftCardView from '../pages/gift/GiftCardView';
 import GiftAddress from '../pages/gift/GiftAddress';
 import GiftAccept from '../pages/gift/GiftAccept';
->>>>>>> refs/heads/feature-jeawon02
+
 
 export default function Router() {
     return (
