@@ -8,8 +8,13 @@ const FloatingChatButton = ({ hasUnread = false }) => {
     const navigate = useNavigate();
 
     const handleClick = () => {
-        // 채팅 페이지는 다른 담당 영역이므로
-        // 현재는 채팅 진입 경로까지만 연결
+        const isLogin = localStorage.getItem("token");
+
+        if (!isLogin) {
+            alert("로그인 후 채팅을 이용할 수 있습니다.");
+            return;
+        }
+
         navigate("/chat");
     };
 

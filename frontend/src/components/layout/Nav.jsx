@@ -5,102 +5,85 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { NavWrapper } from '../../styles/AppLayout';
 
 const Nav = () => {
-
     const location = useLocation();
     const navigate = useNavigate();
 
     const path = location.pathname;
 
-    // 상품 목록 페이지
     const isProduct = path === '/products';
-
-    // 상품 상세 페이지
     const isProductDetail = path.startsWith('/products/');
-
-    // 장바구니 페이지
     const isCart = path === '/cart';
-
-    // 위시리스트 페이지
     const isWishlist = path === '/wishlist';
 
+    // 채팅 목록 페이지
+    const isChatList = path === '/chat';
+
+    // 채팅 관련 페이지
+    const isChatPage = path.startsWith('/chat');
+
+    const handleCartClick = () => {
+        navigate('/cart');
+    };
+
     return (
-
         <NavWrapper>
-
             {/* 왼쪽 영역 */}
             <div className='nav-left'>
-
-                {/* 
-                    상품페이지 / 상품상세페이지 / 장바구니 / 위시리스트는
-                    이전 페이지로 돌아갈 수 있도록 뒤로가기 아이콘 사용
-                */}
-                {(isProduct || isProductDetail || isCart || isWishlist) ? (
-
+                {isChatList ? (
+                    // /chat 페이지에서는 돋보기 대신 + 버튼
+                    <button
+                        type="button"
+                        className="plus-button"
+                        onClick={() => navigate('/chat/add')}
+                        aria-label="친구 추가"
+                    >
+                        +
+                    </button>
+                ) : (isProduct || isProductDetail || isCart || isWishlist || isChatPage) ? (
+                    // 상품 / 장바구니 / 위시리스트 / 채팅 관련 페이지는 뒤로가기
                     <img
                         src="/assets/icons/back.png"
                         alt="뒤로가기"
                         onClick={() => navigate(-1)}
                     />
-
                 ) : (
-
-                    // 메인 / 검색 계열은 검색 아이콘 사용
+                    // 기본 페이지는 검색 아이콘
                     <img
                         src="/assets/icons/search.png"
                         alt="검색"
                         onClick={() => navigate('/search')}
                     />
-
                 )}
-
             </div>
 
             {/* 중앙 로고 */}
             <h1>
-                <Link
-                    to="/"
-                    className='logo'
-                >
+                <Link to="/" className='logo'>
                     따숨품
                 </Link>
             </h1>
 
             {/* 오른쪽 영역 */}
             <div className='nav-right'>
-
                 {isCart ? (
-
-                    // 장바구니 페이지는 오른쪽 공백
-                    <div className='empty-space' />
-
-                ) : (isProduct || isProductDetail || isWishlist) ? (
-
-                    // 상품 목록 / 상품 상세 / 위시리스트 페이지는 장바구니 아이콘
-                    <img
-                        src="/assets/icons/shopping_cart.png"
-                        alt="장바구니"
-                        onClick={() => navigate('/cart')}
-                    />
-
+                    // 장바구니 페이지에서는 오른쪽 공백 처리
+                    <div className="empty-space" />
                 ) : (
-
-                    // 메인 / 검색 페이지는 알림 + 유저 아이콘
+                    // 알림 아이콘 제거, 유저 아이콘 + 장바구니 아이콘 표시
                     <>
-                        <img
-                            src="/assets/icons/bell.png"
-                            alt="알림"
-                        />
-
                         <img
                             src="/assets/icons/user.png"
                             alt="유저"
                         />
+
+                        <img
+                            src="/assets/icons/shopping_cart.png"
+                            alt="장바구니"
+                            onClick={handleCartClick}
+                        />
                     </>
-
                 )}
-
             </div>
-
         </NavWrapper>
     );
 };
