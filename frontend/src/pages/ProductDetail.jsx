@@ -1,4 +1,4 @@
-// ProductDetail.jsx
+//ProductDetail.jsx
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -90,6 +90,7 @@ const ProductDetail = () => {
                         backgroundColor: "#f5f5f5"
                     }}
                 />
+
             </ImageArea>
 
             <BuyBox>
