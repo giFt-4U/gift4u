@@ -13,16 +13,6 @@ import CartPage from '../pages/CartPage';
 import OrderPage from '../pages/OrderPage';
 import WishlistPage from '../pages/WishlistPage';
 
-// CHAT
-import ChatList from '../pages/chat/ChatList';
-import ChatAddFriend from '../pages/chat/ChatAddFriend';
-import ChatRoom from '../pages/chat/ChatRoom';
-
-// GIFT
-import GiftCard from '../pages/gift/GiftCard';
-import GiftCardView from '../pages/gift/GiftCardView';
-import GiftAddress from '../pages/gift/GiftAddress';
-import GiftAccept from '../pages/gift/GiftAccept';
 
 export default function Router() {
     return (
@@ -43,17 +33,7 @@ export default function Router() {
                     <Route path="order" element={<OrderPage />} />
                     <Route path="wishlist" element={<WishlistPage />} />
 
-                    {/* CHAT */}
-                    <Route path="chat" element={<ChatList />} />
-                    <Route path="chat/add" element={<ChatAddFriend />} />
-                    <Route path="chat/:roomId" element={<ChatRoom />} />
 
-                    {/* GIFT */}
-                    <Route path="gifts/card" element={<GiftCard />} />
-                    <Route path="gifts/card/preview" element={<GiftCardView />} />
-                    <Route path="gifts/:uuid" element={<GiftCardView />} />
-                    <Route path="gifts/:uuid/address" element={<GiftAddress />} />
-                    <Route path="gifts/:uuid/accept" element={<GiftAccept />} />
                 </Route>
             </Routes>
         </BrowserRouter>
