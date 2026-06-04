@@ -24,6 +24,7 @@ import LoginPage from '../pages/user/LoginPage';
 import SignupPage from '../pages/user/SignupPage';
 import KakaoCallbackPage from '../pages/user/KakaoCallbackPage';
 import MyPage from '../pages/user/MyPage';
+import FriendsPage from '../pages/user/FriendsPage';
 
 
 export default function Router() {
@@ -60,6 +61,7 @@ export default function Router() {
                     <Route path="signup" element={<SignupPage />} />
                     <Route path="kakao/auth-code" element={<KakaoCallbackPage />} />
                     <Route path="mypage" element={<MyPage />} />
+                    <Route path="friends" element={<FriendsPage />} />
 
                     {/* FRIEND */}
                     <Route path='friends/requestlist' element={<FriendRequestList />} />

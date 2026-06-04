@@ -10,6 +10,10 @@ const GlobalStyle = createGlobalStyle`
     }
 
 
+    html {
+        scrollbar-gutter: stable;
+    }
+
     html,
     body,
     #root {
