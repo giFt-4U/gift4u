@@ -49,7 +49,7 @@ const ChatRoom = () => {
             .catch(() => { });
     }, [roomId]);
 
-    // ── 2. STOMP 연결 ────────────────────────────────────
+    // ── 2. STOMP 연결f ────────────────────────────────────
     useEffect(() => {
         const token = localStorage.getItem('token');
 
