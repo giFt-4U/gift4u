@@ -2,11 +2,15 @@
 
 import React from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 
 const FloatingChatButton = ({ hasUnread = false }) => {
+    const navigate = useNavigate();
 
     const handleClick = () => {
-        alert("채팅 서비스는 추후 연결 예정입니다.");
+        // 채팅 페이지는 다른 담당 영역이므로
+        // 현재는 채팅 진입 경로까지만 연결
+        navigate("/chat");
     };
 
     return (
