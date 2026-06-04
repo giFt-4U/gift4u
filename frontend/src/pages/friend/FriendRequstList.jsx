@@ -27,7 +27,6 @@ const FriendRequestList = () => {
             // 수락 성공 후 화면 목록에서 삭제 처리
             setRequests((prev) => prev.filter((req) => req.id !== id));
         } catch (e) {
-            // 백엔드 글로벌 에러 멘트 그대로 alert 노출
             const globalMessage = e.response?.data?.message;
             alert(globalMessage || '처리에 실패했습니다. 다시 시도해주세요.');
         }
