@@ -17,20 +17,21 @@ function App() {
   // 주문 페이지는 자체 상단바를 사용하므로 공통 Nav 숨김
   const isOrderPage = location.pathname === '/order';
 
+
   return (
     <>
       <GlobalStyle />
       
       <MobileContainer>
 
+
         {!isOrderPage && <Nav />}
 
         <MainContent $noPadding={isCartPage}>
 
+
           <Outlet />
-
         </MainContent>
-
       </MobileContainer>
     </>
   );

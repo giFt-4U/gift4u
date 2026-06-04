@@ -10,6 +10,12 @@ import CartPage from '../pages/CartPage';
 import OrderPage from '../pages/OrderPage';
 import WishlistPage from '../pages/WishlistPage';
 
+import LoginPage from '../pages/user/LoginPage';
+import SignupPage from '../pages/user/SignupPage';
+import KakaoCallbackPage from '../pages/user/KakaoCallbackPage';
+import MyPage from '../pages/user/MyPage';
+
+
 export default function Router() {
 
     return (
@@ -17,43 +23,37 @@ export default function Router() {
         <BrowserRouter>
 
             <Routes>
+                <Route path="/" element={<App />}>
+                    <Route index element={<Home />} />
 
-                <Route
-                    path="/"
-                    element={<App />}
-                >
 
-                    <Route
-                        index
-                        element={<Home />}
-                    />
+                    {/* PRODUCT */}
+                    <Route path="products" element={<ProductPage />} />
+                    <Route path="products/:id" element={<ProductDetail />} />
 
-                    <Route
-                        path="products"
-                        element={<ProductPage />}
-                    />
 
-                    <Route
-                        path="products/:id"
-                        element={<ProductDetail />}
-                    />
+                    {/* CHAT */}
+                    <Route path='chat' element={<ChatList />} />
+                    <Route path='chat/add' element={<ChatAddFriend />} />
+                    <Route path='chat/:roomId' element={<ChatRoom />} />du
 
-                    <Route
-                        path="search"
-                        element={<SearchPage />}
-                    />
-                    <Route
-                        path="cart"
-                        element={<CartPage />}
-                    />
-                    <Route
-                        path="order"
-                        element={<OrderPage />}
-                    />
-                    <Route
-                        path="wishlist"
-                        element={<WishlistPage />}
-                    />
+
+                    {/* GIFT */}
+                    <Route path='gifts/card' element={<GiftCard />} />
+                    <Route path='gifts/card/preview' element={<GiftCardView />} />
+                    <Route path='gifts/:uuid' element={<GiftCardView />} /> {/* 받는 사람 링크 */}
+                    <Route path='gifts/:uuid/address' element={<GiftAddress />} />
+                    <Route path='gifts/:uuid/accept' element={<GiftAccept />} />
+
+                    {/* AUTH */}
+                    <Route path="login" element={<LoginPage />} />
+                    <Route path="signup" element={<SignupPage />} />
+                    <Route path="kakao/auth-code" element={<KakaoCallbackPage />} />
+                    <Route path="mypage" element={<MyPage />} />
+
+                    {/* SEARCH */}
+                    <Route path="search" element={<SearchPage />} />
+
 
                 </Route>
 
