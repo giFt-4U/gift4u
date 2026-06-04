@@ -1,4 +1,4 @@
-//Home.jsx
+// Home.jsx
 
 import React, { useEffect, useState } from 'react';
 import ProductCard from '../components/common/ProductCard';
@@ -10,32 +10,42 @@ import CategorySection from '../components/layout/CategorySection';
 import FloatingChatButton from '../components/common/FloatingChatButton';
 
 const Home = () => {
-
-    const [products, setProducts] = useState([]); // ⭐ 하나만 사용
+    const [products, setProducts] = useState([]);
     const [categoryId, setCategoryId] = useState(0);
     const navigate = useNavigate();
 
     useEffect(() => {
-
         axiosInstance
             .get("/api/products", {
                 params: {
                     page: 0,
                     size: 10,
                     sort: "popular",
-
                     ...(categoryId !== 0 && { categoryId })
                 }
             })
             .then((res) => {
-                setProducts(res.data.content);
+                console.log("상품 응답 데이터:", res.data);
+
+                const data = res.data;
+
+                if (Array.isArray(data)) {
+                    setProducts(data);
+                } else if (data && Array.isArray(data.content)) {
+                    setProducts(data.content);
+                } else {
+                    setProducts([]);
+                }
+            })
+            .catch((err) => {
+                console.error("상품 조회 실패:", err);
+                setProducts([]);
             });
 
     }, [categoryId]);
 
     return (
         <div className='home-container' style={{ padding: '0 20px' }}>
-
             <MainBanner />
 
             <CategorySection onSelectCategory={setCategoryId} />
@@ -73,25 +83,15 @@ const Home = () => {
                 </button>
             </div>
 
-            <div
-                style={{
-                    minHeight: '700px'
-                }}
-            >
-
+            <div style={{ minHeight: '700px' }}>
                 <ProductGrid>
-
-                    {products.map((product) => (
-
+                    {Array.isArray(products) && products.map((product) => (
                         <ProductCard
                             key={product.id}
                             product={product}
                         />
-
                     ))}
-
                 </ProductGrid>
-
             </div>
 
             <FloatingChatButton />
