@@ -8,13 +8,13 @@ const FloatingChatButton = ({ hasUnread = false }) => {
     const navigate = useNavigate();
 
     const handleClick = () => {
-        const token = localStorage.getItem("token");
+        const isLogin = localStorage.getItem("token");
 
-        if (!token) {
-            alert("로그인이 필요한 서비스 입니다.");
-            navigate("/login");
+        if (!isLogin) {
+            alert("로그인 후 채팅을 이용할 수 있습니다.");
             return;
         }
+
         navigate("/chat");
     };
 

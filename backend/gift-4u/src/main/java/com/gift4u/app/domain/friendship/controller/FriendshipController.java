@@ -54,6 +54,14 @@ public class FriendshipController {
 		return ResponseEntity.ok().build();
 	}
 	
+	//받은 친구 요청 목록
+	@GetMapping("/requests/received")
+	public ResponseEntity<List<FriendMemberResponse>> listReceivedRequests(
+			@AuthenticationPrincipal CustomUserDetails userDetails) {
+		return ResponseEntity.ok(
+				friendshipService.listReceivedRequests(userDetails.getUser().getId()));
+	}
+	
 	//수락된 친구 목록(REQ-028)
 	@GetMapping
 	public ResponseEntity<List<FriendMemberResponse>> listFriends(
