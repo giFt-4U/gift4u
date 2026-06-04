@@ -1,13 +1,11 @@
 package com.gift4u.app.domain.chat.controller;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.gift4u.app.domain.chat.dto.ChatMessageRequest;
 import com.gift4u.app.domain.chat.servicer.ChatService;
-import com.gift4u.app.global.security.CustomUserDetails;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,10 +25,7 @@ public class ChatWebSocketController {
 	private final ChatService chatService;
 	
 	@MessageMapping("/chat/send")
-	public void sendMessage(@AuthenticationPrincipal CustomUserDetails userDetails,
-							@Payload ChatMessageRequest request) {
-		Long currentUserId = (userDetails != null && userDetails.getUser() != null) ? userDetails.getUser().getId() : 1L;
-//	    Long currentUserId = userDetails.getUser().getId();
-		chatService.sendMessage(currentUserId, request);
+	public void sendMessage(@RequestBody ChatMessageRequest request) {
+	    chatService.sendMessage(request.getSenderId(), request); 
 	}
 }
