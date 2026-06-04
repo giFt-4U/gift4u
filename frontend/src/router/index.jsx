@@ -18,6 +18,8 @@ import GiftCardView from '../pages/gift/GiftCardView';
 import GiftAddress from '../pages/gift/GiftAddress';
 import GiftAccept from '../pages/gift/GiftAccept';
 
+import FriendRequestList from '../pages/friend/FriendRequstList';
+
 import LoginPage from '../pages/user/LoginPage';
 import SignupPage from '../pages/user/SignupPage';
 import KakaoCallbackPage from '../pages/user/KakaoCallbackPage';
@@ -58,6 +60,9 @@ export default function Router() {
                     <Route path="signup" element={<SignupPage />} />
                     <Route path="kakao/auth-code" element={<KakaoCallbackPage />} />
                     <Route path="mypage" element={<MyPage />} />
+
+                    {/* FRIEND */}
+                    <Route path='friends/requestlist' element={<FriendRequestList />} />
 
                     {/* SEARCH */}
                     <Route path="search" element={<SearchPage />} />

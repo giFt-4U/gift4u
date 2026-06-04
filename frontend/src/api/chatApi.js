@@ -12,4 +12,16 @@ export const getMessages = (roomId, page = 0, size = 30) =>
 
 // 친구 코드로 요청(REQ-027)
 export const sendFriendRequest = (friendCode) =>
-    axiosInstance.post('/api/friendships/request', { friendCode }); 
+    axiosInstance.post('/api/friendships/request', { friendCode });
+
+// 친구 요청 목록
+export const getFriendRequests = () =>
+    axiosInstance.get('/api/friendships/requests/received');
+
+// 친구 수락(REQ-034)
+export const acceptFriendRequest = (id) =>
+    axiosInstance.patch(`/api/friendships/${id}/accept`);
+
+// 친구 거절(REQ-034)
+export const rejectFriendRequest = (id) =>
+    axiosInstance.patch(`/api/friendships/${id}/reject`);
