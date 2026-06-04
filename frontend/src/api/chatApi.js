@@ -8,4 +8,4 @@ export const getOrCreateRoom = (opponentId) => axiosInstance.post('/api/chat/roo
 
 // 과거 메시지 페이징 조회 (REQ-C03)
 export const getMessages = (roomId, page = 0, size = 30) =>
-    axiosInstance.get(`/api/chat/rooms/${roomId}/message?page=${page}&size=${size}`);
+    axiosInstance.get(`/api/chat/rooms/${roomId}/messages?page=${page}&size=${size}`);

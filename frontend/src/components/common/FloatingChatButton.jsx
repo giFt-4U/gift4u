@@ -2,11 +2,20 @@
 
 import React from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 
 const FloatingChatButton = ({ hasUnread = false }) => {
+    const navigate = useNavigate();
 
     const handleClick = () => {
-        alert("채팅 서비스는 추후 연결 예정입니다.");
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            alert("로그인이 필요한 서비스 입니다.");
+            navigate("/login");
+            return;
+        }
+        navigate("/chat");
     };
 
     return (
