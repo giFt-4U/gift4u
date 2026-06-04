@@ -4,16 +4,16 @@ import styled from 'styled-components';
 export const MyPageContainer = styled.div`
     display: flex;
     flex-direction: column;
-    padding: 16px 0 60px;
+    padding: 0 20px 60px;
 `;
 
 export const ProfileSection = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 32px 0 28px;
+    padding: 32px 20px 28px;
+    margin: 0 -20px 24px;
     border-bottom: 1px solid #f2f2f2;
-    margin-bottom: 24px;
 `;
 
 export const ProfileImage = styled.img`
@@ -85,7 +85,8 @@ export const MenuItem = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 4px;
+    margin: 0 -20px;
+    padding: 16px 20px;
     border-bottom: 1px solid #f7f7f7;
     cursor: pointer;
     font-size: 14px;
