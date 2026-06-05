@@ -7,6 +7,8 @@ import lombok.Setter;
 @Setter
 public class ProductUpdateRequest {
 
+    private String brandName;
+
     private String name;
 
     private String description;

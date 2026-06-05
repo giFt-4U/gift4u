@@ -105,7 +105,7 @@ const MyPage = () => {
                     친구 관리
                     <span className="arrow">›</span>
                 </MenuItem>
-                <MenuItem onClick={() => navigate('/friends/requestList')}>
+                <MenuItem onClick={() => navigate('/friends/requestlist')}>
                     친구 요청 목록
                     <span className="arrow">›</span>
                     {hasNewRequest && <RedDot />}

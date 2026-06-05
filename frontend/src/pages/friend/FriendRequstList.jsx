@@ -65,7 +65,6 @@ const FriendRequestList = () => {
                                 <SubText>친구 요청을 보냈습니다.</SubText>
                             </UserInfo>
 
-                            {/* 버튼 제어 영역 */}
                             <ButtonArea>
                                 <AcceptButton onClick={() => handleAccept(req.friendshipId)}>
                                     수락

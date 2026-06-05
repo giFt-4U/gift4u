@@ -1,4 +1,4 @@
-//Home.jsx
+// Home.jsx
 
 import React, { useEffect, useState } from 'react';
 import ProductCard from '../components/common/ProductCard';
@@ -10,32 +10,59 @@ import CategorySection from '../components/layout/CategorySection';
 import FloatingChatButton from '../components/common/FloatingChatButton';
 
 const Home = () => {
-
-    const [products, setProducts] = useState([]); // ⭐ 하나만 사용
+    const [products, setProducts] = useState([]);
     const [categoryId, setCategoryId] = useState(0);
+
     const navigate = useNavigate();
 
     useEffect(() => {
-
         axiosInstance
             .get("/api/products", {
                 params: {
                     page: 0,
                     size: 10,
                     sort: "popular",
-
-                    ...(categoryId !== 0 && { categoryId })
-                }
+                    ...(categoryId !== 0 && { categoryId }),
+                },
             })
             .then((res) => {
-                setProducts(res.data.content);
-            });
+                const data = res.data;
 
+                // 백엔드 응답이 Page 형태일 때
+                if (data && Array.isArray(data.content)) {
+                    setProducts(data.content);
+                    return;
+                }
+
+                // 백엔드 응답이 배열 형태일 때
+                if (Array.isArray(data)) {
+                    setProducts(data);
+                    return;
+                }
+
+                // 백엔드 응답이 { data: [...] } 형태일 때
+                if (data && Array.isArray(data.data)) {
+                    setProducts(data.data);
+                    return;
+                }
+
+                // 백엔드 응답이 { data: { content: [...] } } 형태일 때
+                if (data?.data && Array.isArray(data.data.content)) {
+                    setProducts(data.data.content);
+                    return;
+                }
+
+                // 예상하지 못한 응답이면 빈 배열 처리
+                setProducts([]);
+            })
+            .catch((error) => {
+                console.error("상품 조회 실패:", error);
+                setProducts([]);
+            });
     }, [categoryId]);
 
     return (
         <div className='home-container' style={{ padding: '0 20px' }}>
-
             <MainBanner />
 
             <CategorySection onSelectCategory={setCategoryId} />
@@ -59,6 +86,7 @@ const Home = () => {
                 </h3>
 
                 <button
+                    type="button"
                     onClick={() => navigate('/products')}
                     style={{
                         border: 'none',
@@ -75,23 +103,17 @@ const Home = () => {
 
             <div
                 style={{
-                    minHeight: '700px'
+                    minHeight: '700px',
                 }}
             >
-
                 <ProductGrid>
-
-                    {products.map((product) => (
-
+                    {Array.isArray(products) && products.map((product) => (
                         <ProductCard
                             key={product.id}
                             product={product}
                         />
-
                     ))}
-
                 </ProductGrid>
-
             </div>
 
             <FloatingChatButton />

@@ -1,11 +1,14 @@
-//index.jsx
+// index.jsx
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
 import App from '../App';
+
 import Home from '../pages/Home';
 import ProductPage from '../pages/ProductPage';
 import ProductDetail from '../pages/ProductDetail';
 import SearchPage from '../pages/SearchPage';
+
 import CartPage from '../pages/CartPage';
 import OrderPage from '../pages/OrderPage';
 import WishlistPage from '../pages/WishlistPage';
@@ -13,6 +16,7 @@ import WishlistPage from '../pages/WishlistPage';
 import ChatAddFriend from '../pages/chat/ChatAddFriend';
 import ChatList from '../pages/chat/ChatList';
 import ChatRoom from '../pages/chat/ChatRoom';
+
 import GiftCard from '../pages/gift/GiftCard';
 import GiftCardView from '../pages/gift/GiftCardView';
 import GiftAddress from '../pages/gift/GiftAddress';
@@ -26,35 +30,33 @@ import KakaoCallbackPage from '../pages/user/KakaoCallbackPage';
 import MyPage from '../pages/user/MyPage';
 import FriendsPage from '../pages/user/FriendsPage';
 
-
 export default function Router() {
-
     return (
-
         <BrowserRouter>
-
             <Routes>
                 <Route path="/" element={<App />}>
                     <Route index element={<Home />} />
-
 
                     {/* PRODUCT */}
                     <Route path="products" element={<ProductPage />} />
                     <Route path="products/:id" element={<ProductDetail />} />
 
+                    {/* CART / ORDER / WISHLIST */}
+                    <Route path="cart" element={<CartPage />} />
+                    <Route path="order" element={<OrderPage />} />
+                    <Route path="wishlist" element={<WishlistPage />} />
 
                     {/* CHAT */}
-                    <Route path='chat/add' element={<ChatAddFriend />} />
-                    <Route path='chat' element={<ChatList />} />
-                    <Route path='chat/:roomId' element={<ChatRoom />} />
-
+                    <Route path="chat/add" element={<ChatAddFriend />} />
+                    <Route path="chat" element={<ChatList />} />
+                    <Route path="chat/:roomId" element={<ChatRoom />} />
 
                     {/* GIFT */}
-                    <Route path='gifts/card' element={<GiftCard />} />
-                    <Route path='gifts/card/preview' element={<GiftCardView />} />
-                    <Route path='gifts/:uuid' element={<GiftCardView />} /> {/* 받는 사람 링크 */}
-                    <Route path='gifts/:uuid/address' element={<GiftAddress />} />
-                    <Route path='gifts/:uuid/accept' element={<GiftAccept />} />
+                    <Route path="gifts/card" element={<GiftCard />} />
+                    <Route path="gifts/card/preview" element={<GiftCardView />} />
+                    <Route path="gifts/:uuid" element={<GiftCardView />} />
+                    <Route path="gifts/:uuid/address" element={<GiftAddress />} />
+                    <Route path="gifts/:uuid/accept" element={<GiftAccept />} />
 
                     {/* AUTH */}
                     <Route path="login" element={<LoginPage />} />
@@ -64,17 +66,12 @@ export default function Router() {
                     <Route path="friends" element={<FriendsPage />} />
 
                     {/* FRIEND */}
-                    <Route path='friends/requestlist' element={<FriendRequestList />} />
+                    <Route path="friends/requestlist" element={<FriendRequestList />} />
 
                     {/* SEARCH */}
                     <Route path="search" element={<SearchPage />} />
-
-
                 </Route>
-
             </Routes>
-
         </BrowserRouter>
     );
-
 }
