@@ -3,17 +3,28 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { NavWrapper } from '../../styles/AppLayout';
+import useAuthStore from '../../store/authStore';
 
 const Nav = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const { token } = useAuthStore();
 
     const path = location.pathname;
-
+    //상품 페이지
     const isProduct = path === '/products';
+    
+    //상품 상세 페이지
     const isProductDetail = path.startsWith('/products/');
+    
+    // 장바구니 페이지
     const isCart = path === '/cart';
+    
+    // 위시리스트 페이지
     const isWishlist = path === '/wishlist';
+
+    // 로그인 / 회원가입 페이지
+    const isAuthPage = ['/login', '/signup'].includes(path);
 
     // 채팅 목록 페이지
     const isChatList = path === '/chat';
@@ -23,6 +34,10 @@ const Nav = () => {
 
     const handleCartClick = () => {
         navigate('/cart');
+    };
+
+    const handleUserClick = () => {
+        navigate(token ? '/mypage' : '/login');
     };
 
     return (
@@ -39,8 +54,8 @@ const Nav = () => {
                     >
                         +
                     </button>
-                ) : (isProduct || isProductDetail || isCart || isWishlist || isChatPage) ? (
-                    // 상품 / 장바구니 / 위시리스트 / 채팅 관련 페이지는 뒤로가기
+                ) : (isProduct || isProductDetail || isCart || isWishlist || isChatPage || isAuthPage) ? (
+                    // 상품 / 장바구니 / 위시리스트 / 채팅 관련 / 로그인 / 회원가입 페이지는 뒤로가기
                     <img
                         src="/assets/icons/back.png"
                         alt="뒤로가기"
@@ -69,11 +84,12 @@ const Nav = () => {
                     // 장바구니 페이지에서는 오른쪽 공백 처리
                     <div className="empty-space" />
                 ) : (
-                    // 알림 아이콘 제거, 유저 아이콘 + 장바구니 아이콘 표시
                     <>
                         <img
                             src="/assets/icons/user.png"
                             alt="유저"
+                            style={{ cursor: 'pointer' }}
+                            onClick={handleUserClick}
                         />
 
                         <img
