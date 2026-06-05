@@ -1,4 +1,4 @@
-//SearchPage.jsx
+// SearchPage.jsx
 
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
@@ -32,7 +32,6 @@ const SearchPage = () => {
 
     const trending = ['유모차', '기저귀', '분유', '아기침대'];
 
-
     useEffect(() => {
         const saved = JSON.parse(localStorage.getItem('recentSearch') || '[]');
         setRecent(saved);
@@ -47,7 +46,6 @@ const SearchPage = () => {
 
         return () => clearTimeout(timer);
     }, [keyword]);
-
 
     const fetchSearch = (value) => {
         setLoading(true);
@@ -108,42 +106,79 @@ const SearchPage = () => {
             {loading && <p>검색중...</p>}
 
             <Grid>
-                {results.map((item) => (
-                    <Card
-                        key={item.id}
-                        onClick={() => navigate(`/products/${item.id}`)}
+                {results.map((item) => {
+                    const brandName = item.brandName || item.brand_name;
+                    const imageSrc = item.imageUrl || item.image_url || "/images/default.png";
 
-                        style={{
-                            cursor: 'pointer',
-                            position: 'relative'
-                        }}
-
-
-                    >
-                        <HeartButton product={item} />
-
-                        <ProductImg
-                            src={item.imageUrl}
-                            alt={item.name}
-                            onError={(e) => {
-                                e.target.src = "/images/default.png";
-                            }}
+                    return (
+                        <Card
+                            key={item.id}
+                            onClick={() => navigate(`/products/${item.id}`)}
                             style={{
-                                width: "100%",
-                                aspectRatio: "1 / 1",
-                                objectFit: "cover",
-                                borderRadius: "12px",
-                                backgroundColor: "#f5f5f5"
+                                cursor: 'pointer',
+                                position: 'relative'
                             }}
-                        />
+                        >
+                            <HeartButton product={item} />
 
-                        <InfoBox>
-                            <h4>{item.name}</h4>
-                            <p>{item.price?.toLocaleString()}원</p>
-                        </InfoBox>
+                            <ProductImg
+                                src={imageSrc}
+                                alt={item.name}
+                                onError={(e) => {
+                                    e.target.src = "/images/default.png";
+                                }}
+                                style={{
+                                    width: "100%",
+                                    aspectRatio: "1 / 1",
+                                    objectFit: "cover",
+                                    borderRadius: "12px",
+                                    backgroundColor: "#f5f5f5"
+                                }}
+                            />
 
-                    </Card>
-                ))}
+                            <InfoBox>
+                                {brandName && (
+                                    <p
+                                        className='product-brand'
+                                        style={{
+                                            margin: 0,
+                                            fontSize: '12px',
+                                            fontWeight: 600,
+                                            color: '#777',
+                                            lineHeight: '1.2'
+                                        }}
+                                    >
+                                        {brandName}
+                                    </p>
+                                )}
+
+                                <h4
+                                    style={{
+                                        margin: '0 0 6px',
+                                        fontSize: '14px',
+                                        fontWeight: 500,
+                                        lineHeight: '20px'
+                                    }}
+                                >
+                                    {item.name}
+                                </h4>
+
+                                <p
+                                    style={{
+                                        margin: 0,
+                                        fontSize: '14px',
+                                        fontWeight: 600,
+                                        lineHeight: '18px'
+                                    }}
+                                >
+                                    {item.price?.toLocaleString()}원
+                                </p>
+                            </InfoBox>
+
+
+                        </Card>
+                    );
+                })}
             </Grid>
 
         </PageWrapper>

@@ -6,11 +6,11 @@ import axiosInstance from '../api/axiosInstance';
 import {
     DetailWrapper,
     ImageArea,
+    ProductInfoArea,
     BuyBox,
     DescArea
 } from '../styles/ProductDetailStyle';
 import HeartButton from '../components/common/HeartButton';
-import { addToCart } from '../utils/Cart';
 
 const ProductDetail = () => {
 
@@ -28,24 +28,11 @@ const ProductDetail = () => {
             .catch(console.error);
     }, [id]);
 
-    const handleAddCart = () => {
+    const handleGiftClick = () => {
         const isLogin = localStorage.getItem("token");
 
         if (!isLogin) {
-            alert("로그인 후 장바구니를 이용할 수 있습니다.");
-            return;
-        }
-
-        addToCart(product);
-
-        alert("장바구니에 담겼습니다.");
-    };
-
-    const handleBuyClick = () => {
-        const isLogin = localStorage.getItem("token");
-
-        if (!isLogin) {
-            alert("로그인 후 구매하기를 이용할 수 있습니다.");
+            alert("로그인 후 선물하기를 이용할 수 있습니다.");
             return;
         }
 
@@ -66,52 +53,56 @@ const ProductDetail = () => {
         return <div>로딩중...</div>;
     }
 
+    const brandName = product.brandName || product.brand_name;
+    const imageSrc = product.imageUrl || product.image_url || "/images/default.png";
+
     return (
         <DetailWrapper>
 
-            <ImageArea
-                style={{
-                    position: 'relative'
-                }}
-            >
+            <ImageArea>
                 <HeartButton product={product} />
 
                 <img
-                    src={product.imageUrl}
+                    src={imageSrc}
                     alt={product.name}
                     onError={(e) => {
                         e.target.src = "/images/default.png";
-                    }}
-                    style={{
-                        width: "100%",
-                        aspectRatio: "1 / 1",
-                        objectFit: "cover",
-                        borderRadius: "12px",
-                        backgroundColor: "#f5f5f5"
                     }}
                 />
 
             </ImageArea>
 
+            <ProductInfoArea>
+                {brandName && (
+                    <p className="product-brand">
+                        {brandName}
+                    </p>
+                )}
+
+                <h2 className="product-name">
+                    {product.name}
+                </h2>
+
+                <p className="product-price">
+                    {product.price?.toLocaleString()}원
+                </p>
+            </ProductInfoArea>
+
             <BuyBox>
                 <button
                     type="button"
-                    onClick={handleAddCart}
+                    onClick={handleGiftClick}
                 >
-                    장바구니 담기
-                </button>
-
-                <button
-                    type="button"
-                    onClick={handleBuyClick}
-                >
-                    구매하기
+                    선물하기
                 </button>
             </BuyBox>
 
             <DescArea>
                 <h3>상품 상세 설명</h3>
-                <p>{product.description}</p>
+
+                <p>
+                    {product.description}
+                </p>
             </DescArea>
 
         </DetailWrapper>

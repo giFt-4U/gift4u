@@ -1,3 +1,5 @@
+// ProductPage.jsx
+
 import React, { useEffect, useState, useRef } from 'react';
 import axiosInstance from '../api/axiosInstance';
 import { useNavigate } from 'react-router-dom';
@@ -37,7 +39,7 @@ const ProductPage = () => {
             })
             .catch(console.error);
 
-    }, [page]);
+    }, [page, hasMore]);
 
     useEffect(() => {
 
@@ -75,57 +77,76 @@ const ProductPage = () => {
 
             <ProductPageGrid>
 
-                {products.map((product) => (
+                {products.map((product) => {
+                    const brandName = product.brandName || product.brand_name;
+                    const imageSrc = product.imageUrl || product.image_url || "/images/default.png";
 
-                    <div
-                        key={product.id}
-                        style={{
-                            cursor: 'pointer',
-                            position: 'relative'
-                        }}
-                        onClick={() => navigate(`/products/${product.id}`)}
-                    >
-                        <HeartButton product={product} />
-
-                        <img
-                            src={product.imageUrl}
-                            alt={product.name}
-                            onError={(e) => {
-                                e.target.src = "/images/default.png";
-                            }}
+                    return (
+                        <div
+                            key={product.id}
                             style={{
-                                width: "100%",
-                                aspectRatio: "1 / 1",
-                                objectFit: "cover",
-                                borderRadius: "12px",
-                                backgroundColor: "#f5f5f5"
+                                cursor: 'pointer',
+                                position: 'relative'
                             }}
-                        />
-
-                        <h3
-                            style={{
-                                marginTop: '10px',
-                                fontSize: '14px',
-                                fontWeight: 500,
-                                lineHeight: '20px',
-                            }}
+                            onClick={() => navigate(`/products/${product.id}`)}
                         >
-                            {product.name}
-                        </h3>
+                            <HeartButton product={product} />
 
-                        <p
-                            style={{
-                                marginTop: '6px',
-                                fontSize: '14px',
-                                fontWeight: 600,
-                                lineHeight: '18px',
-                            }}
-                        >
-                            {product.price?.toLocaleString()}원
-                        </p>
+                            <img
+                                src={imageSrc}
+                                alt={product.name}
+                                onError={(e) => {
+                                    e.target.src = "/images/default.png";
+                                }}
+                                style={{
+                                    width: "100%",
+                                    aspectRatio: "1 / 1",
+                                    objectFit: "cover",
+                                    borderRadius: "12px",
+                                    backgroundColor: "#f5f5f5"
+                                }}
+                            />
 
-                    </div>
-                ))}
+                            {brandName && (
+                                <p
+                                    className='product-brand'
+                                    style={{
+                                        margin: '10px 0 0',
+                                        fontSize: '12px',
+                                        fontWeight: 600,
+                                        color: '#777',
+                                        lineHeight: '1.2'
+                                    }}
+                                >
+                                    {brandName}
+                                </p>
+                            )}
+
+                            <h3
+                                style={{
+                                    marginTop: '6px',
+                                    fontSize: '14px',
+                                    fontWeight: 500,
+                                    lineHeight: '20px',
+                                }}
+                            >
+                                {product.name}
+                            </h3>
+
+                            <p
+                                style={{
+                                    marginTop: '6px',
+                                    fontSize: '14px',
+                                    fontWeight: 600,
+                                    lineHeight: '18px',
+                                }}
+                            >
+                                {product.price?.toLocaleString()}원
+                            </p>
+
+                        </div>
+                    );
+                })}
 
             </ProductPageGrid>
 
