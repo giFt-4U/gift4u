@@ -36,7 +36,19 @@ const ChatRoom = () => {
     const bottomRef = useRef(null);
     // 현재 로그인한 userId (localStorage에서 파싱)
     const { user } = useAuthStore();
-    const myUserId = user?.id || user?.userId;
+
+    const getUserIdFromToken = () => {
+        const token = localStorage.getItem('token');
+        if (!token) return null;
+        try {
+            const payload = token.split('.')[1]; // 페이로드 구간 추출
+            const decoded = JSON.parse(atob(payload)); // Base64 디코딩
+            return decoded.sub; // 백엔드 subject에 담긴 userId (21 같은 숫자)
+        } catch (e) {
+            return null;
+        }
+    };
+    const myUserId = user?.id || user?.userId || getUserIdFromToken();
 
     // ── 1. 과거 메시지 조회 ─────────────────────────────
     useEffect(() => {
@@ -49,7 +61,7 @@ const ChatRoom = () => {
             .catch(() => { });
     }, [roomId]);
 
-    // ── 2. STOMP 연결f ────────────────────────────────────
+    // ── 2. STOMP 연결 ────────────────────────────────────
     useEffect(() => {
         const token = localStorage.getItem('token');
 
@@ -60,7 +72,7 @@ const ChatRoom = () => {
 
             // 연결 헤더에 JWT 토큰 포함
             connectHeaders: {
-                Authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
 
             // 연결 성공 시
@@ -106,13 +118,16 @@ const ChatRoom = () => {
         // STOMP 연결 안 됐으면 전송 차단
         if (!stompClientRef.current?.connected) return;
 
+        console.log("보내는 사람 ID (myUserId):", myUserId);
+        console.log("채팅방 ID (roomId):", roomId);
+
         stompClientRef.current.publish({
             destination: '/app/chat/send',
             body: JSON.stringify({
                 roomId: Number(roomId),
+                senderId: Number(myUserId),
                 content: trimmed,
                 messageType: 'TEXT',
-                senderId: myUserId,
             }),
         });
 
@@ -141,7 +156,7 @@ const ChatRoom = () => {
             {/* 메시지 목록 */}
             <S.MessageList>
                 {messages.map((msg, idx) => {
-                    const isMine = msg.senderId === myUserId;
+                    const isMine = Number(msg.senderId) === Number(myUserId);
                     const isGift = msg.messageType === 'GIFT';
                     const giftUuid = isGift ? parseGiftUuid(msg.content) : null;
 
