@@ -29,6 +29,9 @@ public class Product {
     @Column(name = "category_id")
     private Long categoryId;
 
+    @Column(name = "brand_name")
+    private String brandName;
+
     private String name;
 
     private String description;

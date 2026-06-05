@@ -10,6 +10,8 @@ public class ProductResponse {
 
     private Long id;
 
+    private String brandName;
+
     private String name;
 
     private String description;
@@ -22,6 +24,7 @@ public class ProductResponse {
 
         return ProductResponse.builder()
                 .id(product.getId())
+                .brandName(product.getBrandName())
                 .name(product.getName())
                 .description(product.getDescription())
                 .price(product.getPrice())
