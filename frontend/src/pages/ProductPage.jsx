@@ -2,25 +2,44 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import axiosInstance from '../api/axiosInstance';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ProductPageGrid } from '../styles/HomeStyle';
 import HeartButton from '../components/common/HeartButton';
 
 const ProductPage = () => {
 
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+
+    const brandName = searchParams.get('brandName') || '';
 
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
+    const [filterBrandName, setFilterBrandName] = useState(brandName);
+
     const observerRef = useRef(null);
+
+    useEffect(() => {
+        setProducts([]);
+        setPage(0);
+        setHasMore(true);
+        setFilterBrandName(brandName);
+    }, [brandName]);
 
     useEffect(() => {
 
         if (!hasMore) return;
 
         axiosInstance
-            .get(`/api/products?page=${page}&size=10&sort=popular`)
+            .get("/api/products", {
+                params: {
+                    page,
+                    size: 10,
+                    sort: "popular",
+                    ...(filterBrandName && { brandName: filterBrandName }),
+                },
+            })
             .then((res) => {
 
                 const newItems = res.data.content || [];
@@ -39,7 +58,7 @@ const ProductPage = () => {
             })
             .catch(console.error);
 
-    }, [page, hasMore]);
+    }, [page, filterBrandName, hasMore]);
 
     useEffect(() => {
 
@@ -72,7 +91,7 @@ const ProductPage = () => {
                     marginBottom: '18px',
                 }}
             >
-                베스트 상품
+                {filterBrandName ? `${filterBrandName} 상품` : '베스트 상품'}
             </h2>
 
             <ProductPageGrid>
@@ -143,7 +162,6 @@ const ProductPage = () => {
                             >
                                 {product.price?.toLocaleString()}원
                             </p>
-
                         </div>
                     );
                 })}

@@ -13,12 +13,13 @@ public class ProductController {
 
     private final ProductService productService;
 
-    // 📌 리스트 + 검색 + 카테고리
+    // 리스트 + 검색 + 카테고리 + 브랜드
     @GetMapping
     public Page<ProductResponse> getProducts(
 
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String brandName,
 
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -28,9 +29,21 @@ public class ProductController {
         return productService.getProducts(
                 keyword,
                 categoryId,
+                brandName,
                 page,
                 size,
                 sort
+        );
+    }
+
+    // 상품 상세
+    @GetMapping("/{id}")
+    public ProductResponse getProduct(
+            @PathVariable Long id
+    ) {
+        return productService.getProduct(id);
+    }
+}
         );
     }
 

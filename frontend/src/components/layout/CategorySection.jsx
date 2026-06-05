@@ -1,6 +1,7 @@
 // CategorySection.jsx
 
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const categories = [
     { id: 0, name: "전체", img: "/images/category/baby_all.png" },
@@ -13,26 +14,89 @@ const categories = [
     { id: 7, name: "베이비케어", img: "/images/category/babycare.png" },
 ];
 
+const brands = [
+    {
+        name: "따숨베베",
+        img: "/images/brand/dasum_bebe.png",
+    },
+    {
+        name: "맘스온",
+        img: "/images/brand/momson.png",
+    },
+    {
+        name: "베베클린",
+        img: "/images/brand/bebe_clean.png",
+    },
+    {
+        name: "포근아이",
+        img: "/images/brand/pogeun_i.png",
+    },
+    {
+        name: "리틀솜",
+        img: "/images/brand/little_som.png",
+    },
+    {
+        name: "토닥토이",
+        img: "/images/brand/todak_toy.png",
+    },
+    {
+        name: "베이비온",
+        img: "/images/brand/babyon.png",
+    },
+    {
+        name: "라라베베",
+        img: "/images/brand/lala_bebe.png",
+    },
+    {
+        name: "클린맘",
+        img: "/images/brand/clean_mom.png",
+    },
+    {
+        name: "순한아이",
+        img: "/images/brand/soon_i.png",
+    },
+    {
+        name: "맑은숨",
+        img: "/images/brand/malgeun_sum.png",
+    },
+    {
+        name: "케어온",
+        img: "/images/brand/care_on.png",
+    },
+];
+
 const CategorySection = ({ onSelectCategory }) => {
 
+    const navigate = useNavigate();
+
     const [selected, setSelected] = useState(0);
+    const [showBrands, setShowBrands] = useState(false);
 
     const handleClick = (cat) => {
-
         setSelected(cat.id);
 
-        // 부모(HomePage)로 전달
+        // 브랜드는 categoryId=1로 조회하지 않고,
+        // 브랜드 목록 UI만 열고 닫음
+        if (cat.id === 1) {
+            setShowBrands((prev) => !prev);
+            return;
+        }
+
+        setShowBrands(false);
         onSelectCategory(cat.id);
+    };
+
+    const handleBrandClick = (brandName) => {
+        navigate(`/products?brandName=${encodeURIComponent(brandName)}`);
     };
 
     return (
         <div
             style={{
                 padding: "20px 0 40px 0",
-                minHeight: "220px"
+                minHeight: showBrands ? "300px" : "220px",
             }}
         >
-
             <div
                 style={{
                     display: "grid",
@@ -47,7 +111,7 @@ const CategorySection = ({ onSelectCategory }) => {
                         onClick={() => handleClick(cat)}
                         style={{
                             cursor: "pointer",
-                            opacity: selected === cat.id ? 1 : 0.5
+                            opacity: selected === cat.id ? 1 : 0.5,
                         }}
                     >
                         <img
@@ -63,7 +127,7 @@ const CategorySection = ({ onSelectCategory }) => {
                         <p
                             style={{
                                 fontSize: "12px",
-                                marginTop: "5px"
+                                marginTop: "5px",
                             }}
                         >
                             {cat.name}
@@ -71,6 +135,81 @@ const CategorySection = ({ onSelectCategory }) => {
                     </div>
                 ))}
             </div>
+
+            {showBrands && (
+                <div
+                    style={{
+                        marginTop: "20px",
+                        overflowX: "auto",
+                        whiteSpace: "nowrap",
+                        paddingBottom: "6px",
+                    }}
+                >
+                    <div
+                        style={{
+                            display: "inline-flex",
+                            gap: "14px",
+                            padding: "0 2px",
+                        }}
+                    >
+                        {brands.map((brand) => (
+                            <button
+                                key={brand.name}
+                                type="button"
+                                onClick={() => handleBrandClick(brand.name)}
+                                style={{
+                                    width: "72px",
+                                    border: "none",
+                                    background: "transparent",
+                                    padding: 0,
+                                    cursor: "pointer",
+                                    textAlign: "center",
+                                }}
+                            >
+                                <div
+                                    style={{
+                                        width: "64px",
+                                        height: "64px",
+                                        margin: "0 auto",
+                                        borderRadius: "50%",
+                                        backgroundColor: "#f7f7f7",
+                                        border: "1px solid #eee",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        overflow: "hidden",
+                                    }}
+                                >
+                                    <img
+                                        src={brand.img}
+                                        alt={brand.name}
+                                        onError={(e) => {
+                                            e.target.src = "/images/brand/default_brand.png";
+                                        }}
+                                        style={{
+                                            width: "100%",
+                                            height: "100%",
+                                            objectFit: "cover",
+                                        }}
+                                    />
+                                </div>
+
+                                <p
+                                    style={{
+                                        margin: "6px 0 0",
+                                        fontSize: "11px",
+                                        fontWeight: 500,
+                                        color: "#333",
+                                        lineHeight: "14px",
+                                    }}
+                                >
+                                    {brand.name}
+                                </p>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
