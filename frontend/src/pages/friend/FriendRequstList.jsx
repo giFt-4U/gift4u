@@ -20,12 +20,13 @@ const FriendRequestList = () => {
 
     // ── 2. 친구 수락 처리 ──────────────────────────────
     const handleAccept = async (id) => {
+        if (!id) return; // ID가 없으면 실행 방지
         try {
             await acceptFriendRequest(id);
             alert('친구 요청을 수락했습니다.');
 
-            // 수락 성공 후 화면 목록에서 삭제 처리
-            setRequests((prev) => prev.filter((req) => req.friendshipId !== id));
+            // 성공 시: 현재 처리한 ID만 제외하고 목록을 새로 고침 (화면에서 사라짐)
+            setRequests((prev) => prev.filter((req) => (req.id !== id && req.friendshipId !== id)));
         } catch (e) {
             const globalMessage = e.response?.data?.message;
             alert(globalMessage || '처리에 실패했습니다. 다시 시도해주세요.');
@@ -34,14 +35,12 @@ const FriendRequestList = () => {
 
     // ── 3. 친구 거절 처리 ──────────────────────────────
     const handleReject = async (id) => {
-        if (!window.confirm('정말 요청을 거절하시겠습니까?')) return;
-
+        if (!id) return;
         try {
-            await rejectFriendRequest(id);
+            await rejectFriendRequest(id); // 👈 실제 거절 API 함수 호출
             alert('친구 요청을 거절했습니다.');
 
-            // 거절 성공 후 화면 목록에서 삭제 처리
-            setRequests((prev) => prev.filter((req) => req.friendshipId !== id));
+            setRequests((prev) => prev.filter((req) => (req.id !== id && req.friendshipId !== id)));
         } catch (e) {
             const globalMessage = e.response?.data?.message;
             alert(globalMessage || '처리에 실패했습니다. 다시 시도해주세요.');
@@ -60,8 +59,9 @@ const FriendRequestList = () => {
                 <RequestList>
                     {requests.map((req) => (
                         <RequestItem key={req.friendshipId}>
+                            {/* 상대방 이름 혹은 정보 정보 출력 (백엔드 DTO 속성 매칭) */}
                             <UserInfo>
-                                <Nickname>{req.nickname || '사용자'}</Nickname>
+                                <Nickname>{req.nickname}</Nickname>
                                 <SubText>친구 요청을 보냈습니다.</SubText>
                             </UserInfo>
 
