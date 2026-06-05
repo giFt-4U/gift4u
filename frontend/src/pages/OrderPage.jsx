@@ -62,7 +62,7 @@ const OrderPage = () => {
             return;
         }
 
-        alert("메시지 카드 작성 페이지는 추후 연결 예정입니다.");
+        navigate("/gifts/card");
     };
 
     return (
