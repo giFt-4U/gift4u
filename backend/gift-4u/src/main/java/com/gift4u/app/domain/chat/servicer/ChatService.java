@@ -101,15 +101,14 @@ public class ChatService {
 	    return chatRoomRepository
 	            .findByUserAIdOrUserBIdOrderByLastMessageAtDesc(currentUserId, currentUserId)
 	            .stream()
-	            .map(room -> {
-	                // 마지막 메시지 조회
-	                String lastMessage = chatMessageRepository
-	                        .findTopByRoomIdOrderByCreatedAtDesc(room.getId())
-	                        .map(ChatMessage::getContent)
-	                        .orElse(null);
-	                return ChatRoomResponse.of(room, currentUserId, lastMessage);
-	            })
-	            .toList();
+                .map(room -> {
+                    String lastMessage = chatMessageRepository
+                            .findTopByRoomIdOrderByCreatedAtDesc(room.getId())
+                            .map(ChatMessage::getContent)
+                            .orElse("");
+                    return ChatRoomResponse.of(room, currentUserId, lastMessage);
+                })
+                .toList();
 	}
 	
 	
