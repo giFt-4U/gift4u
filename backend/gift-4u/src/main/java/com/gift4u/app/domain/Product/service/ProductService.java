@@ -16,6 +16,7 @@ public class ProductService {
     public Page<ProductResponse> getProducts(
             String keyword,
             Long categoryId,
+            String brandName,
             int page,
             int size,
             String sort
@@ -38,12 +39,43 @@ public class ProductService {
         boolean hasCategory =
                 categoryId != null && categoryId != 0;
 
-        if (hasKeyword && hasCategory) {
+        boolean hasBrand =
+                brandName != null && !brandName.trim().isEmpty();
+
+        if (hasKeyword && hasCategory && hasBrand) {
+
+            result = productRepository
+                    .findByNameContainingIgnoreCaseAndCategoryIdAndBrandName(
+                            keyword.trim(),
+                            categoryId,
+                            brandName.trim(),
+                            pageable
+                    );
+
+        } else if (hasKeyword && hasCategory) {
 
             result = productRepository
                     .findByNameContainingIgnoreCaseAndCategoryId(
                             keyword.trim(),
                             categoryId,
+                            pageable
+                    );
+
+        } else if (hasKeyword && hasBrand) {
+
+            result = productRepository
+                    .findByNameContainingIgnoreCaseAndBrandName(
+                            keyword.trim(),
+                            brandName.trim(),
+                            pageable
+                    );
+
+        } else if (hasCategory && hasBrand) {
+
+            result = productRepository
+                    .findByCategoryIdAndBrandName(
+                            categoryId,
+                            brandName.trim(),
                             pageable
                     );
 
@@ -60,6 +92,14 @@ public class ProductService {
             result = productRepository
                     .findByCategoryId(
                             categoryId,
+                            pageable
+                    );
+
+        } else if (hasBrand) {
+
+            result = productRepository
+                    .findByBrandName(
+                            brandName.trim(),
                             pageable
                     );
 
