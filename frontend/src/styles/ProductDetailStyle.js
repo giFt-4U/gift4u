@@ -2,82 +2,103 @@
 
 import styled from "styled-components";
 
-/* 전체 레이아웃 */
 export const DetailWrapper = styled.div`
-    padding: 20px;
-    max-width: 500px;
-    margin: 0 auto;
+    width: 100%;
+    padding-bottom: 60px;
 `;
 
-/* 이미지 영역 */
 export const ImageArea = styled.div`
     width: 100%;
-    margin-bottom: 28px;
+    position: relative;
 
     img {
         width: 100%;
-        height: auto;
-        border-radius: 16px;
+        aspect-ratio: 1 / 1;
         object-fit: cover;
+        display: block;
+
+        border-radius: 0;
+        background-color: #f5f5f5;
     }
 `;
 
-/* 장바구니 담기 / 구매하기 버튼 영역 */
-export const BuyBox = styled.div`
-    width: 100%;
-    margin: 24px 0 32px;
+export const ProductInfoArea = styled.section`
+    padding: 10px 4px 28px;
 
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    .product-brand {
+        margin: 0;
 
-    button {
-        width: 100%;
-        height: 52px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #777;
+        line-height: 1.2;
+    }
 
-        border-radius: 12px;
+    .product-name {
+        margin: 6px 0 0;
+
+        font-size: 15px;
+        font-weight: 500;
+        color: #111;
+        line-height: 20px;
+    }
+
+    .product-price {
+        margin: 6px 0 0;
 
         font-size: 15px;
         font-weight: 700;
-
-        cursor: pointer;
-
-        transition: 0.2s;
-    }
-
-    button:first-child {
-        border: 1px solid #f5c542;
-        background-color: #ffffff;
-        color: #f5a623;
-    }
-
-    button:last-child {
-        border: none;
-        background-color: #f5c542;
-        color: white;
-    }
-
-    button:hover {
-        opacity: 0.9;
+        color: #111;
+        line-height: 20px;
     }
 `;
 
-/* 설명 영역 */
-export const DescArea = styled.div`
-    margin-top: 30px;
-    padding: 20px;
+export const BuyBox = styled.div`
+    width: 100%;
 
-    background-color: #f8f8f8;
-    border-radius: 16px;
+    display: flex;
+    justify-content: center;
+
+    padding: 36px 0 56px;
+
+    button {
+        width: 320px;
+        max-width: 80%;
+        height: 48px;
+
+        border: none;
+        border-radius: 4px;
+
+        background-color: #151515;
+        color: #ffffff;
+
+        font-size: 15px;
+        font-weight: 500;
+
+        cursor: pointer;
+    }
+`;
+
+export const DescArea = styled.section`
+    border-top: 1px solid #222;
+
+    padding: 24px 4px 80px;
 
     h3 {
-        margin-bottom: 12px;
-        font-size: 18px;
+        margin: 0 0 14px;
+
+        font-size: 16px;
+        font-weight: 600;
+        color: #111;
+        line-height: 22px;
     }
 
     p {
-        line-height: 1.6;
-        color: #555;
+        margin: 0;
+
         font-size: 14px;
+        font-weight: 400;
+        color: #333;
+        line-height: 22px;
     }
 `;
