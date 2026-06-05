@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -75,6 +76,18 @@ public class ChatController {
 													Pageable pageable){
 	    Long currentUserId = userDetails.getUser().getId();
 		return ResponseEntity.ok(chatService.getMessage(currentUserId, roomId, pageable));
+	}
+	
+	/**
+	 * 채팅방 나가기 (REQ-C06).
+	 * DELETE를 사용하는 이유: 내 채팅방 목록에서 제거하는 행위이기 때문.
+	 */
+	@DeleteMapping("/rooms/{roomId}")
+	public ResponseEntity<Void> leaveRoom(
+	        @AuthenticationPrincipal CustomUserDetails userDetails,
+	        @PathVariable Long roomId) {
+	    chatService.leaveRoom(userDetails.getUser().getId(), roomId);
+	    return ResponseEntity.ok().build();
 	}
 
 }

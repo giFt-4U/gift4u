@@ -62,7 +62,6 @@ const LoginPage = () => {
             const res = await login(email, password);
             setToken(res.data.accessToken);
             const meRes = await getMe();
-            setUser(meRes.data);
             navigate('/');
         } catch {
             setError('이메일 또는 비밀번호가 올바르지 않습니다.');

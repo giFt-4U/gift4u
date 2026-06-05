@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
 import { getFriends } from '../../api/friendshipApi';
+import { getOrCreateRoom } from '../../api/chatApi';
 import * as S from '../../styles/FriendsStyle';
 
 const FriendsPage = () => {
@@ -18,9 +19,35 @@ const FriendsPage = () => {
         }
         getFriends()
             .then((res) => setFriends(res.data))
-            .catch(() => {})
+            .catch(() => { })
             .finally(() => setLoading(false));
     }, []);
+
+    const handleFriendClick = async (friendUserId) => {
+        if (!friendUserId) {
+            alert("유효하지 않은 사용자입니다.");
+            return;
+        }
+
+        const message = `${friendUserId || '사용자'}님과 채팅하시겠습니까?`;
+        if (!window.confirm(message)) {
+            return;
+        }
+        try {
+            // 2. 백엔드에 채팅방 시작 요청
+            const response = await getOrCreateRoom(friendUserId);
+
+            // 백엔드가 제공하는 DTO 구조에 맞춰 roomId를 추출
+            const roomId = response.data.roomId;
+
+            // 3. 받아온 고유 roomId를 가지고 채팅방 상세 화면으로 이동
+            navigate(`/chat/${roomId}`);
+        } catch (error) {
+            console.error("채팅방 연결 오류:", error);
+            alert("채팅방을 열 수 없습니다. 잠시 후 다시 시도해 주세요.");
+        }
+    };
+
 
     if (loading) return <S.CenterText>로딩 중...</S.CenterText>;
 
@@ -46,7 +73,9 @@ const FriendsPage = () => {
             ) : (
                 <S.FriendList>
                     {friends.map((f) => (
-                        <S.FriendItem key={f.friendshipId}>
+                        <S.FriendItem
+                            key={f.friendshipId}
+                            onClick={() => handleFriendClick(f.friendId || f.userId, f.friendUserId)}>
                             <S.Avatar>
                                 {f.nickname?.charAt(0)?.toUpperCase() || '?'}
                             </S.Avatar>

@@ -22,4 +22,15 @@ public interface ChatRoomRepository extends JpaRepository <ChatRoom, Long>{
 	 */
 	@EntityGraph(attributePaths = {"userA","userB"})
 	List<ChatRoom> findByUserAIdOrUserBIdOrderByLastMessageAtDesc(Long userAId, Long userBId);
+	
+	/**
+	 * 내 채팅방 목록 — 내가 나간 방은 제외.
+	 * userA면 userALeft=false인 방만, userB면 userBLeft=false인 방만 조회.
+	 */
+	@EntityGraph(attributePaths = {"userA", "userB"})
+	@Query("SELECT r FROM ChatRoom r WHERE " +
+	       "(r.userA.id = :userId AND r.userALeft = false) OR " +
+	       "(r.userB.id = :userId AND r.userBLeft = false) " +
+	       "ORDER BY r.lastMessageAt DESC")
+	List<ChatRoom> findActiveRoomsByUserId(@Param("userId") Long userId);
 }

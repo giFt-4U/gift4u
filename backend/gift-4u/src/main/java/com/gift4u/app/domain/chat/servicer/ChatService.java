@@ -78,18 +78,34 @@ public class ChatService {
 		
 		
 		// 기존 채팅방 있으면 그대로 반환 (중복 생성 방지)
-		return chatRoomRepository.findRoomByTwoUsers(currentUserId, opponentId)
-				.map(room -> ChatRoomResponse.of(room, currentUserId, "기존 대화방 연결"))
-				.orElseGet(()-> {
-					// 없으면 신규 생성 - userA: 요청자, userB: 상대방으로 고정
-					ChatRoom newRoom = ChatRoom.builder()
-							.userA(currentUser)
-							.userB(oppenent)
-							.build();
-					chatRoomRepository.save(newRoom);
-					
-					return ChatRoomResponse.of(newRoom, currentUserId, "새로운 채팅방이 개설되었습니다.");
-				});
+		// 기존 채팅방 조회 (나간 방 포함 — 전체 조회)
+	    return chatRoomRepository.findRoomByTwoUsers(currentUserId, opponentId)
+	            .map(room -> {
+	                // 기존 방이 있으면 — 나간 상태(Left=true)면 재활성화
+	                boolean isUserA = room.getUserA().getId().equals(currentUserId);
+
+	                if (isUserA && room.getUserALeft()) {
+	                    room.rejoin(currentUserId); // Left → false 로 복구
+	                } else if (!isUserA && room.getUserBLeft()) {
+	                    room.rejoin(currentUserId);
+	                }
+
+	                String lastMessage = chatMessageRepository
+	                        .findTopByRoomIdOrderByCreatedAtDesc(room.getId())
+	                        .map(ChatMessage::getContent)
+	                        .orElse(null);
+
+	                return ChatRoomResponse.of(room, currentUserId, lastMessage);
+	            })
+	            .orElseGet(() -> {
+	                // 기존 방 없으면 신규 생성
+	                ChatRoom newRoom = ChatRoom.builder()
+	                        .userA(currentUser)
+	                        .userB(oppenent)
+	                        .build();
+	                chatRoomRepository.save(newRoom);
+	                return ChatRoomResponse.of(newRoom, currentUserId, null);
+	            });
 	}
 	
 	
@@ -99,7 +115,7 @@ public class ChatService {
 	 */
 	public List<ChatRoomResponse> getRooms(Long currentUserId) {
 	    return chatRoomRepository
-	            .findByUserAIdOrUserBIdOrderByLastMessageAtDesc(currentUserId, currentUserId)
+	            .findActiveRoomsByUserId(currentUserId)
 	            .stream()
                 .map(room -> {
                     String lastMessage = chatMessageRepository
@@ -216,8 +232,21 @@ public class ChatService {
 		
 		// 실시간 브로드캐스트
 		messagingTemplate.convertAndSend("/topic/chat/" +room.getId(),ChatMessageResponse.from(message));
-		
-		
 	}
+	
+	/**
+	 * 채팅방 나가기 (REQ-C06).
+	 * 내 목록에서만 숨김. 상대방 채팅방은 유지.
+	 * 상대방이 다시 메시지 보내면 내 목록에 다시 표시되도록
+	 * left 플래그를 false로 되돌리는 것은 sendMessage()에서 처리.
+	 */
+	@Transactional
+	public void leaveRoom(Long currentUserId, Long roomId) {
+	    ChatRoom room = chatRoomRepository.findById(roomId)
+	            .orElseThrow(() -> new GlobalException(ErrorCode.CHAT_ROOM_NOT_FOUND));
 
+	    validateRoomMember(room, currentUserId);
+	    room.leave(currentUserId);
+	}
+	
 }

@@ -93,3 +93,18 @@ export const CenterText = styled.div`
     color: #aaa;
     font-size: 14px;
 `;
+
+export const LeaveButton = styled.button`
+    padding: 6px 10px;
+    margin-right: 12px;
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #999;
+    cursor: pointer;
+    flex-shrink: 0;
+    white-space: nowrap;
+
+    &:active { background: #f5f5f5; }
+`;

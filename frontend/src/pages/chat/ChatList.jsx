@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getChatRooms } from '../../api/chatApi';
+import { getChatRooms, leaveRoom } from '../../api/chatApi';
 import * as S from '../../styles/chat/ChatListStyle';
 
 /**
@@ -16,6 +16,7 @@ const ChatList = () => {
     const [rooms, setRooms] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [confirmRoomId, setConfirmRoomId] = useState(null);
 
     useEffect(() => {
         getChatRooms()
@@ -32,6 +33,20 @@ const ChatList = () => {
         if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
         if (diff < 86400) return `${Math.floor(diff / 3600)}시간 전`;
         return `${Math.floor(diff / 86400)}일 전`;
+    };
+
+    // 채팅방 나가기
+    const handleLeave = async (roomId) => {
+        try {
+            await leaveRoom(roomId);
+            // 목록에서 즉시 제거 (API 재호출 X)
+            setRooms((prev) => prev.filter((r) => r.roomId !== roomId));
+            navigate('/chat');
+        } catch {
+            alert('채팅방 나가기에 실패했습니다.');
+        } finally {
+            setConfirmRoomId(null);
+        }
     };
 
     if (loading) return <S.CenterText>로딩 중...</S.CenterText>;
@@ -64,6 +79,16 @@ const ChatList = () => {
 
                             {/* 시각 */}
                             <S.TimeText>{formatTime(room.lastMessageAt)}</S.TimeText>
+                            {/* 나가기 버튼 */}
+                            <S.LeaveButton
+                                onClick={() => {
+                                    if (window.confirm('정말 이 채팅방에서 나가시겠습니까?')) {
+                                        handleLeave(room.roomId);
+                                    }
+                                }}
+                            >
+                                나가기
+                            </S.LeaveButton>
                         </S.RoomItem>
                     ))}
                 </S.RoomList>

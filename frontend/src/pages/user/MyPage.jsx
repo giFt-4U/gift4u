@@ -1,8 +1,9 @@
 // MyPage.jsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
 import { getMe } from '../../api/auth';
+import { getFriendRequests } from '../../api/chatApi';
 import {
     MyPageContainer,
     ProfileSection,
@@ -26,6 +27,7 @@ const KakaoIcon = () => (
 const MyPage = () => {
     const navigate = useNavigate();
     const { user, setUser, clearToken } = useAuthStore();
+    const [hasNewRequest, setHasNewRequest] = useState(false);
 
     useEffect(() => {
         if (!user) {
@@ -45,6 +47,34 @@ const MyPage = () => {
 
     const isKakao = user?.loginProvider === 'KAKAO';
     const initial = user?.nickname?.charAt(0)?.toUpperCase() || '?';
+
+    // 친구요청 개수
+    useEffect(() => {
+        const checkRequests = async () => {
+            try {
+                // 1. 서버에서 친구 요청 목록을 가져옵니다.
+                const response = await getFriendRequests();
+
+                // 2. 요청이 존재하는지 확인합니다.
+                const isExist = response?.data && response.data.length > 0;
+
+                // 3. 브라우저에 '읽음' 기록이 있는지 확인합니다.
+                const isRead = localStorage.getItem('friendRequestsRead') === 'true';
+
+                // 요청이 존재하고, 아직 읽지 않았다면 빨간 점을 표시합니다.
+                if (isExist && !isRead) {
+                    setHasNewRequest(true);
+                } else {
+                    setHasNewRequest(false);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        checkRequests();
+    }, []);
+
 
     return (
         <MyPageContainer>
@@ -78,6 +108,7 @@ const MyPage = () => {
                 <MenuItem onClick={() => navigate('/friends/requestList')}>
                     친구 요청 목록
                     <span className="arrow">›</span>
+                    {hasNewRequest && <RedDot />}
                 </MenuItem>
             </MenuSection>
 
