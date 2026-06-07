@@ -44,14 +44,3 @@ public class ProductController {
         return productService.getProduct(id);
     }
 }
-        );
-    }
-
-    // 📌 상품 상세
-    @GetMapping("/{id}")
-    public ProductResponse getProduct(
-            @PathVariable Long id
-    ) {
-        return productService.getProduct(id);
-    }
-}
