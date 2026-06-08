@@ -30,7 +30,7 @@ export const NavWrapper = styled.nav`
     display: flex;
     align-items: center;
 
-    padding: 0 20px;
+    padding: 0 18px;
 
     background: #ffffff;
 
@@ -50,7 +50,7 @@ export const NavWrapper = styled.nav`
 
     .nav-right {
         justify-content: flex-end;
-        gap: 12px;
+        gap: 14px;
     }
 
     h1 {
@@ -64,29 +64,34 @@ export const NavWrapper = styled.nav`
     }
 
     .logo {
-        font-family: 'Pretendard Variable', Pretendard, sans-serif;
-        font-size: 22px;
-        font-weight: 500;
-        line-height: 23px;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-
-        color: #f5c542;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         text-decoration: none;
     }
 
-    img {
-        width: 24px;
-        height: 24px;
+    .logo-image {
+        width: 96px;
+        height: 52px;
 
-        cursor: pointer;
+        object-fit: contain;
         display: block;
     }
 
+    .nav-left img,
+    .nav-right img {
+        width: 22px;
+        height: 22px;
+
+        cursor: pointer;
+        display: block;
+        object-fit: contain;
+    }
+
     .empty-space {
-        width: 24px;
-        height: 24px;
+        width: 22px;
+        height: 22px;
     }
 
     .plus-button {
