@@ -18,9 +18,6 @@ const Nav = () => {
     // 상품 상세 페이지
     const isProductDetail = path.startsWith('/products/');
 
-    // 검색 페이지
-    const isSearch = path === '/search';
-
     // 장바구니 페이지
     const isCart = path === '/cart';
 
@@ -40,22 +37,9 @@ const Nav = () => {
         navigate('/cart');
     };
 
-    const handleWishlistClick = () => {
-        navigate('/wishlist');
-    };
-
     const handleUserClick = () => {
         navigate(token ? '/mypage' : '/login');
     };
-
-    const shouldShowBackButton =
-        isProduct ||
-        isProductDetail ||
-        isSearch ||
-        isCart ||
-        isWishlist ||
-        isChatPage ||
-        isAuthPage;
 
     return (
         <NavWrapper>
@@ -70,7 +54,7 @@ const Nav = () => {
                     >
                         +
                     </button>
-                ) : shouldShowBackButton ? (
+                ) : (isProduct || isProductDetail || isCart || isWishlist || isChatPage || isAuthPage) ? (
                     <img
                         src="/assets/icons/back.png"
                         alt="뒤로가기"
@@ -91,7 +75,12 @@ const Nav = () => {
                     <img
                         src="/assets/logo/dasumpum_logo.png"
                         alt="따숨품"
-                        className="logo-image"
+                        style={{
+                            width: "104px",
+                            height: "56px",
+                            objectFit: "contain",
+                            display: "block",
+                        }}
                     />
                 </Link>
             </h1>
@@ -105,13 +94,8 @@ const Nav = () => {
                         <img
                             src="/assets/icons/user.png"
                             alt="유저"
+                            style={{ cursor: 'pointer' }}
                             onClick={handleUserClick}
-                        />
-
-                        <img
-                            src="/assets/icons/heart.png"
-                            alt="위시리스트"
-                            onClick={handleWishlistClick}
                         />
 
                         <img
