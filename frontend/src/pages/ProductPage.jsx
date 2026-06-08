@@ -17,6 +17,7 @@ const ProductPage = () => {
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const [filterBrandName, setFilterBrandName] = useState(brandName);
+    const [loading, setLoading] = useState(false);
 
     const observerRef = useRef(null);
 
@@ -30,6 +31,8 @@ const ProductPage = () => {
     useEffect(() => {
 
         if (!hasMore) return;
+
+        setLoading(true);
 
         axiosInstance
             .get("/api/products", {
@@ -56,7 +59,13 @@ const ProductPage = () => {
                 }
 
             })
-            .catch(console.error);
+            .catch((error) => {
+                console.error("상품 조회 실패:", error);
+                setHasMore(false);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
 
     }, [page, filterBrandName, hasMore]);
 
@@ -66,7 +75,7 @@ const ProductPage = () => {
 
         const observer = new IntersectionObserver((entries) => {
 
-            if (entries[0].isIntersecting) {
+            if (entries[0].isIntersecting && !loading) {
                 setPage((prev) => prev + 1);
             }
 
@@ -78,7 +87,9 @@ const ProductPage = () => {
 
         return () => observer.disconnect();
 
-    }, [hasMore]);
+    }, [hasMore, loading]);
+
+    const isEmpty = !loading && !hasMore && products.length === 0;
 
     return (
         <div style={{ padding: '0 20px' }}>
@@ -93,6 +104,21 @@ const ProductPage = () => {
             >
                 {filterBrandName ? `${filterBrandName} 상품` : '베스트 상품'}
             </h2>
+
+            {isEmpty && (
+                <p
+                    style={{
+                        textAlign: 'center',
+                        padding: '40px 0',
+                        color: '#777',
+                        fontSize: '14px',
+                    }}
+                >
+                    {filterBrandName
+                        ? '해당 브랜드의 상품이 없습니다.'
+                        : '등록된 상품이 없습니다.'}
+                </p>
+            )}
 
             <ProductPageGrid>
 
@@ -168,10 +194,19 @@ const ProductPage = () => {
 
             </ProductPageGrid>
 
-            {hasMore && <div ref={observerRef} style={{ height: '50px' }} />}
+            {hasMore && !isEmpty && (
+                <div ref={observerRef} style={{ height: '50px' }} />
+            )}
 
-            {!hasMore && (
-                <p style={{ textAlign: 'center', padding: '20px' }}>
+            {!hasMore && products.length > 0 && (
+                <p
+                    style={{
+                        textAlign: 'center',
+                        padding: '20px',
+                        color: '#777',
+                        fontSize: '14px',
+                    }}
+                >
                     마지막 상품입니다
                 </p>
             )}
