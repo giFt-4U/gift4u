@@ -21,6 +21,7 @@ import GiftCard from '../pages/gift/GiftCard';
 import GiftCardView from '../pages/gift/GiftCardView';
 import GiftAddress from '../pages/gift/GiftAddress';
 import GiftAccept from '../pages/gift/GiftAccept';
+import FriendsSelect from '../pages/friend/FriendsSelect';
 
 import FriendRequestList from '../pages/friend/FriendRequstList';
 
@@ -67,6 +68,7 @@ export default function Router() {
 
                     {/* FRIEND */}
                     <Route path="friends/requestlist" element={<FriendRequestList />} />
+                    <Route path="/friends/select" element={<FriendsSelect />} />
 
                     {/* SEARCH */}
                     <Route path="search" element={<SearchPage />} />
