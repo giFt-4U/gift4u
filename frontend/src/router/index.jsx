@@ -1,11 +1,14 @@
 // index.jsx
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
 import App from '../App';
+
 import Home from '../pages/Home';
 import ProductPage from '../pages/ProductPage';
 import ProductDetail from '../pages/ProductDetail';
 import SearchPage from '../pages/SearchPage';
+
 import CartPage from '../pages/CartPage';
 import OrderPage from '../pages/OrderPage';
 import WishlistPage from '../pages/WishlistPage';

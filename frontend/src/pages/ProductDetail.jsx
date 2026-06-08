@@ -1,4 +1,4 @@
-// ProductDetail.jsx
+//ProductDetail.jsx
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -69,6 +69,7 @@ const ProductDetail = () => {
                         e.target.src = "/images/default.png";
                     }}
                 />
+
             </ImageArea>
 
             <ProductInfoArea>
