@@ -25,13 +25,11 @@ const FloatingChatButton = ({ hasUnread = false }) => {
             aria-label="채팅"
         >
             <img
-                src={
-                    hasUnread
-                        ? "/assets/icons/chat2.png"
-                        : "/assets/icons/chat1.png"
-                }
+                src="/assets/icons/chat1.png"
                 alt="채팅"
             />
+
+            {hasUnread && <UnreadDot />}
         </ChatButton>
     );
 };
@@ -56,13 +54,23 @@ const ChatButton = styled.button`
     cursor: pointer;
     z-index: 500;
 
-    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.22));
-
     img {
         width: 92px;
         height: 92px;
-
         display: block;
         object-fit: contain;
     }
+`;
+
+const UnreadDot = styled.span`
+    position: absolute;
+    top: 8px;
+    right: 8px;
+
+    width: 16px;
+    height: 16px;
+
+    border-radius: 50%;
+    background-color: #ff3b30;
+    border: 2px solid #ffffff;
 `;
