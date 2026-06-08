@@ -12,11 +12,18 @@ import {
     TagBox,
     Tag,
     TagGray,
+    RemoveRecentButton,
     Grid,
     Card,
     ProductImg,
-    InfoBox
+    InfoBox,
+    EmptyText
 } from '../styles/SearchStyle';
+
+const DEFAULT_TRENDING = ['유모차', '기저귀', '분유', '아기 침대'];
+
+const RECENT_SEARCH_KEY = 'recentSearch';
+const POPULAR_SEARCH_KEY = 'popularSearchCount';
 
 const SearchPage = () => {
 
@@ -29,63 +36,184 @@ const SearchPage = () => {
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
     const [recent, setRecent] = useState([]);
+    const [popularKeywords, setPopularKeywords] = useState(DEFAULT_TRENDING);
+    const [hasSearched, setHasSearched] = useState(false);
 
-    const trending = ['유모차', '기저귀', '분유', '아기침대'];
+    const normalizeKeyword = (value) => {
+        const trimmed = value.trim().replace(/\s+/g, ' ');
+        const noSpace = trimmed.replace(/\s/g, '');
 
-    useEffect(() => {
-        const saved = JSON.parse(localStorage.getItem('recentSearch') || '[]');
-        setRecent(saved);
-    }, []);
+        // 아기침대라고 입력해도 DB 상품명 기준인 아기 침대로 보정
+        if (noSpace === '아기침대') {
+            return '아기 침대';
+        }
 
-    useEffect(() => {
-        if (!keyword.trim()) return;
+        return trimmed;
+    };
 
-        const timer = setTimeout(() => {
-            fetchSearch(keyword);
-        }, 300);
+    const getPopularKeywords = () => {
+        const saved = JSON.parse(
+            localStorage.getItem(POPULAR_SEARCH_KEY) || '{}'
+        );
 
-        return () => clearTimeout(timer);
-    }, [keyword]);
+        const sorted = Object.entries(saved)
+            .sort((a, b) => b[1] - a[1])
+            .map(([keyword]) => keyword);
 
-    const fetchSearch = (value) => {
-        setLoading(true);
+        const merged = [
+            ...sorted,
+            ...DEFAULT_TRENDING.filter((item) => !sorted.includes(item))
+        ];
 
-        axiosInstance
-            .get(`/api/products?keyword=${value}&page=0&size=10&sort=popular`)
-            .then((res) => {
-                setResults(res.data.content || []);
-                saveRecent(value);
-                setSearchParams({ keyword: value });
-            })
-            .finally(() => setLoading(false));
+        return merged.slice(0, 4);
+    };
+
+    const savePopularKeyword = (value) => {
+        const searchValue = normalizeKeyword(value);
+
+        if (!searchValue) return;
+
+        const saved = JSON.parse(
+            localStorage.getItem(POPULAR_SEARCH_KEY) || '{}'
+        );
+
+        saved[searchValue] = (saved[searchValue] || 0) + 1;
+
+        localStorage.setItem(
+            POPULAR_SEARCH_KEY,
+            JSON.stringify(saved)
+        );
+
+        setPopularKeywords(getPopularKeywords());
     };
 
     const saveRecent = (value) => {
-        let updated = [value, ...recent.filter(v => v !== value)];
-        updated = updated.slice(0, 5);
+        const searchValue = normalizeKeyword(value);
 
-        setRecent(updated);
-        localStorage.setItem('recentSearch', JSON.stringify(updated));
+        if (!searchValue) return;
+
+        setRecent((prev) => {
+            const updated = [
+                searchValue,
+                ...prev.filter((item) => item !== searchValue)
+            ].slice(0, 5);
+
+            localStorage.setItem(
+                RECENT_SEARCH_KEY,
+                JSON.stringify(updated)
+            );
+
+            return updated;
+        });
+    };
+
+    const fetchSearch = (value, shouldSaveKeyword = false) => {
+        const searchValue = normalizeKeyword(value);
+
+        if (!searchValue) return;
+
+        setLoading(true);
+        setHasSearched(true);
+
+        if (shouldSaveKeyword) {
+            saveRecent(searchValue);
+            savePopularKeyword(searchValue);
+        }
+
+        axiosInstance
+            .get('/api/products', {
+                params: {
+                    keyword: searchValue,
+                    page: 0,
+                    size: 10,
+                    sort: 'popular',
+                },
+            })
+            .then((res) => {
+                setResults(res.data.content || []);
+                setSearchParams({ keyword: searchValue });
+            })
+            .catch((error) => {
+                console.error('검색 실패:', error);
+                setResults([]);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    };
+
+    useEffect(() => {
+        const savedRecent = JSON.parse(
+            localStorage.getItem(RECENT_SEARCH_KEY) || '[]'
+        );
+
+        setRecent(savedRecent);
+        setPopularKeywords(getPopularKeywords());
+
+        const initialKeyword = normalizeKeyword(keywordParam);
+
+        if (initialKeyword) {
+            setKeyword(initialKeyword);
+            fetchSearch(initialKeyword, false);
+        }
+    }, []);
+
+    const removeRecent = (e, value) => {
+        e.stopPropagation();
+
+        setRecent((prev) => {
+            const updated = prev.filter((item) => item !== value);
+
+            localStorage.setItem(
+                RECENT_SEARCH_KEY,
+                JSON.stringify(updated)
+            );
+
+            return updated;
+        });
+    };
+
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+
+        const searchValue = normalizeKeyword(keyword);
+
+        if (!searchValue) return;
+
+        setKeyword(searchValue);
+        fetchSearch(searchValue, true);
     };
 
     const onSearchClick = (value) => {
-        setKeyword(value);
+        const searchValue = normalizeKeyword(value);
+
+        if (!searchValue) return;
+
+        setKeyword(searchValue);
+        fetchSearch(searchValue, true);
     };
 
     return (
         <PageWrapper>
 
-            <SearchInput
-                value={keyword}
-                onChange={(e) => setKeyword(e.target.value)}
-                placeholder="상품을 검색하세요"
-            />
+            <form onSubmit={handleSearchSubmit}>
+                <SearchInput
+                    value={keyword}
+                    onChange={(e) => setKeyword(e.target.value)}
+                    placeholder="상품을 검색하세요"
+                />
+            </form>
 
             <Section>
                 <h4>🔥 인기 검색어</h4>
+
                 <TagBox>
-                    {trending.map((item) => (
-                        <Tag key={item} onClick={() => onSearchClick(item)}>
+                    {popularKeywords.map((item) => (
+                        <Tag
+                            key={item}
+                            type="button"
+                            onClick={() => onSearchClick(item)}
+                        >
                             {item}
                         </Tag>
                     ))}
@@ -94,16 +222,44 @@ const SearchPage = () => {
 
             <Section>
                 <h4>🕘 최근 검색어</h4>
-                <TagBox>
-                    {recent.map((item) => (
-                        <TagGray key={item} onClick={() => onSearchClick(item)}>
-                            {item}
-                        </TagGray>
-                    ))}
-                </TagBox>
+
+                {recent.length > 0 ? (
+                    <TagBox>
+                        {recent.map((item) => (
+                            <TagGray
+                                key={item}
+                                onClick={() => onSearchClick(item)}
+                            >
+                                <span>{item}</span>
+
+                                <RemoveRecentButton
+                                    type="button"
+                                    onClick={(e) => removeRecent(e, item)}
+                                    aria-label={`${item} 최근 검색어 삭제`}
+                                >
+                                    ×
+                                </RemoveRecentButton>
+                            </TagGray>
+                        ))}
+                    </TagBox>
+                ) : (
+                    <EmptyText>
+                        최근 검색어가 없습니다.
+                    </EmptyText>
+                )}
             </Section>
 
-            {loading && <p>검색중...</p>}
+            {loading && (
+                <EmptyText>
+                    검색중...
+                </EmptyText>
+            )}
+
+            {!loading && hasSearched && results.length === 0 && (
+                <EmptyText>
+                    검색 결과가 없습니다.
+                </EmptyText>
+            )}
 
             <Grid>
                 {results.map((item) => {
@@ -114,10 +270,6 @@ const SearchPage = () => {
                         <Card
                             key={item.id}
                             onClick={() => navigate(`/products/${item.id}`)}
-                            style={{
-                                cursor: 'pointer',
-                                position: 'relative'
-                            }}
                         >
                             <HeartButton product={item} />
 
@@ -127,55 +279,23 @@ const SearchPage = () => {
                                 onError={(e) => {
                                     e.target.src = "/images/default.png";
                                 }}
-                                style={{
-                                    width: "100%",
-                                    aspectRatio: "1 / 1",
-                                    objectFit: "cover",
-                                    borderRadius: "12px",
-                                    backgroundColor: "#f5f5f5"
-                                }}
                             />
 
                             <InfoBox>
                                 {brandName && (
-                                    <p
-                                        className='product-brand'
-                                        style={{
-                                            margin: 0,
-                                            fontSize: '12px',
-                                            fontWeight: 600,
-                                            color: '#777',
-                                            lineHeight: '1.2'
-                                        }}
-                                    >
+                                    <p className="product-brand">
                                         {brandName}
                                     </p>
                                 )}
 
-                                <h4
-                                    style={{
-                                        margin: '0 0 6px',
-                                        fontSize: '14px',
-                                        fontWeight: 500,
-                                        lineHeight: '20px'
-                                    }}
-                                >
+                                <h4 className="product-name">
                                     {item.name}
                                 </h4>
 
-                                <p
-                                    style={{
-                                        margin: 0,
-                                        fontSize: '14px',
-                                        fontWeight: 600,
-                                        lineHeight: '18px'
-                                    }}
-                                >
+                                <p className="product-price">
                                     {item.price?.toLocaleString()}원
                                 </p>
                             </InfoBox>
-
-
                         </Card>
                     );
                 })}
