@@ -7,6 +7,31 @@ export const MyPageContainer = styled.div`
     padding: 0 20px 60px;
 `;
 
+export const TopBar = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 0 4px;
+`;
+
+export const BackButton = styled.button`
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 50%;
+    background-color: #f7f7f7;
+    color: #444;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+`;
+
+export const TopTitle = styled.h1`
+    font-size: 16px;
+    font-weight: 700;
+    color: #222;
+`;
+
 export const ProfileSection = styled.div`
     display: flex;
     flex-direction: column;
@@ -16,13 +41,17 @@ export const ProfileSection = styled.div`
     border-bottom: 1px solid #f2f2f2;
 `;
 
+export const ProfileImageWrap = styled.div`
+    position: relative;
+    margin-bottom: 14px;
+`;
+
 export const ProfileImage = styled.img`
     width: 80px;
     height: 80px;
     border-radius: 50%;
     object-fit: cover;
     background-color: #f0f0f0;
-    margin-bottom: 14px;
     border: 2px solid #f5c542;
 `;
 
@@ -34,10 +63,25 @@ export const ProfileImagePlaceholder = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 14px;
     font-size: 32px;
     font-weight: 700;
     color: #fff;
+`;
+
+export const ProfileEditButton = styled.button`
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 28px;
+    height: 28px;
+    border: 0;
+    border-radius: 50%;
+    background-color: #ff8c00;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
 `;
 
 export const ProfileName = styled.p`
@@ -53,13 +97,38 @@ export const ProfileEmail = styled.p`
 `;
 
 export const FriendCode = styled.p`
-    margin-top: 8px;
     font-size: 12px;
-    color: #888;
+    color: #666;
     background-color: #f7f7f7;
     border-radius: 20px;
     padding: 4px 14px;
     letter-spacing: 0.5px;
+`;
+
+export const FriendCodeRow = styled.div`
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+`;
+
+export const CopyFriendCodeButton = styled.button`
+    width: 30px;
+    height: 30px;
+    border: 1px solid #ececec;
+    background-color: #fff;
+    color: #777;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    transition: all 0.15s;
+    cursor: pointer;
+
+    &:active {
+        transform: scale(0.95);
+    }
 `;
 
 export const ProfileBadge = styled.span`
@@ -101,6 +170,19 @@ export const MenuItem = styled.div`
         color: #ccc;
         font-size: 16px;
     }
+`;
+
+export const MenuRight = styled.div`
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+`;
+
+export const RedDot = styled.span`
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #ff4d4f;
 `;
 
 export const LogoutButton = styled.button`

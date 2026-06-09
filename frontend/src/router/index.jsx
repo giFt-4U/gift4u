@@ -29,6 +29,7 @@ import LoginPage from '../pages/user/LoginPage';
 import SignupPage from '../pages/user/SignupPage';
 import KakaoCallbackPage from '../pages/user/KakaoCallbackPage';
 import MyPage from '../pages/user/MyPage';
+import MyPageEdit from '../pages/user/MyPageEdit';
 import FriendsPage from '../pages/user/FriendsPage';
 
 export default function Router() {
@@ -64,6 +65,7 @@ export default function Router() {
                     <Route path="signup" element={<SignupPage />} />
                     <Route path="kakao/auth-code" element={<KakaoCallbackPage />} />
                     <Route path="mypage" element={<MyPage />} />
+                    <Route path="mypage/edit" element={<MyPageEdit />} />
                     <Route path="friends" element={<FriendsPage />} />
 
                     {/* FRIEND */}

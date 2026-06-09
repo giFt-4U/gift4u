@@ -29,6 +29,8 @@ public enum ErrorCode {
     FRIEND_REQUEST_TO_SELF(HttpStatus.BAD_REQUEST, "FRIEND_REQUEST_TO_SELF", "본인에게 친구 요청을 보낼 수 없습니다."),
     TERMS_AGREEMENT_REQUIRED(HttpStatus.BAD_REQUEST, "TERMS_AGREEMENT_REQUIRED", "약관에 동의해야 가입할 수 있습니다."),
     CHAT_MESSAGE_BLANK(HttpStatus.BAD_REQUEST, "CHAT_MESSAGE_BLANK", "메시지를 입력해주세요."),
+    INVALID_FILE_TYPE(HttpStatus.BAD_REQUEST, "INVALID_FILE_TYPE", "지원하지 않는 이미지 형식입니다."),
+    FILE_TOO_LARGE(HttpStatus.BAD_REQUEST, "FILE_TOO_LARGE", "이미지 용량이 너무 큽니다."),
 
     /////////// 401 - 인증되지 않은 요청 ///////////
 
@@ -66,7 +68,8 @@ public enum ErrorCode {
     /////////// 500 - 서버 내부 오류 ///////////
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "E500", "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요."),
     GIFT_LINK_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "GIFT_LINK_CREATION_FAILED", "선물 링크 생성에 실패했습니다. 다시 시도해주세요."),
-    FRIEND_CODE_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "FRIEND_CODE_GENERATION_FAILED", "친구 코드 생성에 실패했습니다. 다시 시도해 주세요.");
+    FRIEND_CODE_GENERATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "FRIEND_CODE_GENERATION_FAILED", "친구 코드 생성에 실패했습니다. 다시 시도해 주세요."),
+    FILE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "FILE_UPLOAD_FAILED", "프로필 이미지 업로드에 실패했습니다.");
 
     private final HttpStatus status;
     private final String code;

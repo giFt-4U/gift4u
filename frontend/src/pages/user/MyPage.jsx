@@ -6,15 +6,24 @@ import { getMe } from '../../api/auth';
 import { getFriendRequests } from '../../api/chatApi';
 import {
     MyPageContainer,
+    TopBar,
+    BackButton,
+    TopTitle,
     ProfileSection,
+    ProfileImageWrap,
     ProfileImage,
     ProfileImagePlaceholder,
+    ProfileEditButton,
     ProfileName,
     ProfileEmail,
     ProfileBadge,
+    FriendCodeRow,
     FriendCode,
+    CopyFriendCodeButton,
     MenuSection,
     MenuItem,
+    MenuRight,
+    RedDot,
     LogoutButton,
 } from '../../styles/MyPageStyle';
 
@@ -28,21 +37,32 @@ const MyPage = () => {
     const navigate = useNavigate();
     const { user, setUser, clearToken } = useAuthStore();
     const [hasNewRequest, setHasNewRequest] = useState(false);
+    const [copied, setCopied] = useState(false);
 
     useEffect(() => {
-        if (!user) {
-            getMe()
-                .then((res) => setUser(res.data))
-                .catch(() => {
-                    clearToken();
-                    navigate('/login');
-                });
-        }
+        getMe()
+            .then((res) => setUser(res.data))
+            .catch(() => {
+                clearToken();
+                navigate('/login');
+            });
     }, []);
 
     const onLogout = () => {
         clearToken();
         navigate('/login');
+    };
+
+    const onCopyFriendCode = async () => {
+        if (!user?.friendCode) return;
+        try {
+            await navigator.clipboard.writeText(user.friendCode);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2500);
+        } catch (error) {
+            console.error(error);
+            alert('복사에 실패했어요. 다시 시도해주세요.');
+        }
     };
 
     const isKakao = user?.loginProvider === 'KAKAO';
@@ -78,18 +98,39 @@ const MyPage = () => {
 
     return (
         <MyPageContainer>
+            <TopBar>
+                <BackButton onClick={() => navigate(-1)} aria-label="뒤로가기">
+                    ‹
+                </BackButton>
+                <TopTitle>마이페이지</TopTitle>
+            </TopBar>
+
             <ProfileSection>
-                {user?.profileImage ? (
-                    <ProfileImage src={user.profileImage} alt="프로필" />
-                ) : (
-                    <ProfileImagePlaceholder>{initial}</ProfileImagePlaceholder>
-                )}
+                <ProfileImageWrap>
+                    {user?.profileImage ? (
+                        <ProfileImage src={user.profileImage} alt="프로필" />
+                    ) : (
+                        <ProfileImagePlaceholder>{initial}</ProfileImagePlaceholder>
+                    )}
+                    <ProfileEditButton onClick={() => navigate('/mypage/edit')} aria-label="프로필 수정">
+                        +
+                    </ProfileEditButton>
+                </ProfileImageWrap>
 
                 <ProfileName>{user?.nickname || '이름 없음'}</ProfileName>
                 <ProfileEmail>{user?.email || ''}</ProfileEmail>
 
                 {user?.friendCode && (
-                    <FriendCode>내 친구코드 · {user.friendCode}</FriendCode>
+                    <FriendCodeRow>
+                        <FriendCode>나의 코드 · {user.friendCode}</FriendCode>
+                        <CopyFriendCodeButton
+                            onClick={onCopyFriendCode}
+                            aria-label={copied ? '복사 완료' : '코드 복사'}
+                            title={copied ? '복사 완료' : '코드 복사'}
+                        >
+                            {copied ? '✓' : '⧉'}
+                        </CopyFriendCodeButton>
+                    </FriendCodeRow>
                 )}
 
                 {isKakao && (
@@ -101,14 +142,20 @@ const MyPage = () => {
             </ProfileSection>
 
             <MenuSection>
+                <MenuItem onClick={() => navigate('/mypage/edit')}>
+                    회원정보 수정
+                    <span className="arrow">›</span>
+                </MenuItem>
                 <MenuItem onClick={() => navigate('/friends')}>
                     친구 관리
                     <span className="arrow">›</span>
                 </MenuItem>
                 <MenuItem onClick={() => navigate('/friends/requestlist')}>
                     친구 요청 목록
-                    <span className="arrow">›</span>
-                    {hasNewRequest && <RedDot />}
+                    <MenuRight>
+                        {hasNewRequest && <RedDot />}
+                        <span className="arrow">›</span>
+                    </MenuRight>
                 </MenuItem>
             </MenuSection>
 

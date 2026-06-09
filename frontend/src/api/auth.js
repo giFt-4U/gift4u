@@ -12,3 +12,15 @@ export const kakaoLogin = (code) =>
 
 export const getMe = () =>
     axiosInstance.get('/api/users/me');
+
+export const updateMe = (data) =>
+    axiosInstance.patch('/api/users/me', data);
+
+export const uploadProfileImage = (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return axiosInstance.post('/api/users/me/profile-image', formData);
+};
+
+export const deleteProfileImage = () =>
+    axiosInstance.delete('/api/users/me/profile-image');
