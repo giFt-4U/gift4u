@@ -1,7 +1,6 @@
 // CategorySection.jsx
 
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 const categories = [
     { id: 0, name: "전체", img: "/images/category/baby_all.png" },
@@ -65,12 +64,10 @@ const brands = [
     },
 ];
 
-const CategorySection = ({ onSelectCategory }) => {
-
-    const navigate = useNavigate();
-
+const CategorySection = ({ onSelectCategory, onSelectBrand }) => {
     const [selected, setSelected] = useState(0);
     const [showBrands, setShowBrands] = useState(false);
+    const [selectedBrand, setSelectedBrand] = useState("");
 
     const handleClick = (cat) => {
         setSelected(cat.id);
@@ -83,11 +80,17 @@ const CategorySection = ({ onSelectCategory }) => {
         }
 
         setShowBrands(false);
+        setSelectedBrand("");
         onSelectCategory(cat.id);
     };
 
     const handleBrandClick = (brandName) => {
-        navigate(`/products?brandName=${encodeURIComponent(brandName)}`);
+        setSelected(1);
+        setSelectedBrand(brandName);
+
+        // 상품페이지로 이동하지 않고,
+        // Home.jsx에서 바로 브랜드 상품을 조회하도록 전달
+        onSelectBrand(brandName);
     };
 
     return (
@@ -111,7 +114,7 @@ const CategorySection = ({ onSelectCategory }) => {
                         onClick={() => handleClick(cat)}
                         style={{
                             cursor: "pointer",
-                            opacity: selected === cat.id ? 1 : 0.5,
+                            opacity: selected === cat.id ? 1 : 0.75,
                         }}
                     >
                         <img
@@ -128,6 +131,8 @@ const CategorySection = ({ onSelectCategory }) => {
                             style={{
                                 fontSize: "12px",
                                 marginTop: "5px",
+                                fontWeight: selected === cat.id ? 700 : 600,
+                                color: selected === cat.id ? "#111" : "#333",
                             }}
                         >
                             {cat.name}
@@ -152,61 +157,67 @@ const CategorySection = ({ onSelectCategory }) => {
                             padding: "0 2px",
                         }}
                     >
-                        {brands.map((brand) => (
-                            <button
-                                key={brand.name}
-                                type="button"
-                                onClick={() => handleBrandClick(brand.name)}
-                                style={{
-                                    width: "72px",
-                                    border: "none",
-                                    background: "transparent",
-                                    padding: 0,
-                                    cursor: "pointer",
-                                    textAlign: "center",
-                                }}
-                            >
-                                <div
-                                    style={{
-                                        width: "64px",
-                                        height: "64px",
-                                        margin: "0 auto",
-                                        borderRadius: "50%",
-                                        backgroundColor: "#f7f7f7",
-                                        border: "1px solid #eee",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        overflow: "hidden",
-                                    }}
-                                >
-                                    <img
-                                        src={brand.img}
-                                        alt={brand.name}
-                                        onError={(e) => {
-                                            e.target.src = "/images/brand/default_brand.png";
-                                        }}
-                                        style={{
-                                            width: "100%",
-                                            height: "100%",
-                                            objectFit: "cover",
-                                        }}
-                                    />
-                                </div>
+                        {brands.map((brand) => {
+                            const isSelectedBrand = selectedBrand === brand.name;
 
-                                <p
+                            return (
+                                <button
+                                    key={brand.name}
+                                    type="button"
+                                    onClick={() => handleBrandClick(brand.name)}
                                     style={{
-                                        margin: "6px 0 0",
-                                        fontSize: "11px",
-                                        fontWeight: 500,
-                                        color: "#333",
-                                        lineHeight: "14px",
+                                        width: "72px",
+                                        border: "none",
+                                        background: "transparent",
+                                        padding: 0,
+                                        cursor: "pointer",
+                                        textAlign: "center",
                                     }}
                                 >
-                                    {brand.name}
-                                </p>
-                            </button>
-                        ))}
+                                    <div
+                                        style={{
+                                            width: "64px",
+                                            height: "64px",
+                                            margin: "0 auto",
+                                            borderRadius: "50%",
+                                            backgroundColor: "#f7f7f7",
+                                            border: isSelectedBrand
+                                                ? "2px solid #f5c542"
+                                                : "1px solid #eee",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            overflow: "hidden",
+                                        }}
+                                    >
+                                        <img
+                                            src={brand.img}
+                                            alt={brand.name}
+                                            onError={(e) => {
+                                                e.target.src = "/images/brand/default_brand.png";
+                                            }}
+                                            style={{
+                                                width: "100%",
+                                                height: "100%",
+                                                objectFit: "cover",
+                                            }}
+                                        />
+                                    </div>
+
+                                    <p
+                                        style={{
+                                            margin: "6px 0 0",
+                                            fontSize: "11px",
+                                            fontWeight: isSelectedBrand ? 700 : 500,
+                                            color: isSelectedBrand ? "#111" : "#333",
+                                            lineHeight: "14px",
+                                        }}
+                                    >
+                                        {brand.name}
+                                    </p>
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
             )}

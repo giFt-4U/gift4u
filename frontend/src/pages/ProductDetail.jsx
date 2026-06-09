@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
+
 import {
     DetailWrapper,
     ImageArea,
@@ -10,7 +11,9 @@ import {
     BuyBox,
     DescArea
 } from '../styles/ProductDetailStyle';
+
 import HeartButton from '../components/common/HeartButton';
+import { addToCart } from '../utils/Cart';
 
 const ProductDetail = () => {
 
@@ -25,9 +28,25 @@ const ProductDetail = () => {
             .then((res) => {
                 setProduct(res.data);
             })
-            .catch(console.error);
+            .catch((error) => {
+                console.error("상품 상세 조회 실패:", error);
+            });
     }, [id]);
 
+    // 장바구니 담기
+    const handleCartClick = () => {
+        const isLogin = localStorage.getItem("token");
+
+        if (!isLogin) {
+            alert("로그인 후 장바구니를 이용할 수 있습니다.");
+            return;
+        }
+
+        addToCart(product);
+        alert("장바구니에 담겼습니다.");
+    };
+
+    // 선물하기
     const handleGiftClick = () => {
         const isLogin = localStorage.getItem("token");
 
@@ -91,6 +110,15 @@ const ProductDetail = () => {
             <BuyBox>
                 <button
                     type="button"
+                    className="cart-button"
+                    onClick={handleCartClick}
+                >
+                    장바구니 담기
+                </button>
+
+                <button
+                    type="button"
+                    className="gift-button"
                     onClick={handleGiftClick}
                 >
                     선물하기

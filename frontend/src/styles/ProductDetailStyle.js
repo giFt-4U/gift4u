@@ -56,26 +56,33 @@ export const ProductInfoArea = styled.section`
 export const BuyBox = styled.div`
     width: 100%;
 
-    display: flex;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
 
-    padding: 36px 0 56px;
+    padding: 36px 4px 56px;
 
     button {
-        width: 320px;
-        max-width: 80%;
         height: 48px;
 
-        border: none;
         border-radius: 4px;
-
-        background-color: #151515;
-        color: #ffffff;
 
         font-size: 15px;
         font-weight: 500;
 
         cursor: pointer;
+    }
+
+    .cart-button {
+        border: 1px solid #151515;
+        background-color: #ffffff;
+        color: #151515;
+    }
+
+    .gift-button {
+        border: 1px solid #151515;
+        background-color: #151515;
+        color: #ffffff;
     }
 `;
 
