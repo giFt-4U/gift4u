@@ -20,7 +20,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "gift_shipping")
 public class GiftShipping {
 	
-	@Id @GeneratedValue (strategy = GenerationType.IDENTITY)
+	@Id
+	@GeneratedValue (strategy = GenerationType.IDENTITY)
 	private Long id;
 	
 	@OneToOne(fetch=FetchType.LAZY)

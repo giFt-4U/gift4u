@@ -16,6 +16,7 @@ import {
     MenuSection,
     MenuItem,
     LogoutButton,
+    RedDot,
 } from '../../styles/MyPageStyle';
 
 const KakaoIcon = () => (
