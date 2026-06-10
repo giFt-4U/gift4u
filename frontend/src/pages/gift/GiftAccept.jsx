@@ -33,10 +33,10 @@ const GiftAccept = () => {
             {/* 하단 버튼 */}
             <S.ButtonRow>
                 <S.HomeButton onClick={() => navigate('/')}>
-                    홈
+                    메인
                 </S.HomeButton>
-                <S.GiftBoxButton onClick={() => navigate('/mypage/gifts')}>
-                    선물함 보기
+                <S.GiftBoxButton onClick={() => navigate('/chat')}>
+                    채팅방으로   {/* ← "선물함 보기" → "채팅방으로" */}
                 </S.GiftBoxButton>
             </S.ButtonRow>
 

@@ -55,9 +55,9 @@ export default function Router() {
                     {/* GIFT */}
                     <Route path="gifts/card" element={<GiftCard />} />
                     <Route path="gifts/card/preview" element={<GiftCardView />} />
-                    <Route path="gifts/:uuid" element={<GiftCardView />} />
                     <Route path="gifts/:uuid/address" element={<GiftAddress />} />
                     <Route path="gifts/:uuid/accept" element={<GiftAccept />} />
+                    <Route path="gifts/:uuid" element={<GiftCardView />} />
 
                     {/* AUTH */}
                     <Route path="login" element={<LoginPage />} />

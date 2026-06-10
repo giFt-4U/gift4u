@@ -56,6 +56,7 @@ public class SecurityConfig {
             		.requestMatchers("/api/auth/login", "/api/auth/signup", "/api/auth/kakao").permitAll()
             	    .requestMatchers("/ws/**").permitAll()
             		.requestMatchers("/").permitAll()
+            		.requestMatchers(HttpMethod.GET, "/api/gifts/**").permitAll()
             		.requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**")
             			.permitAll()
             		.anyRequest().authenticated())

@@ -120,3 +120,13 @@ export const LogoutButton = styled.button`
         background-color: #fff5f5;
     }
 `;
+
+export const RedDot = styled.span`
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #e53935;
+    border-radius: 50%;
+    margin-left: 6px;
+    vertical-align: middle;
+`;

@@ -206,7 +206,7 @@ public class ChatService {
 				});
 		
 		// GIFT 타입 메시지 - 내용은 프론트가 uuid로 선물 카드 렌더링
-		String giftContent = "선물이 도착했어요 ! "+gift.getUuid();
+		String giftContent = "선물이 도착했어요 ! 🎁 "+gift.getUuid();
 		
 		ChatMessage message = ChatMessage.builder()
 				.room(room)

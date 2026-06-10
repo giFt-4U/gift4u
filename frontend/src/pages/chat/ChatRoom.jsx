@@ -158,20 +158,37 @@ const ChatRoom = () => {
                 {messages.map((msg, idx) => {
                     const isMine = Number(msg.senderId) === Number(myUserId);
                     const isGift = msg.messageType === 'GIFT';
-                    const giftUuid = isGift ? parseGiftUuid(msg.content) : null;
+                    const uuid = isGift ? parseGiftUuid(msg.content) : null;
 
                     return (
                         <S.MessageRow key={msg.id ?? idx} $isMine={isMine}>
 
-                            {/* GIFT 타입 — 선물 카드 미리보기 */}
-                            {isGift && giftUuid ? (
-                                <S.GiftCard onClick={() => navigate(`/gifts/${giftUuid}`)}>
-                                    <S.GiftCardIcon>🎁</S.GiftCardIcon>
-                                    <S.GiftCardText>선물이 도착했어요!</S.GiftCardText>
-                                    <S.GiftCardSub>탭해서 선물 확인하기</S.GiftCardSub>
-                                </S.GiftCard>
-                            ) : (
-                                /* TEXT 타입 — 일반 말풍선 */
+                            {/* GIFT 타입 — 와이어프레임 기준 선물 카드 */}
+                            {isGift && uuid ? (
+                                <S.GiftCardWrapper>
+                                    {/* 상품 이미지 영역 (와이어프레임의 X박스) */}
+                                    <S.GiftCardImage>🎁</S.GiftCardImage>
+
+                                    {/* 상품 정보 */}
+                                    <S.GiftCardInfo>
+                                        <S.GiftCardBrand>따숨품</S.GiftCardBrand>
+                                        <S.GiftCardName>선물이 도착했어요!</S.GiftCardName>
+                                    </S.GiftCardInfo>
+
+                                    {/* 버튼 두 개 — 선물 확인하기 / 주소 입력하기 */}
+                                    <S.GiftCardButton
+                                        onClick={() => navigate(`/gifts/${uuid}`)}
+                                    >
+                                        선물 확인하기
+                                    </S.GiftCardButton>
+                                    <S.GiftCardButton
+                                        $secondary
+                                        onClick={() => navigate(`/gifts/${uuid}/address`)}
+                                    >
+                                        주소 입력하기
+                                    </S.GiftCardButton>
+                                </S.GiftCardWrapper>
+                            ) : (/* TEXT 타입 — 일반 말풍선 */
                                 <S.Bubble $isMine={isMine}>
                                     <S.BubbleText>{msg.content}</S.BubbleText>
                                     <S.BubbleTime>

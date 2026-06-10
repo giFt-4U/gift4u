@@ -75,20 +75,33 @@ const GiftAddress = () => {
             });
 
             // 수령 완료 페이지로 이동
+            alert('선물 수령 및 배송지 입력이 완료되었습니다!');
             navigate(`/gifts/${uuid}/accept`);
 
         } catch (e) {
+            const serverMessage = e.response?.data?.message;
             const code = e.response?.data?.error?.code;
+
+            let errorMessage = '오류가 발생했습니다. 다시 시도해주세요.';
+
             if (code === 'GIFT_ALREADY_RECEIVED') {
-                setApiError('이미 수령한 선물입니다.');
+                errorMessage = '이미 수령한 선물입니다.';
             } else if (code === 'GIFT_EXPIRED') {
-                setApiError('만료된 선물입니다.');
+                errorMessage = '만료된 선물입니다.';
             } else if (code === 'GIFT_LINK_INVALID') {
-                setApiError('유효하지 않은 선물 링크입니다.');
+                errorMessage = '유효하지 않은 선물 링크입니다.';
             } else if (code === 'FORBIDDEN') {
-                setApiError('수령 권한이 없습니다.');
-            } else {
-                setApiError('오류가 발생했습니다. 다시 시도해주세요.');
+                errorMessage = '수령 권한이 없습니다.';
+            } else if (serverMessage) {
+                errorMessage = serverMessage;
+            }
+
+            alert(errorMessage);
+            setApiError(errorMessage);
+
+            // 치명적인 에러(만료, 유효하지 않음)일 경우 안전하게 이전 페이지나 메인으로 이동 처리 가능
+            if (code === 'GIFT_EXPIRED' || code === 'GIFT_LINK_INVALID') {
+                navigate('/');
             }
         } finally {
             setLoading(false);
@@ -120,7 +133,7 @@ const GiftAddress = () => {
                         name="receiverPhone"
                         value={form.receiverPhone}
                         onChange={handleChange}
-                        placeholder="010"
+                        placeholder="010-0000-0000"
                         type="tel"
                         $hasError={!!errors.receiverPhone}
                     />
@@ -160,9 +173,9 @@ const GiftAddress = () => {
 
                 {/* 배송 메모 — 추후 기능 확장용 (현재 BE 미지원) */}
                 <S.FieldGroup>
-                    <FieldLabel>배송의 특이</FieldLabel>
+                    <S.FieldLabel>배송의 특이</S.FieldLabel>
                     <S.MemoBox>
-                        S.<MemoText>기본배송지</MemoText>
+                        <S.MemoText>기본배송지</S.MemoText>
                         <S.MemoSub>사용자 주소 (예시: 000-000-000-00)</S.MemoSub>
                     </S.MemoBox>
                     <S.AddButton>+ 배송지 추가</S.AddButton>

@@ -134,3 +134,52 @@ export const SendButton = styled.button`
     justify-content: center;
     flex-shrink: 0;
 `;
+export const GiftCardWrapper = styled.div`
+    width: 240px;
+    border: 1.5px solid #FF8C00;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+`;
+
+export const GiftCardImage = styled.div`
+    width: 100%;
+    height: 140px;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    border-bottom: 1px solid #eee;
+`;
+
+export const GiftCardInfo = styled.div`
+    padding: 10px 14px;
+    border-bottom: 1px solid #eee;
+`;
+
+export const GiftCardBrand = styled.p`
+    font-size: 11px;
+    color: #aaa;
+    margin: 0 0 2px;
+`;
+
+export const GiftCardName = styled.p`
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+`;
+
+export const GiftCardButton = styled.button`
+    width: 100%;
+    padding: 12px;
+    background: ${({ $secondary }) => $secondary ? '#fff' : '#FF8C00'};
+    color: ${({ $secondary }) => $secondary ? '#FF8C00' : '#fff'};
+    border: none;
+    border-top: ${({ $secondary }) => $secondary ? '1px solid #eee' : 'none'};
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: block;
+`;
