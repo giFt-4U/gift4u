@@ -127,3 +127,36 @@ export const SubmitButton = styled.button`
     font-weight: 700;
     cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
 `;
+
+export const AddressRow = styled.div`
+    display: flex;
+    gap: 8px;
+    align-items: center;
+`;
+
+export const SearchButton = styled.button`
+    padding: 12px 14px;
+    background: #FF8C00;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+`;
+
+export const ZipCode = styled.p`
+    font-size: 12px;
+    color: #888;
+    margin: 4px 0 0;
+`;
+
+export const CenterText = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #aaa;
+`;

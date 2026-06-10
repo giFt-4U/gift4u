@@ -25,7 +25,7 @@ const FloatingChatButton = ({ hasUnread = false }) => {
             aria-label="채팅"
         >
             <img
-                src="/assets/icons/chat1.png"
+                src={hasUnread ? "/assets/icons/chat2.png" : "/assets/icons/chat1.png"}
                 alt="채팅"
             />
 
@@ -59,6 +59,10 @@ const ChatButton = styled.button`
         height: 92px;
         display: block;
         object-fit: contain;
+    }
+    transition: transform 0.1s ease;
+    &:active {
+        transform: scale(0.95);
     }
 `;
 

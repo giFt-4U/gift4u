@@ -22,4 +22,7 @@ public interface GiftRepository extends JpaRepository<Gift, Long> {
 	
 	/** 스케쥴러 전용 **/
 	List<Gift> findAllByStatusAndExpiredAtBefore(GiftStatus staus, LocalDateTime expiredAt);
+
+    // 같은 송신자가 특정 시간대(결제 동시 인서트 시간)에 보낸 선물 목록 조회
+    List<Gift> findAllBySenderIdAndCreatedAtBetween(Long senderId, LocalDateTime start, LocalDateTime end);
 }

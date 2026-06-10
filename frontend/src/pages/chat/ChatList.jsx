@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getChatRooms, leaveRoom } from '../../api/chatApi';
+import useAuthStore from '../../store/authStore';
+import FloatingMainButton from '../../components/common/FloatingMainButton';
 import * as S from '../../styles/chat/ChatListStyle';
 
 /**
@@ -13,6 +15,7 @@ import * as S from '../../styles/chat/ChatListStyle';
  */
 const ChatList = () => {
     const navigate = useNavigate();
+    const { user } = useAuthStore();
     const [rooms, setRooms] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -49,6 +52,32 @@ const ChatList = () => {
         }
     };
 
+    // lastMessageAt이 localStorage에 저장된 마지막 읽은 시각보다 최신이면 unread
+    const isUnread = (room) => {
+        if (!room.lastMessageAt) return false;
+
+        const key = `chat_read_${room.roomId}`;
+        const lastRead = localStorage.getItem(key);
+
+        // 방에 들어간 기록이 아예 없다면 상대방이 보낸 방이므로 빨간 점 표시
+        if (!lastRead) return true;
+
+        const lastMessageTime = new Date(room.lastMessageAt).getTime();
+        const lastReadTime = new Date(lastRead).getTime();
+
+        const TIME_MARGIN = 3000;
+
+        if (lastMessageTime >= lastReadTime && (lastMessageTime - lastReadTime) <= TIME_MARGIN) {
+            return false;
+        }
+    };
+
+    // 채팅방 클릭 시 읽음 처리
+    const handleRoomClick = (room) => {
+        localStorage.setItem(`chat_read_${room.roomId}`, new Date().toISOString());
+        navigate(`/chat/${room.roomId}`);
+    };
+
     if (loading) return <S.CenterText>로딩 중...</S.CenterText>;
     if (error) return <S.CenterText>{error}</S.CenterText>;
 
@@ -62,7 +91,7 @@ const ChatList = () => {
                     {rooms.map((room) => (
                         <S.RoomItem
                             key={room.roomId}
-                            onClick={() => navigate(`/chat/${room.roomId}`)}
+                            onClick={() => handleRoomClick(room)}
                         >
                             {/* 프로필 아이콘 */}
                             <S.Avatar>
@@ -71,7 +100,11 @@ const ChatList = () => {
 
                             {/* 상대방 이름 + 마지막 메시지 */}
                             <S.RoomInfo>
-                                <S.RoomName>{room.opponentNickname}</S.RoomName>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    <S.RoomName>{room.opponentNickname}</S.RoomName>
+                                    {/* 조건식을 통과하면 빨간 점 노출 */}
+                                    {isUnread(room) && <S.UnreadDot />}
+                                </div>
                                 <S.LastMessage>
                                     {room.lastMessage ?? '메시지가 없습니다.'}
                                 </S.LastMessage>
@@ -81,7 +114,8 @@ const ChatList = () => {
                             <S.TimeText>{formatTime(room.lastMessageAt)}</S.TimeText>
                             {/* 나가기 버튼 */}
                             <S.LeaveButton
-                                onClick={() => {
+                                onClick={(e) => {
+                                    e.stopPropagation();
                                     if (window.confirm('정말 이 채팅방에서 나가시겠습니까?')) {
                                         handleLeave(room.roomId);
                                     }
@@ -93,6 +127,8 @@ const ChatList = () => {
                     ))}
                 </S.RoomList>
             )}
+            <FloatingMainButton />
+
         </S.Container>
     );
 };
