@@ -59,6 +59,8 @@ public class SecurityConfig {
             		.requestMatchers(HttpMethod.GET, "/api/gifts/**").permitAll()
             		.requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**")
             			.permitAll()
+            		.requestMatchers(HttpMethod.GET, "/uploads/**")
+            			.permitAll()
             		.anyRequest().authenticated())
             .addFilterBefore(jwtAuthenticationFilter, 
             		UsernamePasswordAuthenticationFilter.class)

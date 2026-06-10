@@ -3,13 +3,16 @@ package com.gift4u.app.domain.user.service;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.gift4u.app.domain.user.dto.SignupRequest;
 import com.gift4u.app.domain.user.dto.SignupResponse;
 import com.gift4u.app.domain.user.dto.UserProfileResponse;
+import com.gift4u.app.domain.user.dto.UserProfileUpdateRequest;
 import com.gift4u.app.domain.user.entity.User;
 import com.gift4u.app.domain.user.enums.LoginProvider;
 import com.gift4u.app.domain.user.enums.UserRole;
@@ -29,7 +32,11 @@ public class UserService {
 
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final ProfileImageStorageService profileImageStorageService;
 	private final SecureRandom secureRandom = new SecureRandom();
+
+	@Value("${app.base-url:http://localhost:8080}")
+	private String baseUrl;
 
 	@Transactional
 	public SignupResponse signup(SignupRequest request) {
@@ -69,11 +76,59 @@ public class UserService {
 	
 	@Transactional(readOnly = true)
 	public UserProfileResponse getMyProfile(Long userId) {
+		User user = findActiveUser(userId);
+		return toProfileResponse(user);
+	}
+
+	@Transactional
+	public UserProfileResponse updateMyProfile(Long userId, UserProfileUpdateRequest request) {
+		User user = findActiveUser(userId);
+
+		if (userRepository.existsByNicknameAndIdNot(request.getNickname(), userId)) {
+			throw new GlobalException(ErrorCode.DUPLICATE_NICKNAME);
+		}
+
+		String phone = request.getPhone();
+		if (phone != null && phone.isBlank()) {
+			phone = null;
+		}
+
+		user.updateProfile(request.getNickname(), phone);
+		return toProfileResponse(user);
+	}
+
+	@Transactional
+	public UserProfileResponse uploadProfileImage(Long userId, MultipartFile file) {
+		User user = findActiveUser(userId);
+
+		profileImageStorageService.deleteIfLocal(user.getProfileImage());
+
+		String savedPath = profileImageStorageService.save(userId, file);
+		user.updateProfileImage(savedPath);
+
+		return toProfileResponse(user);
+	}
+
+	@Transactional
+	public UserProfileResponse deleteProfileImage(Long userId) {
+		User user = findActiveUser(userId);
+
+		profileImageStorageService.deleteIfLocal(user.getProfileImage());
+		user.clearProfileImage();
+
+		return toProfileResponse(user);
+	}
+
+	private User findActiveUser(Long userId) {
 		User user = userRepository.findById(userId)
 				.orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
-		if(user.getDeletedAt() != null) {
+		if (user.getDeletedAt() != null) {
 			throw new GlobalException(ErrorCode.USER_NOT_FOUND);
 		}
+		return user;
+	}
+
+	private UserProfileResponse toProfileResponse(User user) {
 		return UserProfileResponse.builder()
 				.id(user.getId())
 				.email(user.getEmail())
@@ -82,8 +137,18 @@ public class UserService {
 				.friendCode(user.getFriendCode())
 				.loginProvider(user.getLoginProvider())
 				.marketingAgreed(user.getMarketingAgreed())
-				.profileImage(user.getProfileImage())
+				.profileImage(resolveProfileImageUrl(user.getProfileImage()))
 				.build();
+	}
+
+	private String resolveProfileImageUrl(String profileImage) {
+		if (profileImage == null || profileImage.isBlank()) {
+			return null;
+		}
+		if (profileImage.startsWith("http://") || profileImage.startsWith("https://")) {
+			return profileImage;
+		}
+		return baseUrl + profileImage;
 	}
 	public String generateUniqueFriendCode() {
 		for(int attempt = 0; attempt < FRIEND_CODE_MAX_ATTEMPTS; attempt++) {

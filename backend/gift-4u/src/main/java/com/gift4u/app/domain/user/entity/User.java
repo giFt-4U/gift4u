@@ -88,5 +88,18 @@ public class User {
 	
 	@Column(name = "friend_code", length = 20, unique = true)
 	private String friendCode;
+
+	public void updateProfile(String nickname, String phone) {
+		this.nickname = nickname;
+		this.phone = phone;
+	}
+
+	public void updateProfileImage(String profileImage) {
+		this.profileImage = profileImage;
+	}
+
+	public void clearProfileImage() {
+		this.profileImage = null;
+	}
 	
 }//class
