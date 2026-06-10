@@ -25,7 +25,6 @@ import {
     MenuRight,
     RedDot,
     LogoutButton,
-    RedDot,
 } from '../../styles/MyPageStyle';
 
 const KakaoIcon = () => (
@@ -157,6 +156,10 @@ const MyPage = () => {
                         {hasNewRequest && <RedDot />}
                         <span className="arrow">›</span>
                     </MenuRight>
+                </MenuItem>
+                <MenuItem onClick={() => navigate('/mypage/gifts')}>
+                    받은 선물함
+                    <span className="arrow">›</span>
                 </MenuItem>
             </MenuSection>
 

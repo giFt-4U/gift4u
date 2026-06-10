@@ -108,3 +108,18 @@ export const LeaveButton = styled.button`
 
     &:active { background: #f5f5f5; }
 `;
+
+export const RoomNameRow = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 6px;
+`;
+
+export const UnreadDot = styled.span`
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #e53935;
+    border-radius: 50%;
+    flex-shrink: 0;
+`;

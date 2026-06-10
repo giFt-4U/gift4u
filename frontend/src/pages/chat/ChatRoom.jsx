@@ -118,9 +118,6 @@ const ChatRoom = () => {
         // STOMP 연결 안 됐으면 전송 차단
         if (!stompClientRef.current?.connected) return;
 
-        console.log("보내는 사람 ID (myUserId):", myUserId);
-        console.log("채팅방 ID (roomId):", roomId);
-
         stompClientRef.current.publish({
             destination: '/app/chat/send',
             body: JSON.stringify({
@@ -131,6 +128,7 @@ const ChatRoom = () => {
             }),
         });
 
+        localStorage.setItem(`chat_read_${roomId}`, new Date().toISOString());
         setInput('');
     };
 

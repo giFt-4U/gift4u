@@ -38,23 +38,53 @@ const GiftCardView = () => {
     const [giftData, setGiftData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [bundleProducts, setBundleProducts] = useState([]);
 
     // 경로 B일 때만 API 호출
     useEffect(() => {
         if (!uuid) return; // 경로 A면 스킵
+        const fetchGiftAndBundle = async () => {
+            try {
+                setLoading(true);
+                // 1. 상세 선물 내역 단건 조회
+                const res = await getGift(uuid);
+                const mainGift = res.data;
+                setGiftData(mainGift);
 
-        setLoading(true);
-        getGift(uuid)
-            .then((res) => setGiftData(res.data))
-            .catch((e) => {
+                try {
+                    const listRes = await getMyGifts();
+                    const allGifts = listRes.data || [];
+
+                    const mainTime = mainGift.createdAt?.substring(0, 16);
+
+                    const matchedGifts = allGifts.filter(gift => {
+                        const giftTime = gift.createdAt?.substring(0, 16);
+                        return giftTime === mainTime && gift.senderId === mainGift.senderId;
+                    });
+
+                    if (matchedGifts.length > 0) {
+                        setBundleProducts(matchedGifts);
+                    } else {
+                        setBundleProducts([mainGift]);
+                    }
+                } catch (listErr) {
+                    // 전체 목록 조회 에러 시 폴백: 현재 단일 상품 노출
+                    setBundleProducts([mainGift]);
+                }
+
+            } catch (e) {
                 const code = e.response?.data?.error?.code;
                 if (code === 'GIFT_LINK_INVALID') {
                     setError('유효하지 않거나 만료된 선물 링크입니다.');
                 } else {
                     setError('선물 정보를 불러오지 못했습니다.');
                 }
-            })
-            .finally(() => setLoading(false));
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchGiftAndBundle();
     }, [uuid]);
 
     // ── 렌더링에 사용할 데이터 결정 ─────────────────────
@@ -69,8 +99,8 @@ const GiftCardView = () => {
     const isAccepted = status === 'ACCEPTED';
 
     // ── 로딩 / 에러 처리 ─────────────────────────────────
-    if (loading) return <CenterText>로딩 중...</CenterText>;
-    if (error) return <CenterText>{error}</CenterText>;
+    if (loading) return <S.CenterText>로딩 중...</S.CenterText>;
+    if (error) return <S.CenterText>{error}</S.CenterText>;
 
     return (
         <S.Container>
@@ -86,12 +116,23 @@ const GiftCardView = () => {
                 </S.PatternRow>
 
                 {/* 상품 정보 */}
-                {productName && (
-                    <S.ProductBox>
-                        <S.ProductImg>🎁</S.ProductImg>
-                        <S.ProductName>{productName}</S.ProductName>
-                    </S.ProductBox>
-                )}
+                <div style={{ width: '100%', display: 'flex', flexDirection: 'column', margin: '12px 0' }}>
+                    {isPreview ? (
+                        // 경로 A: 송신자 미리보기 시 단일 상품명 노출
+                        <S.ProductBox>
+                            <S.ProductImg>🎁</S.ProductImg>
+                            <S.ProductName>{previewState?.productName || '선물 상품 이름'}</S.ProductName>
+                        </S.ProductBox>
+                    ) : (
+                        // 경로 B: 백엔드가 묶어준 bundleProductNames 배열을 그대로 순회 출력
+                        giftData?.bundleProductNames?.map((name, idx) => (
+                            <S.ProductBox key={idx} style={{ marginBottom: idx === giftData.bundleProductNames.length - 1 ? 0 : '8px' }}>
+                                <S.ProductImg>🎁</S.ProductImg>
+                                <S.ProductName>{name}</S.ProductName>
+                            </S.ProductBox>
+                        ))
+                    )}
+                </div>
 
                 {/* 메시지 */}
                 <S.MessageBox>

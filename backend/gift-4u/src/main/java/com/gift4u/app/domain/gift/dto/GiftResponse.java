@@ -1,6 +1,7 @@
 package com.gift4u.app.domain.gift.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.gift4u.app.domain.gift.entity.Gift;
 import com.gift4u.app.domain.gift.entity.GiftMessage;
@@ -29,6 +30,9 @@ public class GiftResponse {
 	// 메시지 정보
 	private String message;
 	private Integer cardDesignType;
+	
+	// 여러건 조회
+    private List<String> bundleProductNames; 
 	
 	// 선물 기본 정보 목록조회에 이용 (REQ-012, 013)
 	public static GiftResponse from(Gift gift) {
@@ -60,6 +64,24 @@ public class GiftResponse {
 				.message(giftMessage.getMessage())
 				.cardDesignType(giftMessage.getCardDesignType())
 				.build();
+	}
+	
+	// 기존 단건 빌더/생성자 외에 묶음 전용 생성자 메서드 추가
+	public static GiftResponse from(Gift gift, GiftMessage giftMessage, List<String> bundleProductNames) {
+	    return GiftResponse.builder()
+	            .id(gift.getId())
+	            .uuid(gift.getUuid())
+	            .sender(gift.getSender().getId())
+	            .receiver(gift.getReceiver().getId())
+	            .product(gift.getProduct().getId())
+	            .productName(gift.getProduct().getName())
+	            .status(gift.getStatus())
+	            .createdAt(gift.getCreatedAt())
+	            .expiredAt(gift.getExpiredAt())
+	            .message(giftMessage != null ? giftMessage.getMessage() : "선물이 도착했습니다.")
+	            .cardDesignType(giftMessage != null ? giftMessage.getCardDesignType() : 1)
+	            .bundleProductNames(bundleProductNames)
+	            .build();
 	}
 
 }

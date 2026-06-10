@@ -1,5 +1,6 @@
 package com.gift4u.app.domain.gift.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.context.annotation.Lazy;
@@ -93,9 +94,31 @@ public class GiftService {
 	 * 만료된 선물도 조회는 가능하되 상태(EXPIRED)를 그대로 반환
 	 */
 	public GiftResponse getGift(String uuid) {
-		Gift gift = giftRepository.findByUuid(uuid)
-				.orElseThrow(() -> new GlobalException(ErrorCode.GIFT_LINK_INVALID));
-		return GiftResponse.from(gift);
+	    // 1. 기준이 되는 선물 단건 조회
+	    Gift gift = giftRepository.findByUuid(uuid)
+	            .orElseThrow(() -> new GlobalException(ErrorCode.GIFT_LINK_INVALID));
+	            
+	    // 2. 메시지 카드 정보 조회
+	    GiftMessage giftMessage = giftMessageRepository.findByGiftId(gift.getId())
+	            .orElse(null); // 메시지가 없을 경우를 대비해 예외 대신 null 처리 방어
+
+	    // 3. 장바구니 동시 결제 시 연속 인서트 시차가 발생할 수 있으므로 전후 5초 범위 설정
+	    LocalDateTime giftTime = gift.getCreatedAt();
+	    LocalDateTime startTime = giftTime.minusSeconds(5);
+	    LocalDateTime endTime = giftTime.plusSeconds(5);
+	    
+	    // 4. 레포지토리에 추가한 메서드로 같이 묶인 모든 선물 내역 조회
+	    List<Gift> bundleGifts = giftRepository.findAllBySenderIdAndCreatedAtBetween(
+	            gift.getSender().getId(), startTime, endTime
+	    );
+	    
+	    // 5. 함께 결제된 모든 상품들의 이름을 추출하여 리스트화
+	    List<String> bundleProductNames = bundleGifts.stream()
+	            .map(bGift -> bGift.getProduct().getName())
+	            .toList();
+	            
+	    // 6. 묶음 정보 및 메시지 카드가 통합된 빌더 메서드로 응답 반환
+	    return GiftResponse.from(gift, giftMessage, bundleProductNames);
 	}
 	
 	
@@ -137,6 +160,7 @@ public class GiftService {
 		
 		// 수령완료 응답 메시지 카드 정보 포함
 		GiftMessage giftMessage = giftMessageRepository.findByGiftId(gift.getId()).orElse(null);
+		chatService.sendAcceptMessage(gift, gift.getReceiver().getNickname());
 		
 		return GiftResponse.from(gift, giftMessage);
 	}

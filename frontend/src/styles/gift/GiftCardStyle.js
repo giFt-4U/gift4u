@@ -146,3 +146,19 @@ export const SubmitButton = styled.button`
     font-weight: 600;
     cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
 `;
+
+export const ProductSectionBox = styled.div`
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin: 12px 0;
+`;
+
+export const CenterText = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-size: 16px;
+    color: #666;
+`;

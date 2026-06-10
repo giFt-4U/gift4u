@@ -249,4 +249,34 @@ public class ChatService {
 	    room.leave(currentUserId);
 	}
 	
+	/**
+	 * 선물 수령 완료 시 채팅방에 시스템 메시지 전송.
+	 * GiftService.acceptGift() 성공 후 호출.
+	 * "닉네임님이 선물을 받았습니다!" 메시지를 GIFT 타입으로 발송.
+	 */
+	@Transactional
+	public void sendAcceptMessage(Gift gift, String receiverNickname) {
+	    ChatRoom room = chatRoomRepository
+	            .findRoomByTwoUsers(gift.getSender().getId(), gift.getReceiver().getId())
+	            .orElse(null);
+
+	    if (room == null) return; // 채팅방 없으면 스킵
+
+	    String content = receiverNickname + "님이 선물을 받았습니다! 🎉";
+
+	    ChatMessage message = ChatMessage.builder()
+	            .room(room)
+	            .senderId(gift.getReceiver().getId())
+	            .content(content)
+	            .messageType(MessageType.TEXT) // 일반 텍스트로 표시
+	            .build();
+	    chatMessageRepository.save(message);
+	    room.updateLastMessageAt();
+
+	    messagingTemplate.convertAndSend(
+	            "/topic/chat/" + room.getId(),
+	            ChatMessageResponse.from(message)
+	    );
+	}
+	
 }
