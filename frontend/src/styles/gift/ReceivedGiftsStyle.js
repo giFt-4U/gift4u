@@ -40,6 +40,12 @@ export const StatusBadge = styled.span`
     color: ${({ $color }) => $color};
 `;
 
+export const SenderText = styled.span`
+    font-size: 12px; font-weight: 600;
+    color: #666666;
+    margin-bottom: 2px;
+`;
+
 export const ExpireText = styled.p`
     font-size: 11px; color: #bbb; margin: 4px 0 0;
 `;
