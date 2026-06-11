@@ -53,12 +53,6 @@ const FriendsSelect = () => {
 
     return (
         <S.Container>
-            <S.Header>
-                <S.Title>
-                    선물 받을 친구 선택
-                    <S.FriendCount>{friends.length}명</S.FriendCount>
-                </S.Title>
-            </S.Header>
 
             {friends.length === 0 ? (
                 <S.EmptyState>
