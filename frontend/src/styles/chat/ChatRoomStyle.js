@@ -99,27 +99,17 @@ export const InputArea = styled.div`
     background: #fff;
 `;
 
-export const TextInput = styled.textarea`
+export const TextInput = styled.input`
     flex: 1;
+    height: 40px; 
     padding: 10px 14px;
     border: 1px solid #ddd;
     border-radius: 20px;
     font-size: 14px;
     outline: none;
     
-    // textarea 전용 필수 속성 추가
-    resize: none;
-    min-height: 8px;
-    max-height: 120px;
-    line-height: 1.4;
-
     &:focus {
         border-color: #FF8C00;
-    }
-
-    // 스크롤바 숨기기
-    &::-webkit-scrollbar {
-        display: none;
     }
 `;
 

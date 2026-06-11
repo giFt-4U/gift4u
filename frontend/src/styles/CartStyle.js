@@ -389,6 +389,11 @@ export const BottomOrderBox = styled.div`
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
 
   z-index: 200;
+  
+  @media (min-width: 1000px) {
+    left: calc(50% + 300px);
+    transform: translateX(-50%);
+   }
 `;
 
 /*

@@ -163,6 +163,10 @@ export const DeliverySection = styled.section`
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.04);
 
     z-index: 90;
+       @media (min-width: 1000px) {
+        left: calc(50% + 300px);
+        transform: translateX(-50%);
+    }
 `;
 
 export const DeliveryTitle = styled.h3`
@@ -211,6 +215,11 @@ export const BottomOrderBox = styled.div`
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
 
     z-index: 100;
+    
+    @media (min-width: 1000px) {
+        left: calc(50% + 300px);
+        transform: translateX(-50%);
+    }
 `;
 
 export const BottomTop = styled.div`
@@ -225,6 +234,7 @@ export const BottomTop = styled.div`
     font-weight: 400;
     line-height: 1.4;
     letter-spacing: 0.3px;
+    
 `;
 
 export const SelectedCount = styled.div`

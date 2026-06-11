@@ -41,6 +41,32 @@ const Nav = () => {
     const isMyPage = path === '/mypage' || path.startsWith('/mypage/');
     const isFriendsPage = path === '/friends' || path.startsWith('/friends/');
 
+    // 선물 관련 페이지
+    const isGiftsPage = path.startsWith('/gifts');
+    // 선물 중 이탈 방지
+    useEffect(() => {
+        if (path !== '/gifts/card') return; // 오직 /gifts/card 페이지에서만 가동
+
+        let isConfirming = false;
+
+        const handlePopState = () => {
+            // 이미 확인 창이 켜져 있다면 아래 로직을 통째로 무시
+            if (isConfirming) return;
+
+            isConfirming = true;
+
+            const hasConfirmed = window.confirm("정말 선물을 취소하시겠습니까?");
+            if (hasConfirmed) {
+                navigate(-1);
+            } else {
+                window.history.pushState(null, '', window.location.href);
+                isConfirming = false;
+            }
+        };
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, [path, navigate]);
+
     // backHeader
     const getHeaderTitle = () => {
         if (path === '/mypage') return '마이페이지';
@@ -48,15 +74,15 @@ const Nav = () => {
         if (path === '/friends') return '친구 관리';
         if (path === '/friends/requestlist') return '친구 요청 목록';
         if (path === '/mypage/gifts') return '받은 선물함';
+        if (path === '/gifts/') return;
         if (isChatList) return '메시지';
 
         if (path.startsWith('/chat/') && roomId) {
             return location.state?.partnerName || '채팅방';
         }
-
+        if (isGiftsPage) return null;
         return null;
     };
-
     const titleText = getHeaderTitle();
 
     // 스크롤 이벤트 리스너 등록
@@ -84,13 +110,8 @@ const Nav = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const handleCartClick = () => {
-        navigate('/cart');
-    };
-
-    const handleUserClick = () => {
-        navigate(token ? '/mypage' : '/login');
-    };
+    const handleCartClick = () => { navigate('/cart'); };
+    const handleUserClick = () => { navigate(token ? '/mypage' : '/login'); };
 
     return (
         <NavWrapper $isVisible={isVisible}>
@@ -106,12 +127,20 @@ const Nav = () => {
                         +
                     </button>
                 ) : (
-                    isProduct || isProductDetail || isCart || isWishlist || isChatPage || isAuthPage || isMyPage || isFriendsPage
+                    isProduct || isProductDetail || isCart || isWishlist || isChatPage
+                    || isAuthPage || isMyPage || isFriendsPage || isGiftsPage
                 ) ? (
                     <img
                         src="/assets/icons/back.png"
                         alt="뒤로가기"
-                        onClick={() => navigate(-1)}
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => {
+                            if (path === '/gifts/card') {
+                                window.dispatchEvent(new Event('popstate'));
+                            } else {
+                                navigate(-1);
+                            }
+                        }}
                     />
                 ) : (
                     <img
@@ -144,20 +173,23 @@ const Nav = () => {
 
             {/* 오른쪽 영역 */}
             <div className='nav-right'>
-                {isCart ? (
+                {isCart || isGiftsPage ? (
                     <div className="empty-space" />
                 ) : (
                     <>
-                        <img
-                            src="/assets/icons/user.png"
-                            alt="유저"
-                            style={{ cursor: 'pointer' }}
-                            onClick={handleUserClick}
-                        />
+                        {!isMyPage && (
+                            <img
+                                src="/assets/icons/user.png"
+                                alt="유저"
+                                style={{ cursor: 'pointer' }}
+                                onClick={handleUserClick}
+                            />
+                        )}
 
                         <img
                             src="/assets/icons/shopping_cart.png"
                             alt="장바구니"
+                            style={{ cursor: 'pointer' }}
                             onClick={handleCartClick}
                         />
                     </>
