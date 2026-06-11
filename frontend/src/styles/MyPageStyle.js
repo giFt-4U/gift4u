@@ -159,7 +159,7 @@ export const MenuItem = styled.div`
     border-bottom: 1px solid #f7f7f7;
     cursor: pointer;
     font-size: 14px;
-    color: #333;
+    color: ${({ $danger }) => ($danger ? '#e74c3c' : '#333')};
     font-weight: 500;
 
     &:active {
