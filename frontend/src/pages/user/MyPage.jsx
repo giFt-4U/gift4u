@@ -98,12 +98,6 @@ const MyPage = () => {
 
     return (
         <MyPageContainer>
-            <TopBar>
-                <BackButton onClick={() => navigate(-1)} aria-label="뒤로가기">
-                    ‹
-                </BackButton>
-                <TopTitle>마이페이지</TopTitle>
-            </TopBar>
 
             <ProfileSection>
                 <ProfileImageWrap>

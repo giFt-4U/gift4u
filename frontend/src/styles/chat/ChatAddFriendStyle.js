@@ -6,6 +6,7 @@ export const Container = styled.div`
     flex-direction: column;
     height: 100%;
     background: #fff;
+    margin: -10px;
 `;
 
 export const BackButton = styled.button`

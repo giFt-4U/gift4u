@@ -75,7 +75,9 @@ const ChatList = () => {
     // 채팅방 클릭 시 읽음 처리
     const handleRoomClick = (room) => {
         localStorage.setItem(`chat_read_${room.roomId}`, new Date().toISOString());
-        navigate(`/chat/${room.roomId}`);
+        navigate(`/chat/${room.roomId}`, {
+            state: { partnerName: room.opponentNickname }
+        });
     };
 
     if (loading) return <S.CenterText>로딩 중...</S.CenterText>;
@@ -92,6 +94,7 @@ const ChatList = () => {
                         <S.RoomItem
                             key={room.roomId}
                             onClick={() => handleRoomClick(room)}
+
                         >
                             {/* 프로필 아이콘 */}
                             <S.Avatar>

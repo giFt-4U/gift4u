@@ -38,21 +38,21 @@ export default FloatingChatButton;
 
 const ChatButton = styled.button`
     position: fixed;
-
-    right: max(18px, calc((100vw - 500px) / 2 + 18px));
     bottom: 24px;
-
     width: 92px;
     height: 92px;
-
     border: none;
     border-radius: 50%;
-
     background: transparent;
     padding: 0;
-
     cursor: pointer;
     z-index: 500;
+
+    right: max(18px, calc((100vw - 500px) / 2 + 18px));
+
+    @media (min-width: 1000px) {
+        right: max(18px, calc((88vw - 500px) / 2 - 170px)); 
+    }
 
     img {
         width: 92px;
@@ -60,6 +60,7 @@ const ChatButton = styled.button`
         display: block;
         object-fit: contain;
     }
+
     transition: transform 0.1s ease;
     &:active {
         transform: scale(0.95);

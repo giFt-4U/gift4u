@@ -51,8 +51,6 @@ const FriendRequestList = () => {
 
     return (
         <Container>
-            <Title>친구 요청 확인</Title>
-
             {requests.length === 0 ? (
                 <CenterText>받은 친구 요청이 없습니다.</CenterText>
             ) : (
@@ -87,14 +85,9 @@ export default FriendRequestList;
 const Container = styled.div`
     padding: 20px;
     max-width: 600px;
-    margin: 0 auto;
+    margin: -20px;
 `;
 
-const Title = styled.h2`
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-`;
 
 const RequestList = styled.div`
     display: flex;
