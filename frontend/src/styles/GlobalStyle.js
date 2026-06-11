@@ -23,7 +23,11 @@ const GlobalStyle = createGlobalStyle`
 
 
     body {
-        background-color: #f0f0f4;
+    background: #FFFEFD;
+        
+        background: linear-gradient(193deg, rgba(255, 254, 253, 1) 0%, rgba(255, 244, 230, 1) 57%, rgb(255, 236, 221) 100%);
+        background-attachment: fixed;
+        background-repeat: no-repeat;
 
         font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
         font-weight: 400;

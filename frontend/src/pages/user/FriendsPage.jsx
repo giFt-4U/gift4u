@@ -54,10 +54,7 @@ const FriendsPage = () => {
     return (
         <S.Container>
             <S.Header>
-                <S.Title>
-                    친구
-                    <S.FriendCount>{friends.length}명</S.FriendCount>
-                </S.Title>
+                <S.FriendCount>{friends.length}명</S.FriendCount>
             </S.Header>
 
             {friends.length === 0 ? (

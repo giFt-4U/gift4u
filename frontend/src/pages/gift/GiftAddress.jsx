@@ -224,6 +224,7 @@ const GiftAddress = () => {
                             readOnly
                             $hasError={!!errors.address}
                             style={{ flex: 1 }}
+                            onClick={openAddressSearch}
                         />
                         <S.SearchButton type="button" onClick={openAddressSearch}>
                             주소 검색
@@ -239,37 +240,15 @@ const GiftAddress = () => {
                         style={{ marginTop: 8 }}
                     />
                 </S.FieldGroup>
-                {/* 주소 */}
-                <S.FieldGroup>
-                    <S.FieldLabel>주소 별명</S.FieldLabel>
-                    <S.FieldInput
-                        name="address"
-                        value={form.address}
-                        onChange={handleChange}
-                        placeholder="주소 별명을 입력하세요 (예시: 집, 회사)"
-                        $hasError={!!errors.address}
-                    />
-                    {errors.address && <S.FieldError>{errors.address}</S.FieldError>}
-                </S.FieldGroup>
-
-                {/* 배송 메모 — 추후 기능 확장용 (현재 BE 미지원) */}
-                <S.FieldGroup>
-                    <S.FieldLabel>배송의 특이</S.FieldLabel>
-                    <S.MemoBox>
-                        <S.MemoText>기본배송지</S.MemoText>
-                        <S.MemoSub>사용자 주소 (예시: 000-000-000-00)</S.MemoSub>
-                    </S.MemoBox>
-                    <S.AddButton>+ 배송지 추가</S.AddButton>
-                </S.FieldGroup>
 
                 {apiError && <S.ApiError>{apiError}</S.ApiError>}
 
             </S.ScrollArea>
 
-            {/* 선물하기 버튼 */}
+            {/* 선물 받기 버튼 */}
             <S.BottomArea>
                 <S.SubmitButton onClick={handleSubmit} disabled={loading}>
-                    {loading ? '처리 중...' : '선물하기'}
+                    {loading ? '처리 중...' : '선물 받기'}
                 </S.SubmitButton>
             </S.BottomArea>
 

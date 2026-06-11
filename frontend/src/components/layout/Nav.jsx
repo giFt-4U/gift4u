@@ -1,16 +1,21 @@
 // Nav.jsx
 
-import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { NavWrapper } from '../../styles/AppLayout';
 import useAuthStore from '../../store/authStore';
 
 const Nav = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const { roomId } = useParams();
     const { token } = useAuthStore();
 
     const path = location.pathname;
+
+    // 스크롤 노출 여부
+    const [isVisible, setIsVisible] = useState(true);
+    const lastScrollY = useRef(0);
 
     // 상품 페이지
     const isProduct = path === '/products';
@@ -33,6 +38,52 @@ const Nav = () => {
     // 채팅 관련 페이지
     const isChatPage = path.startsWith('/chat');
 
+    const isMyPage = path === '/mypage' || path.startsWith('/mypage/');
+    const isFriendsPage = path === '/friends' || path.startsWith('/friends/');
+
+    // backHeader
+    const getHeaderTitle = () => {
+        if (path === '/mypage') return '마이페이지';
+        if (path === '/mypage/edit') return '회원정보 수정';
+        if (path === '/friends') return '친구 관리';
+        if (path === '/friends/requestlist') return '친구 요청 목록';
+        if (path === '/mypage/gifts') return '받은 선물함';
+        if (isChatList) return '메시지';
+
+        if (path.startsWith('/chat/') && roomId) {
+            return location.state?.partnerName || '채팅방';
+        }
+
+        return null;
+    };
+
+    const titleText = getHeaderTitle();
+
+    // 스크롤 이벤트 리스너 등록
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY;
+
+            // 최상단 여백에서는 무조건 노출
+            if (currentScrollY <= 10) {
+                setIsVisible(true);
+                lastScrollY.current = currentScrollY;
+                return;
+            }
+
+            if (currentScrollY > lastScrollY.current) {
+                setIsVisible(false); // 스크롤 내릴 때 숨김
+            } else {
+                setIsVisible(true);  // 스크롤 올릴 때 나타남
+            }
+
+            lastScrollY.current = currentScrollY;
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
     const handleCartClick = () => {
         navigate('/cart');
     };
@@ -42,7 +93,7 @@ const Nav = () => {
     };
 
     return (
-        <NavWrapper>
+        <NavWrapper $isVisible={isVisible}>
             {/* 왼쪽 영역 */}
             <div className='nav-left'>
                 {isChatList ? (
@@ -54,7 +105,9 @@ const Nav = () => {
                     >
                         +
                     </button>
-                ) : (isProduct || isProductDetail || isCart || isWishlist || isChatPage || isAuthPage) ? (
+                ) : (
+                    isProduct || isProductDetail || isCart || isWishlist || isChatPage || isAuthPage || isMyPage || isFriendsPage
+                ) ? (
                     <img
                         src="/assets/icons/back.png"
                         alt="뒤로가기"
@@ -68,21 +121,25 @@ const Nav = () => {
                     />
                 )}
             </div>
-
-            {/* 중앙 로고 */}
+            {/* 중앙 영역 */}
             <h1>
-                <Link to="/" className='logo' aria-label="따숨품 홈으로 이동">
-                    <img
-                        src="/assets/logo/dasumpum_logo.png"
-                        alt="따숨품"
+                {titleText ? (
+                    <span
+                        className="logo title-text"
                         style={{
-                            width: "104px",
-                            height: "56px",
-                            objectFit: "contain",
-                            display: "block",
+                            color: '#333333',
+                            cursor: 'default',
+                            textDecoration: 'none',
+                            userSelect: 'none'
                         }}
-                    />
-                </Link>
+                    >
+                        {titleText}
+                    </span>
+                ) : (
+                    <Link to="/" className='logo' aria-label="따숨품 홈으로 이동">
+                        따숨품
+                    </Link>
+                )}
             </h1>
 
             {/* 오른쪽 영역 */}

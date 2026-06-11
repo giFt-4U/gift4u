@@ -8,22 +8,6 @@ export const Container = styled.div`
     background: #fff;
 `;
 
-export const BackButton = styled.button`
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    color: #333;
-    width: 32px;
-`;
-
-export const Title = styled.h1`
-    font-size: 18px;
-    font-weight: 700;
-    color: #FF8C00;
-    margin: 0;
-`;
-
 export const ScrollArea = styled.div`
     flex: 1;
     overflow-y: auto;

@@ -6,6 +6,7 @@ export const Container = styled.div`
     flex-direction: column;
     height: 100%;
     background: #fff;
+    margin: -20px;
 `;
 
 export const Header = styled.div`
@@ -16,18 +17,12 @@ export const Header = styled.div`
     border-bottom: 1px solid #f5f5f5;
 `;
 
-export const Title = styled.h1`
-    font-size: 18px;
-    font-weight: 700;
-    color: #FF8C00;
-    margin: 0;
-`;
-
 export const FriendCount = styled.span`
+    flex: 1;
     font-size: 13px;
     color: #bbb;
     font-weight: 400;
-    margin-left: 6px;
+    text-align: right;
 `;
 
 export const FriendList = styled.ul`

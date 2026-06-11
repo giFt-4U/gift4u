@@ -4,18 +4,10 @@ import styled from "styled-components";
 export const Container = styled.div`
     display: flex;
     flex-direction: column;
-    height: 89vh;
+    height: 92vh;
     background: #fff;
     overflow: hidden;
-`;
-
-export const BackButton = styled.button`
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    color: #333;
-    width: 32px;
+    margin: -20px;
 `;
 
 export const Title = styled.h1`
@@ -107,16 +99,27 @@ export const InputArea = styled.div`
     background: #fff;
 `;
 
-export const TextInput = styled.input`
+export const TextInput = styled.textarea`
     flex: 1;
     padding: 10px 14px;
     border: 1px solid #ddd;
     border-radius: 20px;
     font-size: 14px;
     outline: none;
+    
+    // textarea 전용 필수 속성 추가
+    resize: none;
+    min-height: 8px;
+    max-height: 120px;
+    line-height: 1.4;
 
     &:focus {
         border-color: #FF8C00;
+    }
+
+    // 스크롤바 숨기기
+    &::-webkit-scrollbar {
+        display: none;
     }
 `;
 
@@ -133,7 +136,12 @@ export const SendButton = styled.button`
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    
+    padding-left: 4px;
+    padding-bottom: 3px;
+    
 `;
+
 export const GiftCardWrapper = styled.div`
     width: 240px;
     border: 1.5px solid #FF8C00;
