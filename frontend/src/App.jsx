@@ -2,7 +2,6 @@
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Nav from './components/layout/Nav';
-import GlobalStyle from './styles/GlobalStyle';
 import { AppWrapper, LeftSection, MobileContainer, MainContent } from './styles/AppLayout';
 
 function App() {
@@ -16,8 +15,6 @@ function App() {
 
   return (
     <>
-      <GlobalStyle />
-
       <AppWrapper>
         <LeftSection>
           <img src={`${import.meta.env.BASE_URL}assets/logo/intro.svg`} alt="따숨품 로고 및 소개글" />

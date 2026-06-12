@@ -1,6 +1,7 @@
 // index.jsx
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import GlobalStyle from '../styles/GlobalStyle';
 
 import App from '../App';
 
@@ -33,9 +34,16 @@ import MyPage from '../pages/user/MyPage';
 import MyPageEdit from '../pages/user/MyPageEdit';
 import FriendsPage from '../pages/user/FriendsPage';
 
+import AdminLayout from '../pages/admin/AdminLayout';
+import AdminDashboard from '../pages/admin/AdminDashboard';
+import AdminUserListPage from '../pages/admin/AdminUserListPage';
+import AdminProductListPage from '../pages/admin/AdminProductListPage';
+
 export default function Router() {
     return (
         <BrowserRouter>
+            <GlobalStyle />
+            <div style={{ width: '100%', minHeight: '100vh' }}>
             <Routes>
                 <Route path="/" element={<App />}>
                     <Route index element={<Home />} />
@@ -77,7 +85,15 @@ export default function Router() {
                     {/* SEARCH */}
                     <Route path="search" element={<SearchPage />} />
                 </Route>
+
+                {/* ADMIN */}
+                <Route path="/admin" element={<AdminLayout />}>
+                    <Route index element={<AdminDashboard />} />
+                    <Route path="users" element={<AdminUserListPage />} />
+                    <Route path="products" element={<AdminProductListPage />} />
+                </Route>
             </Routes>
+            </div>
         </BrowserRouter>
     );
 }
