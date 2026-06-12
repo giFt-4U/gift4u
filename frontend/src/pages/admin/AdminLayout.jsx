@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import useAuthStore from '../../store/authStore';
+import { getMe } from '../../api/auth';
+import { isAdminRole, resolveUserRole } from '../../utils/authUtils';
 
 /* ── icons (inline SVG, no deps) ────────────────────────── */
 const IconGrid = () => (
@@ -276,16 +278,129 @@ const Content = styled.main`
     max-width: 1280px;
 `;
 
+const LoadingWrap = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%;
+    color: #9ca3af;
+    font-size: 14px;
+`;
+
+const DeniedWrap = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%;
+    padding: 24px;
+    text-align: center;
+    gap: 12px;
+    background: #f4f5f7;
+`;
+
+const DeniedTitle = styled.h2`
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+`;
+
+const DeniedText = styled.p`
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.6;
+`;
+
+const DeniedBox = styled.div`
+    margin-top: 8px;
+    padding: 14px 18px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 13px;
+    color: #374151;
+    line-height: 1.7;
+`;
+
+const DeniedBtn = styled.button`
+    margin-top: 8px;
+    height: 40px;
+    padding: 0 18px;
+    border: none;
+    border-radius: 8px;
+    background: #ff8c00;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+`;
+
 /* ── Component ────────────────────────────────────────────── */
 const AdminLayout = () => {
     const [open, setOpen] = useState(true);
+    const [ready, setReady] = useState(false);
+    const [denied, setDenied] = useState(null);
     const navigate = useNavigate();
-    const { clearToken } = useAuthStore();
+    const { token, setUser, clearToken } = useAuthStore();
+
+    useEffect(() => {
+        if (!token) {
+            navigate('/login', { replace: true });
+            return;
+        }
+
+        getMe()
+            .then((res) => {
+                const role = resolveUserRole(res.data, token);
+                setUser({ ...res.data, role });
+                if (!isAdminRole(role)) {
+                    setDenied({
+                        email: res.data.email,
+                        role: role || '없음',
+                    });
+                    return;
+                }
+                setDenied(null);
+                setReady(true);
+            })
+            .catch(() => {
+                clearToken();
+                navigate('/login', { replace: true });
+            });
+    }, [token, navigate, setUser, clearToken]);
 
     const onLogout = () => {
         clearToken();
         navigate('/login');
     };
+
+    if (denied) {
+        return (
+            <DeniedWrap>
+                <DeniedTitle>관리자 권한이 없습니다</DeniedTitle>
+                <DeniedText>
+                    현재 로그인된 계정으로는 관리자 페이지에 접근할 수 없습니다.<br />
+                    ADMIN 계정으로 다시 로그인해주세요.
+                </DeniedText>
+                <DeniedBox>
+                    로그인 계정: <strong>{denied.email || '알 수 없음'}</strong><br />
+                    권한: <strong>{denied.role}</strong>
+                </DeniedBox>
+                <DeniedBtn type="button" onClick={onLogout}>
+                    로그아웃 후 다시 로그인
+                </DeniedBtn>
+            </DeniedWrap>
+        );
+    }
+
+    if (!ready) {
+        return <LoadingWrap>관리자 페이지 확인 중…</LoadingWrap>;
+    }
 
     return (
         <Shell>

@@ -13,12 +13,14 @@ public class LoginResponse {
 	private String accessToken;
 	private String tokenType;
 	private long expiresIn;
+	private String role;
 	
-	public static LoginResponse of(String accessToken, long expiresInMs) {
+	public static LoginResponse of(String accessToken, long expiresInMs, String role) {
 		return LoginResponse.builder()
 				.accessToken(accessToken)
 				.tokenType("Bearer")
 				.expiresIn(expiresInMs)
+				.role(role)
 				.build();
 	}
 

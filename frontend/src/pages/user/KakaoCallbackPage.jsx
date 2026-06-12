@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
 import { kakaoLogin, getMe } from '../../api/auth';
+import { resolveUserRole, isAdminRole } from '../../utils/authUtils';
 
 const KakaoCallbackPage = () => {
     const navigate = useNavigate();
@@ -21,11 +22,12 @@ const KakaoCallbackPage = () => {
                 setToken(res.data.accessToken);
                 try {
                     const meRes = await getMe();
-                    setUser(meRes.data);
+                    const role = resolveUserRole(meRes.data, res.data.accessToken);
+                    setUser({ ...meRes.data, role });
+                    navigate(isAdminRole(role) ? '/admin' : '/', { replace: true });
                 } catch {
-                    // 유저 정보 실패해도 로그인은 유지
+                    navigate('/', { replace: true });
                 }
-                navigate('/');
             })
             .catch(() => {
                 alert('카카오 로그인에 실패했습니다. 다시 시도해주세요.');

@@ -53,7 +53,7 @@ public class AuthService {
 		}
 		
 		String token = jwtTokenProvider.createAccessToken(user.getId(), user.getEmail(), user.getRole());
-		return LoginResponse.of(token, jwtTokenProvider.getAccessTokenValidityMs());
+		return LoginResponse.of(token, jwtTokenProvider.getAccessTokenValidityMs(), user.getRole().name());
 	}
 	
 	@Transactional
@@ -70,7 +70,7 @@ public class AuthService {
 		
 		String token = jwtTokenProvider.createAccessToken(user.getId(), user.getEmail(), user.getRole());
 		
-		return LoginResponse.of(token, jwtTokenProvider.getAccessTokenValidityMs());
+		return LoginResponse.of(token, jwtTokenProvider.getAccessTokenValidityMs(), user.getRole().name());
 	}
 	
 	private User createKakaoUser(KakaoUserProfile profile, String kakaoId) {

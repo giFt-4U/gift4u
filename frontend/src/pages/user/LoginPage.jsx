@@ -1,8 +1,9 @@
 // LoginPage.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
 import { login, getMe } from '../../api/auth';
+import { getRoleFromToken, isAdminRole, resolveUserRole } from '../../utils/authUtils';
 import {
     AuthContainer,
     AuthHeader,
@@ -36,6 +37,22 @@ const LoginPage = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
+    // 이미 ADMIN으로 로그인된 상태면 관리자 페이지로
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        getMe()
+            .then((res) => {
+                const role = resolveUserRole(res.data, token);
+                setUser({ ...res.data, role });
+                if (isAdminRole(role)) {
+                    navigate('/admin', { replace: true });
+                }
+            })
+            .catch(() => {});
+    }, [navigate, setUser]);
+
     const onKakaoLogin = () => {
         if (!KAKAO_REST_API_KEY) {
             alert('.env에 VITE_KAKAO_REST_API_KEY를 추가해주세요.');
@@ -59,10 +76,14 @@ const LoginPage = () => {
         setError('');
         setLoading(true);
         try {
+            localStorage.removeItem('user');
             const res = await login(email, password);
-            setToken(res.data.accessToken);
+            const accessToken = res.data.accessToken;
+            setToken(accessToken);
             const meRes = await getMe();
-            navigate('/');
+            const role = res.data.role || resolveUserRole(meRes.data, accessToken);
+            setUser({ ...meRes.data, role });
+            navigate(isAdminRole(role) ? '/admin' : '/', { replace: true });
         } catch {
             setError('이메일 또는 비밀번호가 올바르지 않습니다.');
         } finally {

@@ -61,6 +61,7 @@ public class SecurityConfig {
             			.permitAll()
             		.requestMatchers(HttpMethod.GET, "/uploads/**")
             			.permitAll()
+            		.requestMatchers("/api/admin/**").hasRole("ADMIN")
             		.anyRequest().authenticated())
             .addFilterBefore(jwtAuthenticationFilter, 
             		UsernamePasswordAuthenticationFilter.class)

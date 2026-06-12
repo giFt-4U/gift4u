@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
 import { getMe } from '../../api/auth';
+import { resolveUserRole, isAdminRole } from '../../utils/authUtils';
 import { getFriendRequests } from '../../api/chatApi';
 import {
     MyPageContainer,
@@ -41,7 +42,11 @@ const MyPage = () => {
 
     useEffect(() => {
         getMe()
-            .then((res) => setUser(res.data))
+            .then((res) => {
+                const token = localStorage.getItem('token');
+                const role = resolveUserRole(res.data, token);
+                setUser({ ...res.data, role });
+            })
             .catch(() => {
                 clearToken();
                 navigate('/login');
@@ -66,6 +71,7 @@ const MyPage = () => {
     };
 
     const isKakao = user?.loginProvider === 'KAKAO';
+    const isAdmin = isAdminRole(user?.role);
     const initial = user?.nickname?.charAt(0)?.toUpperCase() || '?';
 
     // 친구요청 개수
@@ -136,6 +142,13 @@ const MyPage = () => {
             </ProfileSection>
 
             <MenuSection>
+                {isAdmin && (
+                    <MenuItem onClick={() => navigate('/admin')}>
+                        관리자 페이지
+                        <span className="arrow">›</span>
+                    </MenuItem>
+                )}
+
                 <MenuItem onClick={() => navigate('/mypage/edit')}>
                     회원정보 수정
                     <span className="arrow">›</span>
