@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.gift4u.app.domain.user.dto.ChangePasswordRequest;
 import com.gift4u.app.domain.user.dto.SignupRequest;
 import com.gift4u.app.domain.user.dto.SignupResponse;
 import com.gift4u.app.domain.user.dto.UserProfileResponse;
@@ -117,6 +118,28 @@ public class UserService {
 		user.clearProfileImage();
 
 		return toProfileResponse(user);
+	}
+
+	@Transactional
+	public void changePassword(Long userId, ChangePasswordRequest request) {
+		User user = findActiveUser(userId);
+
+		if (user.getLoginProvider() != LoginProvider.LOCAL) {
+			throw new GlobalException(ErrorCode.KAKAO_USER_NO_PASSWORD);
+		}
+
+		if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+			throw new GlobalException(ErrorCode.INVALID_CURRENT_PASSWORD);
+		}
+
+		user.changePassword(passwordEncoder.encode(request.getNewPassword()));
+	}
+
+	@Transactional
+	public void withdraw(Long userId) {
+		User user = findActiveUser(userId);
+		profileImageStorageService.deleteIfLocal(user.getProfileImage());
+		user.withdraw();
 	}
 
 	private User findActiveUser(Long userId) {

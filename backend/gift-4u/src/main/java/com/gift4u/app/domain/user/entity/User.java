@@ -101,5 +101,13 @@ public class User {
 	public void clearProfileImage() {
 		this.profileImage = null;
 	}
+
+	public void changePassword(String encodedPassword) {
+		this.password = encodedPassword;
+	}
+
+	public void withdraw() {
+		this.deletedAt = LocalDateTime.now();
+	}
 	
 }//class
