@@ -5,12 +5,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ProductRepository
-        extends JpaRepository<Product, Long> {
+public interface ProductRepository extends JpaRepository<Product, Long> {
 
     // 검색
     Page<Product> findByNameContainingIgnoreCase(
             String keyword,
+            Pageable pageable
+    );
+
+    // 관리자 검색: 상품명 또는 브랜드명
+    Page<Product> findByNameContainingIgnoreCaseOrBrandNameContainingIgnoreCase(
+            String name,
+            String brandName,
             Pageable pageable
     );
 
