@@ -60,6 +60,7 @@ const OrderPage = () => {
             state: {
                 productId,
                 productName,
+                productPrice: finalPrice
             },
         });
     };

@@ -24,6 +24,8 @@ import GiftAddress from '../pages/gift/GiftAddress';
 import GiftAccept from '../pages/gift/GiftAccept';
 import FriendsSelect from '../pages/friend/FriendsSelect';
 import ReceivedGifts from '../pages/gift/ReceivedGifts';
+import PaymentCheckoutPage from '../pages/payment/PaymentCheckoutPage';
+import PaymentSuccess from '../pages/payment/PaymentSuccess';
 
 import FriendRequestList from '../pages/friend/FriendRequstList';
 
@@ -46,57 +48,61 @@ export default function Router() {
         <BrowserRouter>
             <GlobalStyle />
             <div style={{ width: '100%', minHeight: '100vh' }}>
-            <Routes>
-                <Route path="/" element={<App />}>
-                    <Route index element={<Home />} />
+                <Routes>
+                    <Route path="/" element={<App />}>
+                        <Route index element={<Home />} />
 
-                    {/* PRODUCT */}
-                    <Route path="products" element={<ProductPage />} />
-                    <Route path="products/:id" element={<ProductDetail />} />
+                        {/* PRODUCT */}
+                        <Route path="products" element={<ProductPage />} />
+                        <Route path="products/:id" element={<ProductDetail />} />
 
-                    {/* CART / ORDER / WISHLIST */}
-                    <Route path="cart" element={<CartPage />} />
-                    <Route path="order" element={<OrderPage />} />
-                    <Route path="wishlist" element={<WishlistPage />} />
+                        {/* CART / ORDER / WISHLIST */}
+                        <Route path="cart" element={<CartPage />} />
+                        <Route path="order" element={<OrderPage />} />
+                        <Route path="wishlist" element={<WishlistPage />} />
 
-                    {/* CHAT */}
-                    <Route path="chat/add" element={<ChatAddFriend />} />
-                    <Route path="chat" element={<ChatList />} />
-                    <Route path="chat/:roomId" element={<ChatRoom />} />
+                        {/* CHAT */}
+                        <Route path="chat/add" element={<ChatAddFriend />} />
+                        <Route path="chat" element={<ChatList />} />
+                        <Route path="chat/:roomId" element={<ChatRoom />} />
 
-                    {/* GIFT */}
-                    <Route path="gifts/card" element={<GiftCard />} />
-                    <Route path="gifts/card/preview" element={<GiftCardView />} />
-                    <Route path="gifts/:uuid/address" element={<GiftAddress />} />
-                    <Route path="gifts/:uuid/accept" element={<GiftAccept />} />
-                    <Route path="gifts/:uuid" element={<GiftCardView />} />
+                        {/* GIFT */}
+                        <Route path="gifts/card" element={<GiftCard />} />
+                        <Route path="gifts/card/preview" element={<GiftCardView />} />
+                        <Route path="gifts/:uuid/address" element={<GiftAddress />} />
+                        <Route path="gifts/:uuid/accept" element={<GiftAccept />} />
+                        <Route path="gifts/:uuid" element={<GiftCardView />} />
 
-                    {/* AUTH */}
-                    <Route path="login" element={<LoginPage />} />
-                    <Route path="signup" element={<SignupPage />} />
-                    <Route path="kakao/auth-code" element={<KakaoCallbackPage />} />
-                    <Route path="mypage" element={<MyPage />} />
-                    <Route path="mypage/edit" element={<MyPageEdit />} />
-                    <Route path="mypage/password" element={<MyPagePassword />} />
-                    <Route path="mypage/withdraw" element={<MyPageWithdraw />} />
-                    <Route path="mypage/gifts" element={<ReceivedGifts />} />
-                    <Route path="friends" element={<FriendsPage />} />
+                        {/* PAYMENT */}
+                        <Route path="gifts/checkout" element={<PaymentCheckoutPage />} />
+                        <Route path="gifts/success" element={<PaymentSuccess />} />
 
-                    {/* FRIEND */}
-                    <Route path="friends/requestlist" element={<FriendRequestList />} />
-                    <Route path="/friends/select" element={<FriendsSelect />} />
+                        {/* AUTH */}
+                        <Route path="login" element={<LoginPage />} />
+                        <Route path="signup" element={<SignupPage />} />
+                        <Route path="kakao/auth-code" element={<KakaoCallbackPage />} />
+                        <Route path="mypage" element={<MyPage />} />
+                        <Route path="mypage/edit" element={<MyPageEdit />} />
+                        <Route path="mypage/password" element={<MyPagePassword />} />
+                        <Route path="mypage/withdraw" element={<MyPageWithdraw />} />
+                        <Route path="mypage/gifts" element={<ReceivedGifts />} />
+                        <Route path="friends" element={<FriendsPage />} />
 
-                    {/* SEARCH */}
-                    <Route path="search" element={<SearchPage />} />
-                </Route>
+                        {/* FRIEND */}
+                        <Route path="friends/requestlist" element={<FriendRequestList />} />
+                        <Route path="/friends/select" element={<FriendsSelect />} />
 
-                {/* ADMIN */}
-                <Route path="/admin" element={<AdminLayout />}>
-                    <Route index element={<AdminDashboard />} />
-                    <Route path="users" element={<AdminUserListPage />} />
-                    <Route path="products" element={<AdminProductListPage />} />
-                </Route>
-            </Routes>
+                        {/* SEARCH */}
+                        <Route path="search" element={<SearchPage />} />
+                    </Route>
+
+                    {/* ADMIN */}
+                    <Route path="/admin" element={<AdminLayout />}>
+                        <Route index element={<AdminDashboard />} />
+                        <Route path="users" element={<AdminUserListPage />} />
+                        <Route path="products" element={<AdminProductListPage />} />
+                    </Route>
+                </Routes>
             </div>
         </BrowserRouter>
     );

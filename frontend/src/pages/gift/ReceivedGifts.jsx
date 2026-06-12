@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getReceivedGifts } from '../../api/giftApi';
+import { getFriends } from '../../api/friendshipApi';
 import * as S from '../../styles/gift/ReceivedGiftsStyle';
 
 /**
@@ -15,6 +16,7 @@ import * as S from '../../styles/gift/ReceivedGiftsStyle';
 const ReceivedGifts = () => {
     const navigate = useNavigate();
     const [gifts, setGifts] = useState([]);
+    const [friends, setFriends] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -29,6 +31,39 @@ const ReceivedGifts = () => {
         if (status === 'ACCEPTED') return { text: '수령 완료', color: '#4CAF50' };
         if (status === 'EXPIRED') return { text: '만료됨', color: '#aaa' };
         return { text: status, color: '#888' };
+    };
+
+    useEffect(() => {
+        const fetchListData = async () => {
+            try {
+                // 1. 받은 선물 목록과 내 친구 목록을 동시에 서버에서 가져옴
+                const [giftRes, friendRes] = await Promise.all([
+                    getReceivedGifts(),
+                    getFriends()
+                ]);
+
+                setGifts(giftRes.data || []);
+                setFriends(friendRes.data || []);
+            } catch (error) {
+                console.error("데이터 로딩 실패:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchListData();
+    }, []);
+
+    const getSenderNickname = (senderId) => {
+        if (!senderId) return '익명의 친구';
+
+        // 내 친구 목록 데이터에서 고유 유저 ID가 일치하는 단 한 명을 매칭
+        const matchedFriend = friends.find(f =>
+            Number(f.friendId) === Number(senderId) ||
+            Number(f.userId) === Number(senderId)
+        );
+
+        return matchedFriend ? matchedFriend.nickname : '선물한 사용자';
     };
 
     if (loading) return <S.CenterText>로딩 중...</S.CenterText>;
@@ -62,6 +97,9 @@ const ReceivedGifts = () => {
                                     <S.ExpireText>
                                         만료: {new Date(gift.expiredAt).toLocaleDateString('ko-KR')}
                                     </S.ExpireText>
+                                    <S.SenderText>
+                                        보낸 사람: <strong style={{ color: '#222', fontWeight: '600' }}>{getSenderNickname(gift.sender)}</strong>
+                                    </S.SenderText>
                                 </S.GiftInfo>
 
                                 {/* PENDING이면 수령하기 버튼 */}

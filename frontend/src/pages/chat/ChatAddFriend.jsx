@@ -37,7 +37,7 @@ const ChatAddFriend = () => {
             await sendFriendRequest(friendCode.trim());
 
             alert('친구 요청이 전송되었습니다.');
-            navigate(`/chat/room/${roomId}`);
+            navigate(`/chat`);
 
         } catch (e) {
             const serverResponse = e.response?.data;
