@@ -161,6 +161,7 @@ public class UserService {
 				.loginProvider(user.getLoginProvider())
 				.marketingAgreed(user.getMarketingAgreed())
 				.profileImage(resolveProfileImageUrl(user.getProfileImage()))
+				.role(user.getRole())
 				.build();
 	}
 

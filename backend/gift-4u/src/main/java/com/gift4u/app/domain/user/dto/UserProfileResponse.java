@@ -1,6 +1,7 @@
 package com.gift4u.app.domain.user.dto;
 
 import com.gift4u.app.domain.user.enums.LoginProvider;
+import com.gift4u.app.domain.user.enums.UserRole;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,5 +21,7 @@ public class UserProfileResponse {
 	private String profileImage;
 	
 	private LoginProvider loginProvider;
+
+	private UserRole role;
 	
 }

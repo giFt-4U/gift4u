@@ -68,7 +68,7 @@ public class User {
 	private LoginProvider loginProvider = LoginProvider.LOCAL; // DB에는 LOCAL/KAKAO 문자열 저장
 	
 	@Enumerated(EnumType.STRING)
-	@Column(name = "role", length = 10, nullable = false)
+	@Column(name = "user_role", length = 10, nullable = false)
 	@Builder.Default
 	private UserRole role = UserRole.USER;
 	

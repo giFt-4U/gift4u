@@ -1,31 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-
-/* ── mock data ───────────────────────────────────────────── */
-const weeklySignups = [
-    { day: '월', count: 3 },
-    { day: '화', count: 7 },
-    { day: '수', count: 5 },
-    { day: '목', count: 12 },
-    { day: '금', count: 9 },
-    { day: '토', count: 4 },
-    { day: '일', count: 6 },
-];
-const monthlyOrders = [
-    { month: '1월', value: 24 },
-    { month: '2월', value: 31 },
-    { month: '3월', value: 28 },
-    { month: '4월', value: 47 },
-    { month: '5월', value: 52 },
-    { month: '6월', value: 38 },
-];
-const recentUsers = [
-    { id: 1, nickname: '김따숨', email: 'a@test.com', provider: 'LOCAL',  joined: '오늘 09:12' },
-    { id: 2, nickname: '이선물', email: 'b@test.com', provider: 'KAKAO',  joined: '오늘 08:44' },
-    { id: 3, nickname: '박육아', email: 'c@test.com', provider: 'LOCAL',  joined: '어제 22:01' },
-    { id: 4, nickname: '최아기', email: 'd@test.com', provider: 'LOCAL',  joined: '어제 18:30' },
-    { id: 5, nickname: '정따뜻', email: 'e@test.com', provider: 'KAKAO',  joined: '어제 15:10' },
-];
+import { getAdminDashboard } from '../../api/adminApi';
 
 /* ── Styles ──────────────────────────────────────────────── */
 const PageTitle = styled.h2`
@@ -39,8 +14,7 @@ const PageSub = styled.p`
 
 /* stat cards */
 const StatGrid = styled.div`
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    display: grid; grid-template-columns: repeat(4, 1fr);
     gap: 16px; margin-bottom: 28px;
     @media (max-width: 1100px) { grid-template-columns: repeat(2, 1fr); }
 `;
@@ -61,12 +35,8 @@ const StatValue = styled.p`
     font-size: 28px; font-weight: 700; color: #111827;
     line-height: 1; margin-bottom: 8px; letter-spacing: 0; text-transform: none;
 `;
-const StatTrend = styled.span`
-    display: inline-flex; align-items: center; gap: 4px;
-    font-size: 11.5px; font-weight: 600;
-    color: ${({ $up }) => ($up ? '#059669' : '#dc2626')};
-    background: ${({ $up }) => ($up ? '#ecfdf5' : '#fff1f0')};
-    padding: 3px 8px; border-radius: 20px;
+const StatSub = styled.span`
+    font-size: 11.5px; color: #9ca3af;
 `;
 
 /* chart row */
@@ -86,33 +56,26 @@ const ChartSub = styled.p`
     letter-spacing: 0; text-transform: none;
 `;
 
-/* bar chart (CSS) */
+/* bar chart */
 const BarChartWrap = styled.div`
-    display: flex; align-items: flex-end; gap: 8px; height: 160px; padding-bottom: 24px; position: relative;
+    display: flex; align-items: flex-end; gap: 8px; height: 160px;
+    padding-bottom: 24px; position: relative;
 `;
 const BarCol = styled.div`
-    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%;
-    justify-content: flex-end;
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    gap: 4px; height: 100%; justify-content: flex-end;
 `;
 const Bar = styled.div`
     width: 100%; border-radius: 5px 5px 0 0;
-    background: ${({ $active }) => ($active ? '#ff8c00' : '#ffe0b2')};
+    background: #ffe0b2;
     height: ${({ $h }) => $h}%;
-    transition: height .4s ease, background .2s;
-    cursor: default;
+    transition: height .4s ease;
     &:hover { background: #ff8c00; }
 `;
-const BarLabel = styled.span`
-    font-size: 11px; color: #9ca3af; position: absolute; bottom: 0;
-`;
-const BarLabelRow = styled.div`
-    display: flex; gap: 8px; margin-top: 8px;
-`;
-const BarLabelItem = styled.span`
-    flex: 1; text-align: center; font-size: 11px; color: #9ca3af;
-`;
+const BarLabelRow = styled.div`display: flex; gap: 8px; margin-top: 8px;`;
+const BarLabelItem = styled.span`flex: 1; text-align: center; font-size: 11px; color: #9ca3af;`;
 
-/* line chart (SVG) */
+/* line chart */
 const LineChartWrap = styled.div`height: 160px; position: relative;`;
 
 /* table */
@@ -131,10 +94,7 @@ const ViewAll = styled.a`
     font-size: 12px; color: #e07800; font-weight: 600; cursor: pointer; text-decoration: none;
     &:hover { text-decoration: underline; }
 `;
-const Table = styled.table`
-    width: 100%; border-collapse: collapse; font-size: 13px;
-    letter-spacing: 0; text-transform: none;
-`;
+const Table = styled.table`width: 100%; border-collapse: collapse; font-size: 13px;`;
 const Thead = styled.thead`background: #fafafa;`;
 const Th = styled.th`
     padding: 10px 20px; text-align: left; font-size: 11px; font-weight: 600;
@@ -160,23 +120,24 @@ const ProviderBadge = styled.span`
     background: ${({ $k }) => ($k ? '#fef9c3' : '#eff6ff')};
     color: ${({ $k }) => ($k ? '#92400e' : '#1d4ed8')};
 `;
+const EmptyRow = styled.td`
+    padding: 40px 20px; text-align: center; color: #9ca3af; font-size: 14px;
+`;
 
 /* ── CSS Bar Chart ───────────────────────────────────────── */
-const CSSBarChart = ({ data, maxVal }) => {
-    const max = maxVal || Math.max(...data.map(d => d.count));
+const CSSBarChart = ({ data }) => {
+    const max = Math.max(...data.map(d => d.count), 1);
     return (
         <div>
             <BarChartWrap>
                 {data.map((d, i) => (
                     <BarCol key={i}>
-                        <Bar $h={Math.round((d.count / max) * 100)} />
+                        <Bar $h={max > 0 ? Math.max(Math.round((d.count / max) * 100), d.count > 0 ? 4 : 0) : 0} />
                     </BarCol>
                 ))}
             </BarChartWrap>
             <BarLabelRow>
-                {data.map((d, i) => (
-                    <BarLabelItem key={i}>{d.day}</BarLabelItem>
-                ))}
+                {data.map((d, i) => <BarLabelItem key={i}>{d.day}</BarLabelItem>)}
             </BarLabelRow>
         </div>
     );
@@ -188,7 +149,7 @@ const SVGLineChart = ({ data }) => {
     const values = data.map(d => d.value);
     const minV = Math.min(...values);
     const maxV = Math.max(...values);
-    const xStep = (W - PAD.l - PAD.r) / (data.length - 1);
+    const xStep = (W - PAD.l - PAD.r) / Math.max(data.length - 1, 1);
     const toX = (i) => PAD.l + i * xStep;
     const toY = (v) => PAD.t + ((maxV - v) / (maxV - minV || 1)) * (H - PAD.t - PAD.b);
 
@@ -202,7 +163,6 @@ const SVGLineChart = ({ data }) => {
     return (
         <LineChartWrap>
             <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" style={{ overflow: 'visible' }}>
-                {/* grid lines */}
                 {[0, 0.5, 1].map((t, i) => {
                     const y = PAD.t + t * (H - PAD.t - PAD.b);
                     return (
@@ -214,15 +174,11 @@ const SVGLineChart = ({ data }) => {
                         </g>
                     );
                 })}
-                {/* area fill */}
                 <polygon points={areaPoints} fill="rgba(255,140,0,0.08)" />
-                {/* line */}
                 <polyline points={points} fill="none" stroke="#ff8c00" strokeWidth="2.2" strokeLinejoin="round" />
-                {/* dots */}
                 {data.map((d, i) => (
                     <circle key={i} cx={toX(i)} cy={toY(d.value)} r="4" fill="#ff8c00" />
                 ))}
-                {/* x labels */}
                 {data.map((d, i) => (
                     <text key={i} x={toX(i)} y={H - 6} textAnchor="middle" fontSize="10" fill="#9ca3af">
                         {d.month}
@@ -235,9 +191,23 @@ const SVGLineChart = ({ data }) => {
 
 /* ── Component ───────────────────────────────────────────── */
 const AdminDashboard = () => {
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+
     const today = new Date().toLocaleDateString('ko-KR', {
         year: 'numeric', month: 'long', day: 'numeric', weekday: 'long',
     });
+
+    useEffect(() => {
+        getAdminDashboard()
+            .then(res => setData(res.data))
+            .catch(() => {})
+            .finally(() => setLoading(false));
+    }, []);
+
+    const weekly = data?.weeklySignups || [];
+    const monthly = data?.monthlyOrders || [];
+    const recentUsers = data?.recentUsers || [];
 
     return (
         <div>
@@ -248,26 +218,26 @@ const AdminDashboard = () => {
                 <StatCard>
                     <StatIcon $bg="#fff4e8">👥</StatIcon>
                     <StatLabel>전체 회원</StatLabel>
-                    <StatValue>1,284</StatValue>
-                    <StatTrend $up>▲ 12% 이번 달</StatTrend>
+                    <StatValue>{loading ? '—' : data?.totalUsers?.toLocaleString()}</StatValue>
+                    <StatSub>가입 회원 총 수</StatSub>
                 </StatCard>
                 <StatCard>
                     <StatIcon $bg="#f0fdf4">📦</StatIcon>
                     <StatLabel>등록 상품</StatLabel>
-                    <StatValue>347</StatValue>
-                    <StatTrend $up>▲ 8개 신규</StatTrend>
+                    <StatValue>{loading ? '—' : data?.totalProducts?.toLocaleString()}</StatValue>
+                    <StatSub>전체 등록 상품</StatSub>
                 </StatCard>
                 <StatCard>
                     <StatIcon $bg="#eff6ff">🎁</StatIcon>
-                    <StatLabel>이번 달 주문</StatLabel>
-                    <StatValue>52</StatValue>
-                    <StatTrend $up={false}>▼ 3% 전월 대비</StatTrend>
+                    <StatLabel>누적 주문</StatLabel>
+                    <StatValue>{loading ? '—' : data?.totalOrders?.toLocaleString()}</StatValue>
+                    <StatSub>전체 주문 건수</StatSub>
                 </StatCard>
                 <StatCard>
                     <StatIcon $bg="#fdf2f8">🌟</StatIcon>
                     <StatLabel>오늘 신규 가입</StatLabel>
-                    <StatValue>9</StatValue>
-                    <StatTrend $up>▲ 전일 대비 +3</StatTrend>
+                    <StatValue>{loading ? '—' : data?.todaySignups?.toLocaleString()}</StatValue>
+                    <StatSub>오늘 가입한 회원</StatSub>
                 </StatCard>
             </StatGrid>
 
@@ -275,13 +245,17 @@ const AdminDashboard = () => {
                 <ChartCard>
                     <ChartTitle>이번 주 신규 가입</ChartTitle>
                     <ChartSub>요일별 가입자 수</ChartSub>
-                    <CSSBarChart data={weeklySignups} />
+                    {weekly.length > 0
+                        ? <CSSBarChart data={weekly} />
+                        : <div style={{ height: 160, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d1d5db', fontSize: 13 }}>데이터 없음</div>}
                 </ChartCard>
 
                 <ChartCard>
                     <ChartTitle>월별 주문 추이</ChartTitle>
                     <ChartSub>최근 6개월</ChartSub>
-                    <SVGLineChart data={monthlyOrders} />
+                    {monthly.length > 0
+                        ? <SVGLineChart data={monthly} />
+                        : <div style={{ height: 160, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d1d5db', fontSize: 13 }}>데이터 없음</div>}
                 </ChartCard>
             </ChartRow>
 
@@ -299,11 +273,15 @@ const AdminDashboard = () => {
                         </tr>
                     </Thead>
                     <tbody>
-                        {recentUsers.map((u) => (
+                        {loading ? (
+                            <tr><EmptyRow colSpan={3}>불러오는 중…</EmptyRow></tr>
+                        ) : recentUsers.length === 0 ? (
+                            <tr><EmptyRow colSpan={3}>가입 회원이 없습니다.</EmptyRow></tr>
+                        ) : recentUsers.map((u) => (
                             <Tr key={u.id}>
                                 <Td>
                                     <UserInfo>
-                                        <Avatar>{u.nickname.charAt(0)}</Avatar>
+                                        <Avatar>{u.nickname?.charAt(0) || '?'}</Avatar>
                                         <div>
                                             <UserName>{u.nickname}</UserName>
                                             <UserEmail>{u.email}</UserEmail>
@@ -311,11 +289,11 @@ const AdminDashboard = () => {
                                     </UserInfo>
                                 </Td>
                                 <Td>
-                                    <ProviderBadge $k={u.provider === 'KAKAO'}>
-                                        {u.provider === 'KAKAO' ? '카카오' : '일반'}
+                                    <ProviderBadge $k={u.loginProvider === 'KAKAO'}>
+                                        {u.loginProvider === 'KAKAO' ? '카카오' : '일반'}
                                     </ProviderBadge>
                                 </Td>
-                                <Td style={{ color: '#9ca3af', fontSize: 12 }}>{u.joined}</Td>
+                                <Td style={{ color: '#9ca3af', fontSize: 12 }}>{u.joinedAt}</Td>
                             </Tr>
                         ))}
                     </tbody>

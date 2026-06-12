@@ -1,5 +1,6 @@
 package com.gift4u.app.domain.user.repository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +18,16 @@ public interface UserRepository extends JpaRepository<User, Long>{
 	boolean existsByFriendCode(String friendCode);
 	
 	Optional<User> findByFriendCode(String friendCode);
+
+	org.springframework.data.domain.Page<User> findByNicknameContainingIgnoreCaseOrEmailContainingIgnoreCase(
+			String nickname, String email,
+			org.springframework.data.domain.Pageable pageable);
+
+	org.springframework.data.domain.Page<User> findByDeletedAtIsNull(
+			org.springframework.data.domain.Pageable pageable);
+
+	org.springframework.data.domain.Page<User> findByDeletedAtIsNotNull(
+			org.springframework.data.domain.Pageable pageable);
+
+	long countByCreatedAtBetween(LocalDateTime from, LocalDateTime to);
 }//interface
