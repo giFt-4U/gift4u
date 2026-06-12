@@ -140,10 +140,17 @@ const MyPage = () => {
                     회원정보 수정
                     <span className="arrow">›</span>
                 </MenuItem>
+
+                <MenuItem onClick={() => navigate('/wishlist')}>
+                    위시리스트
+                    <span className="arrow">›</span>
+                </MenuItem>
+
                 <MenuItem onClick={() => navigate('/friends')}>
                     친구 관리
                     <span className="arrow">›</span>
                 </MenuItem>
+
                 <MenuItem onClick={() => navigate('/friends/requestlist')}>
                     친구 요청 목록
                     <MenuRight>
@@ -151,6 +158,7 @@ const MyPage = () => {
                         <span className="arrow">›</span>
                     </MenuRight>
                 </MenuItem>
+
                 <MenuItem onClick={() => navigate('/mypage/gifts')}>
                     받은 선물함
                     <span className="arrow">›</span>
