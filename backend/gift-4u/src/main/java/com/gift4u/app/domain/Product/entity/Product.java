@@ -54,4 +54,15 @@ public class Product {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    @PrePersist
+    public void prePersist() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+
+        if (isActive == 0) {
+            isActive = 1;
+        }
+    }
 }
