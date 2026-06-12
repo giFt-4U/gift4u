@@ -27,6 +27,8 @@ import KakaoCallbackPage from '../pages/user/KakaoCallbackPage';
 import MyPage from '../pages/user/MyPage';
 import FriendsPage from '../pages/user/FriendsPage';
 
+import AdminPage from '../pages/admin/AdminPage';
+
 export default function Router() {
     return (
         <BrowserRouter>
@@ -67,6 +69,10 @@ export default function Router() {
 
                     {/* SEARCH */}
                     <Route path="search" element={<SearchPage />} />
+
+                    {/* ADMIN */}
+                    <Route path="admin/*" element={<AdminPage />} />
+
                 </Route>
             </Routes>
         </BrowserRouter>

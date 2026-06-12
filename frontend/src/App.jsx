@@ -16,11 +16,22 @@ function App() {
 
   // 주문 페이지는 자체 상단바를 사용하므로 공통 Nav 숨김
   const isOrderPage = location.pathname === '/order';
+  // 관리자 페이지에서는 공통 Nav 숨김
+  const isAdminPage = location.pathname.startsWith('/admin');
+
+  if (isAdminPage) {
+    return (
+      <>
+        <GlobalStyle />
+        <Outlet />
+      </>
+    );
+  }
 
   return (
     <>
       <GlobalStyle />
-      
+
       <MobileContainer>
 
         {!isOrderPage && <Nav />}
