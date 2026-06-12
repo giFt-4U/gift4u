@@ -1,37 +1,36 @@
 // App.jsx
-
+import React from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import Nav from './components/layout/Nav';
 import GlobalStyle from './styles/GlobalStyle';
-import { MainContent, MobileContainer } from './styles/AppLayout';
-import { Outlet, useLocation } from 'react-router-dom';
+import { AppWrapper, LeftSection, MobileContainer, MainContent } from './styles/AppLayout';
 
 function App() {
-
   const location = useLocation();
+  const path = location.pathname;
 
-  // 장바구니 페이지와 주문 페이지에서는 MainContent padding 제거
-  const isCartPage =
-    location.pathname === '/cart' ||
-    location.pathname === '/order';
-
+  // 전체 너비 구분선이 필요한 페이지는 MainContent padding 제거
+  const isCartPage = path === '/cart' || path === '/order';
   // 주문 페이지는 자체 상단바를 사용하므로 공통 Nav 숨김
-  const isOrderPage = location.pathname === '/order';
+  const isOrderPage = path === '/order';
 
   return (
     <>
       <GlobalStyle />
-      
-      <MobileContainer>
 
-        {!isOrderPage && <Nav />}
+      <AppWrapper>
+        <LeftSection>
+          <img src={`${import.meta.env.BASE_URL}assets/logo/intro.svg`} alt="따숨품 로고 및 소개글" />
+        </LeftSection>
 
-        <MainContent $noPadding={isCartPage}>
+        <MobileContainer>
+          {!isOrderPage && <Nav />}
 
-          <Outlet />
-
-        </MainContent>
-
-      </MobileContainer>
+          <MainContent $noPadding={isCartPage}>
+            <Outlet />
+          </MainContent>
+        </MobileContainer>
+      </AppWrapper>
     </>
   );
 }
