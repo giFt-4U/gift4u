@@ -1,6 +1,7 @@
 package com.gift4u.app.domain.user.controller;
 
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.gift4u.app.domain.user.dto.ChangePasswordRequest;
 import com.gift4u.app.domain.user.dto.SignupRequest;
 import com.gift4u.app.domain.user.dto.SignupResponse;
 import com.gift4u.app.domain.user.dto.UserProfileResponse;
@@ -55,5 +57,20 @@ public class UserController {
 	public UserProfileResponse deleteProfileImage(
 			@AuthenticationPrincipal CustomUserDetails userDetails) {
 		return userService.deleteProfileImage(userDetails.getUser().getId());
+	}
+
+	@PatchMapping("/api/users/me/password")
+	public ResponseEntity<Void> changePassword(
+			@AuthenticationPrincipal CustomUserDetails userDetails,
+			@Valid @RequestBody ChangePasswordRequest request) {
+		userService.changePassword(userDetails.getUser().getId(), request);
+		return ResponseEntity.ok().build();
+	}
+
+	@DeleteMapping("/api/users/me")
+	public ResponseEntity<Void> withdraw(
+			@AuthenticationPrincipal CustomUserDetails userDetails) {
+		userService.withdraw(userDetails.getUser().getId());
+		return ResponseEntity.ok().build();
 	}
 }

@@ -12,9 +12,22 @@ export const Container = styled.div`
 export const Header = styled.div`
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 18px 20px 14px;
+    gap: 8px;
+    padding: 12px 20px 14px;
     border-bottom: 1px solid #f5f5f5;
+`;
+
+export const BackButton = styled.button`
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 50%;
+    background-color: #f7f7f7;
+    color: #444;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    flex-shrink: 0;
 `;
 
 export const FriendCount = styled.span`
@@ -85,6 +98,30 @@ export const CenterText = styled.div`
     height: 200px;
     color: #aaa;
     font-size: 14px;
+`;
+
+export const ErrorText = styled.p`
+    margin: 0;
+    font-size: 14px;
+    color: #e74c3c;
+    text-align: center;
+    line-height: 1.6;
+`;
+
+export const RetryButton = styled.button`
+    margin-top: 12px;
+    padding: 10px 28px;
+    background-color: #fff;
+    border: 1px solid #e6e6e6;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    cursor: pointer;
+
+    &:active {
+        background-color: #fafafa;
+    }
 `;
 
 export const EmptyState = styled.div`

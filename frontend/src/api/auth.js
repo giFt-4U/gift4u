@@ -24,3 +24,9 @@ export const uploadProfileImage = (file) => {
 
 export const deleteProfileImage = () =>
     axiosInstance.delete('/api/users/me/profile-image');
+
+export const changePassword = (data) =>
+    axiosInstance.patch('/api/users/me/password', data);
+
+export const withdraw = () =>
+    axiosInstance.delete('/api/users/me');

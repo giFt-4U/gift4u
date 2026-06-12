@@ -31,6 +31,8 @@ public enum ErrorCode {
     CHAT_MESSAGE_BLANK(HttpStatus.BAD_REQUEST, "CHAT_MESSAGE_BLANK", "메시지를 입력해주세요."),
     INVALID_FILE_TYPE(HttpStatus.BAD_REQUEST, "INVALID_FILE_TYPE", "지원하지 않는 이미지 형식입니다."),
     FILE_TOO_LARGE(HttpStatus.BAD_REQUEST, "FILE_TOO_LARGE", "이미지 용량이 너무 큽니다."),
+    INVALID_CURRENT_PASSWORD(HttpStatus.BAD_REQUEST, "INVALID_CURRENT_PASSWORD", "현재 비밀번호가 올바르지 않습니다."),
+    KAKAO_USER_NO_PASSWORD(HttpStatus.BAD_REQUEST, "KAKAO_USER_NO_PASSWORD", "카카오 계정은 비밀번호 변경이 불가합니다."),
 
     /////////// 401 - 인증되지 않은 요청 ///////////
 

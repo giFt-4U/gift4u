@@ -1,5 +1,5 @@
 // FriendsPage.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
 import { getFriends } from '../../api/friendshipApi';
@@ -11,53 +11,72 @@ const FriendsPage = () => {
     const { token } = useAuthStore();
     const [friends, setFriends] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    const fetchFriends = useCallback(() => {
+        setLoading(true);
+        setError('');
+        getFriends()
+            .then((res) => setFriends(res.data))
+            .catch((err) => {
+                const message =
+                    err.response?.data?.error?.message ||
+                    '친구 목록을 불러오지 못했어요.';
+                setError(message);
+                setFriends([]);
+            })
+            .finally(() => setLoading(false));
+    }, []);
 
     useEffect(() => {
         if (!token) {
             navigate('/login');
             return;
         }
-        getFriends()
-            .then((res) => setFriends(res.data))
-            .catch(() => { })
-            .finally(() => setLoading(false));
-    }, []);
+        fetchFriends();
+    }, [token, navigate, fetchFriends]);
 
-    const handleFriendClick = async (friendUserId) => {
+    const handleFriendClick = async (friend) => {
+        const friendUserId = friend.userId;
         if (!friendUserId) {
-            alert("유효하지 않은 사용자입니다.");
+            alert('유효하지 않은 사용자입니다.');
             return;
         }
 
-        const message = `${friendUserId || '사용자'}님과 채팅하시겠습니까?`;
-        if (!window.confirm(message)) {
+        const name = friend.nickname || '친구';
+        if (!window.confirm(`${name}님과 채팅하시겠습니까?`)) {
             return;
         }
+
         try {
-            // 2. 백엔드에 채팅방 시작 요청
             const response = await getOrCreateRoom(friendUserId);
-
-            // 백엔드가 제공하는 DTO 구조에 맞춰 roomId를 추출
             const roomId = response.data.roomId;
-
-            // 3. 받아온 고유 roomId를 가지고 채팅방 상세 화면으로 이동
             navigate(`/chat/${roomId}`);
-        } catch (error) {
-            console.error("채팅방 연결 오류:", error);
-            alert("채팅방을 열 수 없습니다. 잠시 후 다시 시도해 주세요.");
+        } catch (err) {
+            console.error('채팅방 연결 오류:', err);
+            alert('채팅방을 열 수 없습니다. 잠시 후 다시 시도해 주세요.');
         }
     };
-
 
     if (loading) return <S.CenterText>로딩 중...</S.CenterText>;
 
     return (
         <S.Container>
             <S.Header>
-                <S.FriendCount>{friends.length}명</S.FriendCount>
+                <S.BackButton onClick={() => navigate('/mypage')} aria-label="뒤로가기">
+                    ‹
+                </S.BackButton>
+                {!error && <S.FriendCount>{friends.length}명</S.FriendCount>}
             </S.Header>
 
-            {friends.length === 0 ? (
+            {error ? (
+                <S.EmptyState>
+                    <S.ErrorText>{error}</S.ErrorText>
+                    <S.RetryButton type="button" onClick={fetchFriends}>
+                        다시 시도
+                    </S.RetryButton>
+                </S.EmptyState>
+            ) : friends.length === 0 ? (
                 <S.EmptyState>
                     <S.EmptyText>
                         아직 친구가 없어요.{'\n'}
@@ -72,7 +91,8 @@ const FriendsPage = () => {
                     {friends.map((f) => (
                         <S.FriendItem
                             key={f.friendshipId}
-                            onClick={() => handleFriendClick(f.friendId || f.userId, f.friendUserId)}>
+                            onClick={() => handleFriendClick(f)}
+                        >
                             <S.Avatar>
                                 {f.nickname?.charAt(0)?.toUpperCase() || '?'}
                             </S.Avatar>
