@@ -45,6 +45,7 @@ const FriendsSelect = () => {
                 productName,
                 receiverId,
                 receiverNickname: friend.nickname,
+                productPrice: location.state.productPrice,
             },
         });
     };

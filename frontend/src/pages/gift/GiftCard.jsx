@@ -31,8 +31,7 @@ const GiftCard = () => {
     const location = useLocation();
 
     // 상품 상세에서 전달받은 값
-    const { productId, receiverId, productName } = location.state ?? {};
-
+    const { productId, receiverId, productName, productPrice } = location.state ?? {};
     const [message, setMessage] = useState(location.state?.message || '');
     const [selectedDesign, setSelectedDesign] = useState(location.state?.cardDesignType || 1);
     const [loading, setLoading] = useState(false);
@@ -43,43 +42,27 @@ const GiftCard = () => {
 
     // ── 선물하기 API 호출 ────────────────────────────────
     const handleSubmit = async () => {
+
         if (!message.trim()) {
             setError('메시지를 입력해주세요.');
-            return;
-        }
-        if (!productId || !receiverId) {
-            setError('상품 또는 수신자 정보가 없습니다. 다시 시도해주세요.');
             return;
         }
 
         setLoading(true);
         setError(null);
 
-        try {
-            const res = await createGift({
-                receiverId,
-                productId,
-                message: message.trim(),
-                cardDesignType: selectedDesign,
-            });
-
-            // 선물 생성 성공 → 채팅방으로 이동 (BE가 자동으로 채팅 메시지 발송)
-            navigate('/chat');
-
-        } catch (e) {
-            const code = e.response?.data?.error?.code;
-            if (code === 'PRODUCT_NOT_FOUND') {
-                setError('상품 정보를 찾을 수 없습니다.');
-            } else if (code === 'USER_NOT_FOUND') {
-                setError('수신자 정보를 찾을 수 없습니다.');
-            } else if (code === 'PRODUCT_INACTIVE') {
-                setError('판매가 종료된 상품입니다.');
-            } else {
-                setError('선물 전송에 실패했습니다. 다시 시도해주세요.');
+        navigate('/gifts/checkout', {
+            state: {
+                amount: productPrice,
+                giftData: {
+                    receiverId,
+                    productId,
+                    message: message.trim(),
+                    cardDesignType: selectedDesign,
+                    productName: productName
+                }
             }
-        } finally {
-            setLoading(false);
-        }
+        });
     };
 
     // ── 카드 미리보기 ────────────────────────────────────
@@ -156,7 +139,7 @@ const GiftCard = () => {
                     카드 미리보기
                 </S.PreviewButton>
                 <S.SubmitButton onClick={handleSubmit} disabled={loading}>
-                    {loading ? '전송 중...' : '선물하기'}
+                    {loading ? '전송 중...' : '결제하기'}
                 </S.SubmitButton>
             </S.ButtonRow>
 
