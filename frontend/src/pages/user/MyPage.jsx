@@ -163,6 +163,16 @@ const MyPage = () => {
                     받은 선물함
                     <span className="arrow">›</span>
                 </MenuItem>
+                {!isKakao && (
+                    <MenuItem onClick={() => navigate('/mypage/password')}>
+                        비밀번호 변경
+                        <span className="arrow">›</span>
+                    </MenuItem>
+                )}
+                <MenuItem onClick={() => navigate('/mypage/withdraw')} $danger>
+                    회원탈퇴
+                    <span className="arrow">›</span>
+                </MenuItem>
             </MenuSection>
 
             <LogoutButton onClick={onLogout}>로그아웃</LogoutButton>
