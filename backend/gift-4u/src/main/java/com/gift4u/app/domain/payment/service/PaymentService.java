@@ -12,7 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import com.gift4u.app.domain.chat.servicer.ChatService;
 import com.gift4u.app.domain.gift.dto.GiftResponse;
+import com.gift4u.app.domain.gift.entity.Gift;
+import com.gift4u.app.domain.gift.repository.GiftRepository;
 import com.gift4u.app.domain.gift.service.GiftService;
 import com.gift4u.app.domain.payment.dto.PaymentConfirmRequest;
 import com.gift4u.app.domain.payment.entity.Payment;
@@ -34,6 +37,8 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final GiftService giftService;
+    private final GiftRepository giftRepository;
+    private final ChatService chatService;
 
     @Value("${toss.secret-key}")
     private String secretKey;
@@ -97,21 +102,27 @@ public class PaymentService {
             
             Map<String, Object> responseBody = response.getBody();
 
-            // 3. 결제 완료 처리 분기
+
+            // 3. 결제 완료 및 선물 생성 (트랜잭션 내부)
             if (response.getStatusCode() == HttpStatus.OK && responseBody != null) {
                 String method = (String) responseBody.get("method");
                 String approvedAtStr = (String) responseBody.get("approvedAt");
                 LocalDateTime approvedAt = ZonedDateTime.parse(approvedAtStr).toLocalDateTime();
 
-                // 결제 완료 상태 변경
                 payment.completePayment(confirmRequest.getPaymentKey(), method, approvedAt);
 
-                // 4. 기존 선물 생성 로직 정상 호출
-                return giftService.createGift(senderId, confirmRequest.getGiftInfo());
+                GiftResponse giftResponse = giftService.createGift(senderId, confirmRequest.getGiftInfo());
+                
+                Gift gift = giftRepository.findById(giftResponse.getId())
+                        .orElseThrow(() -> new IllegalArgumentException("선물 저장 오류"));
+
+                chatService.sendGiftMessage(gift);
+                
+                return giftResponse;
                 
             } else {
                 payment.failPayment();
-                throw new RuntimeException("토스페이먼츠 승인 거절 상태코드: " + response.getStatusCode());
+                throw new RuntimeException("토스 승인 거절");
             }
         }catch (Exception e) {
             payment.failPayment();

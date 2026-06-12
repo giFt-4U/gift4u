@@ -52,6 +52,7 @@ const ChatRoom = () => {
 
     // ── 1. 과거 메시지 조회 ─────────────────────────────
     useEffect(() => {
+        if (!roomId || roomId === 'undefined') return;
         getMessages(roomId)
             .then((res) => {
                 // API는 최신순(DESC)으로 내려오므로 뒤집어서 표시
@@ -143,7 +144,7 @@ const ChatRoom = () => {
     // ── 5. GIFT 타입 메시지에서 uuid 파싱 ───────────────
     // BE에서 "선물이 도착했어요! 🎁 {uuid}" 형태로 저장
     const parseGiftUuid = (content) => {
-        const parts = content?.split('🎁 ');
+        const parts = content?.split('🎁');
         return parts?.length > 1 ? parts[1].trim() : null;
     };
 

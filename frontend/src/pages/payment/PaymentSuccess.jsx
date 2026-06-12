@@ -44,9 +44,8 @@ export default function PaymentSuccess() {
                 setStatus("🎉 결제 완료! 선물이 성공적으로 전송되었습니다.");
                 localStorage.removeItem("pending_gift_data");
 
-                // 2단계: 선물 저장과 채팅 발송
                 setTimeout(() => {
-                    navigate('/chat');
+                    navigate(`/chat/`);
                 }, 1500);
             })
             .catch((err) => {
