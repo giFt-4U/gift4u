@@ -13,30 +13,48 @@ import {
 } from "../utils/Cart";
 
 const WishlistPage = () => {
-
     const navigate = useNavigate();
 
     const [wishlistItems, setWishlistItems] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
+    const fetchWishlist = async () => {
         const isLogin = localStorage.getItem("token");
 
-        // 비로그인 상태로 위시리스트에 들어오면 찜 목록 초기화
         if (!isLogin) {
-            localStorage.removeItem("wishlistItems");
             setWishlistItems([]);
+            setLoading(false);
             return;
         }
 
-        setWishlistItems(getWishlistItems());
+        try {
+            setLoading(true);
+
+            const items = await getWishlistItems();
+            setWishlistItems(items);
+        } catch (error) {
+            console.error("위시리스트 조회 실패:", error);
+            setWishlistItems([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchWishlist();
     }, []);
 
-    const handleRemove = (id) => {
-        removeFromWishlist(id);
+    const handleRemove = async (id) => {
+        try {
+            await removeFromWishlist(id);
 
-        setWishlistItems(prev =>
-            prev.filter(item => item.id !== id)
-        );
+            setWishlistItems(prev =>
+                prev.filter(item => Number(item.id) !== Number(id))
+            );
+        } catch (error) {
+            console.error("위시리스트 삭제 실패:", error);
+            alert("위시리스트 삭제에 실패했습니다.");
+        }
     };
 
     const handleAddCart = (product) => {
@@ -53,7 +71,6 @@ const WishlistPage = () => {
 
     return (
         <div style={{ padding: "20px" }}>
-
             <h2
                 style={{
                     fontSize: "20px",
@@ -64,7 +81,18 @@ const WishlistPage = () => {
                 위시리스트
             </h2>
 
-            {wishlistItems.length === 0 ? (
+            {loading ? (
+                <p
+                    style={{
+                        textAlign: "center",
+                        color: "#777",
+                        padding: "60px 0",
+                        fontSize: "14px",
+                    }}
+                >
+                    불러오는 중입니다.
+                </p>
+            ) : wishlistItems.length === 0 ? (
                 <p
                     style={{
                         textAlign: "center",
@@ -81,6 +109,7 @@ const WishlistPage = () => {
                         display: "grid",
                         gridTemplateColumns: "repeat(2, 1fr)",
                         gap: "16px",
+                        alignItems: "stretch",
                     }}
                 >
                     {wishlistItems.map(item => (
@@ -89,10 +118,13 @@ const WishlistPage = () => {
                             style={{
                                 position: "relative",
                                 cursor: "pointer",
+
+                                display: "flex",
+                                flexDirection: "column",
+                                height: "100%",
                             }}
                             onClick={() => navigate(`/products/${item.id}`)}
                         >
-                            {/* 위시리스트 삭제 버튼 */}
                             <button
                                 type="button"
                                 onClick={(e) => {
@@ -139,9 +171,18 @@ const WishlistPage = () => {
                             <h4
                                 style={{
                                     marginTop: "8px",
+                                    marginBottom: 0,
+
                                     fontSize: "14px",
                                     lineHeight: "20px",
                                     fontWeight: 500,
+
+                                    minHeight: "40px",
+
+                                    display: "-webkit-box",
+                                    WebkitLineClamp: 2,
+                                    WebkitBoxOrient: "vertical",
+                                    overflow: "hidden",
                                 }}
                             >
                                 {item.name}
@@ -150,11 +191,13 @@ const WishlistPage = () => {
                             <p
                                 style={{
                                     marginTop: "4px",
+                                    marginBottom: "8px",
+
                                     fontSize: "14px",
                                     fontWeight: 600,
                                 }}
                             >
-                                {item.price?.toLocaleString()}원
+                                {Number(item.price || 0).toLocaleString()}원
                             </p>
 
                             <button
@@ -164,7 +207,7 @@ const WishlistPage = () => {
                                     handleAddCart(item);
                                 }}
                                 style={{
-                                    marginTop: "8px",
+                                    marginTop: "auto",
 
                                     width: "100%",
                                     height: "36px",
