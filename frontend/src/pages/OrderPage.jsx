@@ -55,14 +55,14 @@ const OrderPage = () => {
     const deliveryFee = 0;
     const finalPrice = totalProductPrice + deliveryFee;
 
-    const handleMessageCard = () => {
-        if (orderItems.length === 0) {
-            alert("주문할 상품이 없습니다.");
-            navigate("/cart");
-            return;
-        }
-
-        navigate("/gifts/card");
+    const handleSelectFriend = (productId, productName) => {
+        navigate('/friends/select', {
+            state: {
+                productId,
+                productName,
+                productPrice: finalPrice
+            },
+        });
     };
 
     return (
@@ -183,9 +183,16 @@ const OrderPage = () => {
 
                 <MessageButton
                     type="button"
-                    onClick={handleMessageCard}
+                    onClick={() => {
+                        if (orderItems.length === 0) {
+                            alert('주문할 상품이 없습니다.');
+                            return;
+                        }
+                        const item = orderItems[0];
+                        handleSelectFriend(item.id, item.name);
+                    }}
                 >
-                    메시지 카드 작성하기
+                    선물할 친구 선택하기
                 </MessageButton>
             </BottomOrderBox>
 
