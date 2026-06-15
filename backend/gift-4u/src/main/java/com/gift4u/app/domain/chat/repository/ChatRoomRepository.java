@@ -16,6 +16,11 @@ public interface ChatRoomRepository extends JpaRepository <ChatRoom, Long>{
 			+ "OR (r.userA.id = :userBId AND r.userB.id = :userBId)")
 	Optional<ChatRoom> findRoomByTwoUsers(@Param("userAId")Long userAId, @Param("userBId") Long userBId);
 	
+    @Query("SELECT r FROM ChatRoom r WHERE " +
+            "(r.userA.id = :userAId AND r.userB.id = :userBId) OR " +
+            "(r.userA.id = :userBId AND r.userB.id = :userAId)")
+     List<ChatRoom> findRoomListByTwoUsers(@Param("userAId") Long userAId, @Param("userBId") Long userBId);
+
 	/** 내 채팅방 목록 - 마지막 메시지 최신순 정렬 (REQ-C01)
 	 * @EntityGraph: userA, userB를 즉시 로딩해 N+1 문제 방지
 	 * ChatRoomResponse.of()에서 userA/userB.getNickname() 접근 필요

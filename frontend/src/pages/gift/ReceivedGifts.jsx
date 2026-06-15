@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getReceivedGifts } from '../../api/giftApi';
 import { getFriends } from '../../api/friendshipApi';
 import * as S from '../../styles/gift/ReceivedGiftsStyle';
+import axiosInstance from '../../api/axiosInstance';
 
 /**
  * 받은 선물 목록 페이지
@@ -66,6 +67,22 @@ const ReceivedGifts = () => {
         return matchedFriend ? matchedFriend.nickname : '선물한 사용자';
     };
 
+    const GiftItemRow = ({ gift, navigate, statusLabel, getSenderNickname }) => {
+        const [productImg, setProductImg] = useState("/images/default.png");
+        const label = statusLabel(gift.status);
+
+        useEffect(() => {
+            if (!gift.productId) return;
+
+            axios.get(`/api/products/${gift.productId}`)
+                .then((res) => {
+                    const img = res.data?.imageUrl || res.data?.image_url;
+                    if (img) setProductImg(img);
+                })
+                .catch((err) => console.error("선물함 상품 이미지 가치 조회 실패:", err));
+        }, [gift.productId]);
+    }
+
     if (loading) return <S.CenterText>로딩 중...</S.CenterText>;
 
     return (
@@ -76,15 +93,21 @@ const ReceivedGifts = () => {
                 <S.GiftList>
                     {gifts.map((gift) => {
                         const label = statusLabel(gift.status);
+                        const currentImgSrc = gift.imageUrl || gift.image_url || "/images/default.png";
+
                         return (
                             <S.GiftItem key={gift.id}>
-                                {/* 상품 이미지 → 클릭 시 상품 상세 */}
                                 <S.ProductThumb
                                     onClick={() => navigate(`/products/${gift.productId}`)}
                                 >
-                                    🎁
+                                    <S.ThumbImage
+                                        src={currentImgSrc}
+                                        alt={gift.productName}
+                                        onError={(e) => {
+                                            e.target.src = "/images/default.png"; // 깨짐 방지용 방어막
+                                        }}
+                                    />
                                 </S.ProductThumb>
-
                                 <S.GiftInfo>
                                     <S.ProductName
                                         onClick={() => navigate(`/gifts/${gift.uuid}`)}
@@ -118,5 +141,6 @@ const ReceivedGifts = () => {
         </S.Container>
     );
 };
+
 
 export default ReceivedGifts;

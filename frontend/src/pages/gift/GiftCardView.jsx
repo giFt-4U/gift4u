@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
-import { getGift } from '../../api/giftApi';
+import { getGift, getReceivedGifts } from '../../api/giftApi';
 import * as S from '../../styles/gift/GiftCardViewStyle';
+import axiosInstance from '../../api/axiosInstance';
 
 /**
  * 선물 카드 뷰 페이지 — 두 가지 진입 경로
@@ -21,9 +22,9 @@ import * as S from '../../styles/gift/GiftCardViewStyle';
 
 // 봉투 디자인별 스타일 매핑 (GiftCard.jsx와 동일하게 유지)
 const DESIGN_STYLES = {
-    1: { bg: '#FFF0F5', accent: '#FF8C00', pattern: '🌸', name: '플라워' },
-    2: { bg: '#F0F4FF', accent: '#5B7FFF', pattern: '⭐', name: '스타' },
-    3: { bg: '#FFFBF0', accent: '#FFB300', pattern: '🟡', name: '체크' },
+    1: { bgImg: '/images/cards/card1.png', accent: '#FF8C00' },
+    2: { bgImg: '/images/cards/card2.png', accent: '#5B7FFF' },
+    3: { bgImg: '/images/cards/card3.png', accent: '#FFB300' },
 };
 
 const GiftCardView = () => {
@@ -38,54 +39,41 @@ const GiftCardView = () => {
     const [giftData, setGiftData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [bundleProducts, setBundleProducts] = useState([]);
+    const [apiProducts, setApiProducts] = useState([]);
 
     // 경로 B일 때만 API 호출
     useEffect(() => {
-        if (!uuid) return; // 경로 A면 스킵
-        const fetchGiftAndBundle = async () => {
+        if (!uuid) return;
+
+        const fetchGiftAndRealImages = async () => {
             try {
                 setLoading(true);
-                // 1. 상세 선물 내역 단건 조회
                 const res = await getGift(uuid);
-                const mainGift = res.data;
-                setGiftData(mainGift);
+                const gift = res.data;
+                setGiftData(gift);
 
-                try {
-                    const listRes = await getMyGifts();
-                    const allGifts = listRes.data || [];
+                const targetIds = gift.bundleProductIds || (gift.productId ? [gift.productId] : []);
 
-                    const mainTime = mainGift.createdAt?.substring(0, 16);
+                if (targetIds.length > 0) {
+                    const productRequests = targetIds.map(id => axios.get(`/api/products/${id}`));
+                    const productResponses = await Promise.all(productRequests);
 
-                    const matchedGifts = allGifts.filter(gift => {
-                        const giftTime = gift.createdAt?.substring(0, 16);
-                        return giftTime === mainTime && gift.senderId === mainGift.senderId;
-                    });
-
-                    if (matchedGifts.length > 0) {
-                        setBundleProducts(matchedGifts);
-                    } else {
-                        setBundleProducts([mainGift]);
-                    }
-                } catch (listErr) {
-                    // 전체 목록 조회 에러 시 폴백: 현재 단일 상품 노출
-                    setBundleProducts([mainGift]);
+                    const formatted = productResponses.map(pRes => ({
+                        name: pRes.data?.name || '선물 상품 이름',
+                        imageUrl: pRes.data?.imageUrl || pRes.data?.image_url || '/images/default.png'
+                    }));
+                    setApiProducts(formatted);
                 }
-
             } catch (e) {
-                const code = e.response?.data?.error?.code;
-                if (code === 'GIFT_LINK_INVALID') {
-                    setError('유효하지 않거나 만료된 선물 링크입니다.');
-                } else {
-                    setError('선물 정보를 불러오지 못했습니다.');
-                }
+                setError('선물 정보를 불러오지 못했습니다.');
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchGiftAndBundle();
+        fetchGiftAndRealImages();
     }, [uuid]);
+
 
     // ── 렌더링에 사용할 데이터 결정 ─────────────────────
     const message = previewState?.message ?? giftData?.message;
@@ -98,6 +86,44 @@ const GiftCardView = () => {
     const isExpired = status === 'EXPIRED';
     const isAccepted = status === 'ACCEPTED';
 
+    const userUploadedImg = isPreview ? previewState?.uploadedImgUrl : giftData?.uploadedImgUrl;
+
+    const getLocalStorageProducts = () => {
+        try {
+            const localItems = JSON.parse(localStorage.getItem("orderItems"));
+            if (Array.isArray(localItems) && localItems.length > 0) {
+                return localItems.map(item => ({
+                    name: item?.name || item?.productName || '선물 상품 이름',
+                    imageUrl: item?.imageUrl || item?.image_url || '/images/default.png'
+                }));
+            }
+            return [];
+        } catch (e) {
+            return [];
+        }
+    };
+
+    // 단일 포맷 데이터 변환 및 결합
+    const getFormattedProducts = () => {
+        if (isPreview) {
+            const local = getLocalStorageProducts();
+            if (local.length > 0) return local;
+            return [{
+                name: previewState?.productName || '선물 상품 이름',
+                imageUrl: previewState?.imageUrl || previewState?.image_url || '/images/default.png'
+            }];
+        } else {
+            if (apiProducts.length > 0) return apiProducts;
+
+            return [{
+                name: giftData?.productName || '선물 상품 이름',
+                imageUrl: '/images/default.png'
+            }];
+        }
+    };
+
+    const displayProducts = getFormattedProducts();
+
     // ── 로딩 / 에러 처리 ─────────────────────────────────
     if (loading) return <S.CenterText>로딩 중...</S.CenterText>;
     if (error) return <S.CenterText>{error}</S.CenterText>;
@@ -106,33 +132,39 @@ const GiftCardView = () => {
         <S.Container>
 
             {/* 카드 본문 */}
-            <S.CardArea $bg={design.bg}>
+            <S.CardArea $bgImg={design.bgImg}>
 
-                {/* 상단 장식 패턴 */}
-                <S.PatternRow>
-                    {[...Array(5)].map((_, i) => (
-                        <S.PatternIcon key={i}>{design.pattern}</S.PatternIcon>
-                    ))}
-                </S.PatternRow>
 
-                {/* 상품 정보 */}
-                <div style={{ width: '100%', display: 'flex', flexDirection: 'column', margin: '12px 0' }}>
-                    {isPreview ? (
-                        // 경로 A: 송신자 미리보기 시 단일 상품명 노출
-                        <S.ProductBox>
-                            <S.ProductImg>🎁</S.ProductImg>
-                            <S.ProductName>{previewState?.productName || '선물 상품 이름'}</S.ProductName>
-                        </S.ProductBox>
+                {/* 이미지 박스 */}
+                <S.MainImageFrame>
+                    {userUploadedImg ? (
+                        <S.RealProductImage
+                            src={userUploadedImg}
+                            alt="선물 카드 커스텀 사진"
+                            onError={(e) => { e.target.src = "/images/default.png"; }}
+                        />
                     ) : (
-                        // 경로 B: 백엔드가 묶어준 bundleProductNames 배열을 그대로 순회 출력
-                        giftData?.bundleProductNames?.map((name, idx) => (
-                            <S.ProductBox key={idx} style={{ marginBottom: idx === giftData.bundleProductNames.length - 1 ? 0 : '8px' }}>
-                                <S.ProductImg>🎁</S.ProductImg>
-                                <S.ProductName>{name}</S.ProductName>
-                            </S.ProductBox>
-                        ))
+                        <S.ImagePlaceholderLine />
                     )}
-                </div>
+                </S.MainImageFrame>
+
+                {/* 2. 와이어프레임 중앙: 다른 화면들과 완벽히 일치하는 상품 리스트 출력 (여러 개면 밑으로 차례대로 렌더링) */}
+                <S.ProductContainer>
+                    {displayProducts.map((item, idx) => (
+                        <S.ProductBox key={idx}>
+                            <S.SmallThumbBox>
+                                <S.RealProductImage
+                                    src={item.imageUrl}
+                                    alt={item.name}
+                                    onError={(e) => { e.target.src = "/images/default.png"; }}
+                                />
+                            </S.SmallThumbBox>
+                            <S.ProductTextGroup>
+                                <S.ProductName>{item.name}</S.ProductName>
+                            </S.ProductTextGroup>
+                        </S.ProductBox>
+                    ))}
+                </S.ProductContainer>
 
                 {/* 메시지 */}
                 <S.MessageBox>
@@ -140,13 +172,6 @@ const GiftCardView = () => {
                         {message ?? '메시지가 없습니다.'}
                     </S.MessageText>
                 </S.MessageBox>
-
-                {/* 하단 장식 패턴 */}
-                <S.PatternRow>
-                    {[...Array(5)].map((_, i) => (
-                        <S.PatternIcon key={i}>{design.pattern}</S.PatternIcon>
-                    ))}
-                </S.PatternRow>
 
             </S.CardArea>
 

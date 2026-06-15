@@ -61,3 +61,11 @@ export const CenterText = styled.div`
     justify-content: center; height: 200px;
     color: #aaa; font-size: 14px;
 `;
+
+export const ThumbImage = styled.img`
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+`;

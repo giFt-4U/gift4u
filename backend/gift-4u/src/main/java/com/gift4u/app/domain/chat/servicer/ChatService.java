@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.gift4u.app.domain.chat.dto.ChatMessageRequest;
 import com.gift4u.app.domain.chat.dto.ChatMessageResponse;
@@ -181,7 +183,6 @@ public class ChatService {
 		return response;
 	}
 	
-	
 	/** 선물 생성 시 채팅방에 자동 전달되는 GIFT 타입 시스템 메시지 (REQ-C05)
 	 * GiftSevice.createGift() 완료 후 호출된다.
 	 * 1. 보낸사람 <> 받는 사람 채팅방 조회 or 생성
@@ -190,20 +191,22 @@ public class ChatService {
 	 * 4. 브로드캐스트
 	 */
 	@Transactional
-	public void sendGiftMessage(Gift gift) {
+	public Long sendGiftMessage(Gift gift) {
 		User sender = gift.getSender();
-		User reciver = gift.getReceiver();
+		User receiver = gift.getReceiver();
 		
-		// 채팅방 조회 or 생성 (선물 전송이 채팅방을 자동 생성할 수 있음)
 		ChatRoom room = chatRoomRepository
-				.findRoomByTwoUsers(sender.getId(), reciver.getId())
-				.orElseGet(()->{
-					ChatRoom newRoom = ChatRoom.builder()
-							.userA(sender)
-							.userB(reciver)
-							.build();
-					return chatRoomRepository.save(newRoom);
-				});
+                .findRoomListByTwoUsers(sender.getId(), receiver.getId())
+                .stream()
+                .findFirst() // 데이터가 2개 이상 튀어나와도 예외 없이 첫 번째 방을 유연하게 선택합니다.
+                .orElseGet(() -> {
+                    // 방이 전혀 없을 때만 새 방 생성
+                    ChatRoom newRoom = ChatRoom.builder()
+                            .userA(sender)   // 보낸 사람
+                            .userB(receiver) // 받는 사람
+                            .build();
+                    return chatRoomRepository.save(newRoom);
+                });
 		
 		// GIFT 타입 메시지 - 내용은 프론트가 uuid로 선물 카드 렌더링
 		String giftContent = "선물이 도착했어요 ! 🎁 "+gift.getUuid();
@@ -218,7 +221,6 @@ public class ChatService {
 		
 		room.updateLastMessageAt();
 		
-		
 		// 선물 - 채팅방 연결 저장 (중복 방지)
 		boolean alreadyLinked = giftChatLinkRepository.findByGiftId(gift.getId()).isPresent();
 		if(!alreadyLinked) {
@@ -231,7 +233,20 @@ public class ChatService {
 		}
 		
 		// 실시간 브로드캐스트
-		messagingTemplate.convertAndSend("/topic/chat/" +room.getId(),ChatMessageResponse.from(message));
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    messagingTemplate.convertAndSend(
+                        "/topic/chat/" + room.getId(), 
+                        ChatMessageResponse.from(message)
+                    );
+                }
+            });
+        } else {
+            messagingTemplate.convertAndSend("/topic/chat/" + room.getId(), ChatMessageResponse.from(message));
+        }
+        return room.getId();
 	}
 	
 	/**

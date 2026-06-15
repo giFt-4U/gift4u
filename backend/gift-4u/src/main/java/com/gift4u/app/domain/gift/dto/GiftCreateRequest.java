@@ -17,6 +17,9 @@ public class GiftCreateRequest {
 	
 	@NotNull
 	private Long productId;
+
+    @NotNull
+    private Long senderId;
 	
 	// REQ-010
 	@NotBlank

@@ -1,48 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import styled from 'styled-components';
 import { createGift } from '../../api/giftApi';
 import * as S from '../../styles/gift/GiftCardStyle';
 
-/**
- * 선물 카드 작성 페이지 (REQ-010, REQ-011)
- *
- * 진입 경로:
- *   상품 상세 페이지 → 선물하기 버튼 클릭
- *   → navigate('/gifts/card', { state: { productId, receiverId } })
- *
- * 흐름:
- *   1. 메시지 입력 (최대 200자)
- *   2. 봉투 디자인 선택 (1~3)
- *   3. 카드 미리보기 버튼 → /gifts/card/preview 로 상태 전달
- *   4. 선물하기 버튼 → createGift() API 호출 → 채팅방으로 이동
- */
-
-// 봉투 디자인 목록 (cardDesignType 1~3)
-// 와이어프레임 기준 3가지 패턴
+// 봉투 디자인 목록 (이미지 경로 매핑)
 const CARD_DESIGNS = [
-    { type: 1, label: '플라워', bg: '#FFF0F5', pattern: '🌸' },
-    { type: 2, label: '스타', bg: '#F0F4FF', pattern: '⭐' },
-    { type: 3, label: '체크', bg: '#FFFBF0', pattern: '🟡' },
+    { type: 1, label: '플라워', imgSrc: '/images/cards/card1.png' },
+    { type: 2, label: '스타', imgSrc: '/images/cards/card2.png' },
+    { type: 3, label: '체크', imgSrc: '/images/cards/card3.png' },
 ];
 
 const GiftCard = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const fileInputRef = useRef(null);
 
     // 상품 상세에서 전달받은 값
-    const { productId, receiverId, productName, productPrice } = location.state ?? {};
+    const {
+        productId,
+        receiverId,
+        productName,
+        productNames,
+        productImages,
+        imageUrl,
+        image_url,
+        productPrice,
+        totalPrice
+    } = location.state ?? {};
+
     const [message, setMessage] = useState(location.state?.message || '');
     const [selectedDesign, setSelectedDesign] = useState(location.state?.cardDesignType || 1);
+    const [uploadedImgUrl, setUploadedImgUrl] = useState(location.state?.uploadedImgUrl || null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
     const MAX_LENGTH = 200;
     const remaining = MAX_LENGTH - message.length;
 
-    // ── 선물하기 API 호출 ────────────────────────────────
-    const handleSubmit = async () => {
+    // 배너 클릭 시 파일 선택 창 열기
+    const handleBannerClick = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
+        }
+    };
 
+    // 파일 선택 완료 시 미리보기 URL 생성 및 저장
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const previewUrl = URL.createObjectURL(file);
+            setUploadedImgUrl(previewUrl);
+        }
+    };
+
+    // ── 선물하기 및 결제 페이지 이동 ───────────────────────
+    const handleSubmit = async () => {
         if (!message.trim()) {
             setError('메시지를 입력해주세요.');
             return;
@@ -51,15 +63,22 @@ const GiftCard = () => {
         setLoading(true);
         setError(null);
 
+        const finalAmount = totalPrice ?? productPrice ?? 0;
+
         navigate('/gifts/checkout', {
             state: {
-                amount: productPrice,
+                amount: Number(finalAmount),
+                productPrice: Number(finalAmount),
+                ...location.state,
                 giftData: {
                     receiverId,
                     productId,
                     message: message.trim(),
                     cardDesignType: selectedDesign,
-                    productName: productName
+                    productName: productName,
+                    imageUrl: imageUrl || image_url,
+                    uploadedImgUrl: uploadedImgUrl,
+                    price: Number(finalAmount)
                 }
             }
         });
@@ -74,19 +93,34 @@ const GiftCard = () => {
         setError(null);
         navigate('/gifts/card/preview', {
             state: {
+                ...location.state,
                 message,
                 cardDesignType: selectedDesign,
-                productName,
-                productId,
-                receiverId,
+                uploadedImgUrl: uploadedImgUrl
             },
         });
     };
 
     return (
         <S.Container>
-
             <S.ScrollArea>
+
+                <S.TopPreviewBox onClick={handleBannerClick}>
+                    {uploadedImgUrl ? (
+                        <S.UploadedPreviewImg src={uploadedImgUrl} alt="사용자 업로드 이미지" />
+                    ) : (
+                        <S.PreviewPlaceholderText>📸 클릭하여 카드에 넣을 사진 고르기</S.PreviewPlaceholderText>
+                    )}
+                </S.TopPreviewBox>
+
+                {/* 숨겨진 파일 인풋 태그 */}
+                <input
+                    type="file"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                    onChange={handleFileChange}
+                />
 
                 {/* 상품명 표시 */}
                 {productName && (
@@ -111,19 +145,17 @@ const GiftCard = () => {
                     </S.CharCount>
                 </S.Section>
 
-                {/* 봉투 디자인 선택 */}
+                {/* 편지 봉투 고르기 (사진 선택 컴포넌트) */}
                 <S.Section>
                     <S.SectionLabel>편지 봉투 고르기</S.SectionLabel>
                     <S.DesignGrid>
                         {CARD_DESIGNS.map((design) => (
                             <S.DesignItem
                                 key={design.type}
-                                $bg={design.bg}
                                 $selected={selectedDesign === design.type}
                                 onClick={() => setSelectedDesign(design.type)}
                             >
-                                <S.DesignPattern>{design.pattern}</S.DesignPattern>
-                                <S.DesignLabel>{design.label}</S.DesignLabel>
+                                <S.DesignImage src={design.imgSrc} alt={design.label} />
                             </S.DesignItem>
                         ))}
                     </S.DesignGrid>
@@ -142,7 +174,6 @@ const GiftCard = () => {
                     {loading ? '전송 중...' : '결제하기'}
                 </S.SubmitButton>
             </S.ButtonRow>
-
         </S.Container>
     );
 };
