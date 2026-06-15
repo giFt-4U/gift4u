@@ -34,7 +34,6 @@ public class PaymentController {
 
     /**
      * 2. 토스 승인 요청 + 결제 완료 + 선물 생성 원스톱 연동 API
-     * (@RequestAttribute 또는 인증용 세션 등 프로젝트 로그인 방식에 따라 senderId를 바인딩하세요)
      */
     @PostMapping("/confirm")
     public ResponseEntity<GiftResponse> confirmPayment(
@@ -42,8 +41,11 @@ public class PaymentController {
             @Valid @RequestBody PaymentConfirmRequest confirmRequest) {
 
         Long currentUserId = userDetails.getUser().getId();
-        
+
+        // 1. DB 트랜잭션 종료 및 결과 응답 객체 수신
         GiftResponse response = paymentService.confirmPaymentAndCreateGift(currentUserId, confirmRequest);
+        
+        // 2. 실시간 채팅 메시지 발송
         return ResponseEntity.ok(response);
     }
 }
