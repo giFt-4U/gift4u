@@ -2,6 +2,8 @@ package com.gift4u.app.domain.wishlist.service;
 
 import com.gift4u.app.domain.Product.entity.Product;
 import com.gift4u.app.domain.Product.repository.ProductRepository;
+import com.gift4u.app.domain.user.entity.User;
+import com.gift4u.app.domain.user.repository.UserRepository;
 import com.gift4u.app.domain.wishlist.dto.WishlistResponse;
 import com.gift4u.app.domain.wishlist.entity.WishlistItem;
 import com.gift4u.app.domain.wishlist.repository.WishlistItemRepository;
@@ -13,12 +15,14 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class WishlistService {
 
     private final WishlistItemRepository wishlistItemRepository;
     private final ProductRepository productRepository;
+    private final UserRepository userRepository;
 
-    @Transactional(readOnly = true)
+    // 내 위시리스트 조회
     public List<WishlistResponse> getUserWishlist(Long userId) {
         return wishlistItemRepository.findByUserIdOrderByCreatedAtDesc(userId)
                 .stream()
@@ -26,6 +30,18 @@ public class WishlistService {
                 .toList();
     }
 
+    // 친구 위시리스트 조회
+    public List<WishlistResponse> getFriendWishlist(String friendCode) {
+        User friend = userRepository.findByFriendCode(friendCode)
+                .orElseThrow(() -> new RuntimeException("친구를 찾을 수 없습니다."));
+
+        return wishlistItemRepository.findByUserIdOrderByCreatedAtDesc(friend.getId())
+                .stream()
+                .map(WishlistResponse::from)
+                .toList();
+    }
+
+    // 내 위시리스트에 상품 추가
     @Transactional
     public void addWishlist(Long userId, Long productId) {
         boolean exists = wishlistItemRepository.existsByUserIdAndProduct_Id(userId, productId);
@@ -45,6 +61,7 @@ public class WishlistService {
         wishlistItemRepository.save(wishlistItem);
     }
 
+    // 내 위시리스트에서 상품 삭제
     @Transactional
     public void removeWishlist(Long userId, Long productId) {
         wishlistItemRepository.findByUserIdAndProduct_Id(userId, productId)

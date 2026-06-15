@@ -1,108 +1,78 @@
-// WishlistPage.jsx
+// FriendWishlistPage.jsx
 
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { getFriendWishlistItems } from "../../utils/Wishlist";
 
-import {
-    getWishlistItems,
-    removeFromWishlist,
-} from "../utils/Wishlist";
-
-import {
-    addToCart,
-} from "../utils/Cart";
-
-const WishlistPage = () => {
+const FriendWishlistPage = () => {
     const navigate = useNavigate();
+    const { friendCode } = useParams();
 
     const [wishlistItems, setWishlistItems] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const fetchWishlist = async () => {
-        const isLogin = localStorage.getItem("token");
-
-        if (!isLogin) {
-            setWishlistItems([]);
-            setLoading(false);
-            return;
-        }
-
-        try {
-            setLoading(true);
-
-            const items = await getWishlistItems();
-            setWishlistItems(items);
-        } catch (error) {
-            console.error("위시리스트 조회 실패:", error);
-            setWishlistItems([]);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
-        fetchWishlist();
-    }, []);
+        const fetchFriendWishlist = async () => {
+            try {
+                setLoading(true);
 
-    const handleRemove = async (id) => {
-        try {
-            await removeFromWishlist(id);
+                const items = await getFriendWishlistItems(friendCode);
+                setWishlistItems(items);
+            } catch (error) {
+                console.error("친구 위시리스트 조회 실패:", error);
+                setWishlistItems([]);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-            setWishlistItems(prev =>
-                prev.filter(item => Number(item.id) !== Number(id))
-            );
-        } catch (error) {
-            console.error("위시리스트 삭제 실패:", error);
-            alert("위시리스트 삭제에 실패했습니다.");
-        }
-    };
+        fetchFriendWishlist();
+    }, [friendCode]);
 
-    const handleAddCart = (product) => {
-        const isLogin = localStorage.getItem("token");
-
-        if (!isLogin) {
-            alert("로그인 후 장바구니를 이용할 수 있습니다.");
-            return;
-        }
-
-        addToCart(product);
-        alert("장바구니에 담겼습니다.");
+    const handleGift = (productId) => {
+        // 현재는 상품 상세로 이동
+        // 나중에 선물하기 기능이 완성되면 선물 작성 페이지로 바꾸면 됨
+        navigate(`/products/${productId}`);
     };
 
     return (
         <div style={{ padding: "20px" }}>
-            <h2
-                style={{
-                    fontSize: "20px",
-                    fontWeight: 600,
-                    marginBottom: "20px",
-                }}
-            >
-                위시리스트
+            <h2 style={{ fontSize: "20px", fontWeight: 600, marginBottom: "8px" }}>
+                친구 위시리스트
             </h2>
 
+            <p style={{ fontSize: "13px", color: "#777", marginBottom: "20px" }}>
+                친구가 찜한 상품을 확인하고 선물할 상품을 선택해보세요.
+            </p>
+
             {loading ? (
-                <p
-                    style={{
-                        textAlign: "center",
-                        color: "#777",
-                        padding: "60px 0",
-                        fontSize: "14px",
-                    }}
-                >
+                <p style={{ textAlign: "center", color: "#777", padding: "60px 0", fontSize: "14px" }}>
                     불러오는 중입니다.
                 </p>
             ) : wishlistItems.length === 0 ? (
-                <p
-                    style={{
-                        textAlign: "center",
-                        color: "#777",
-                        padding: "60px 0",
-                        fontSize: "14px",
-                    }}
-                >
-                    찜한 상품이 없습니다.
-                </p>
+                <div style={{ textAlign: "center", padding: "60px 0" }}>
+                    <p style={{ color: "#777", fontSize: "14px", marginBottom: "16px" }}>
+                        친구가 아직 찜한 상품이 없습니다.
+                    </p>
+
+                    <button
+                        type="button"
+                        onClick={() => navigate("/products")}
+                        style={{
+                            height: "40px",
+                            padding: "0 18px",
+                            border: "none",
+                            borderRadius: "8px",
+                            background: "#ff8d28",
+                            color: "white",
+                            cursor: "pointer",
+                            fontSize: "14px",
+                            fontWeight: 600,
+                        }}
+                    >
+                        전체 상품 보러가기
+                    </button>
+                </div>
             ) : (
                 <div
                     style={{
@@ -112,47 +82,17 @@ const WishlistPage = () => {
                         alignItems: "stretch",
                     }}
                 >
-                    {wishlistItems.map(item => (
+                    {wishlistItems.map((item) => (
                         <div
                             key={item.id}
                             style={{
-                                position: "relative",
                                 cursor: "pointer",
-
                                 display: "flex",
                                 flexDirection: "column",
                                 height: "100%",
                             }}
                             onClick={() => navigate(`/products/${item.id}`)}
                         >
-                            <button
-                                type="button"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleRemove(item.id);
-                                }}
-                                style={{
-                                    position: "absolute",
-                                    top: "8px",
-                                    right: "8px",
-                                    zIndex: 10,
-
-                                    width: "30px",
-                                    height: "30px",
-
-                                    border: "none",
-                                    borderRadius: "50%",
-
-                                    background: "white",
-
-                                    cursor: "pointer",
-                                    fontSize: "16px",
-                                    fontWeight: 700,
-                                }}
-                            >
-                                ×
-                            </button>
-
                             <img
                                 src={item.imageUrl}
                                 alt={item.name}
@@ -172,13 +112,10 @@ const WishlistPage = () => {
                                 style={{
                                     marginTop: "8px",
                                     marginBottom: 0,
-
                                     fontSize: "14px",
                                     lineHeight: "20px",
                                     fontWeight: 500,
-
                                     minHeight: "40px",
-
                                     display: "-webkit-box",
                                     WebkitLineClamp: 2,
                                     WebkitBoxOrient: "vertical",
@@ -192,7 +129,6 @@ const WishlistPage = () => {
                                 style={{
                                     marginTop: "4px",
                                     marginBottom: "8px",
-
                                     fontSize: "14px",
                                     fontWeight: 600,
                                 }}
@@ -204,27 +140,22 @@ const WishlistPage = () => {
                                 type="button"
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    handleAddCart(item);
+                                    handleGift(item.id);
                                 }}
                                 style={{
                                     marginTop: "auto",
-
                                     width: "100%",
                                     height: "36px",
-
                                     border: "1px solid #ff8d28",
                                     borderRadius: "6px",
-
                                     background: "#ff8d28",
                                     color: "white",
-
                                     cursor: "pointer",
-
                                     fontSize: "13px",
                                     fontWeight: 600,
                                 }}
                             >
-                                장바구니 담기
+                                선물하기
                             </button>
                         </div>
                     ))}
@@ -234,4 +165,4 @@ const WishlistPage = () => {
     );
 };
 
-export default WishlistPage;
+export default FriendWishlistPage;

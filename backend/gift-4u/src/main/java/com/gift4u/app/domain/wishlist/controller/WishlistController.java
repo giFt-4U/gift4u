@@ -53,6 +53,14 @@ public class WishlistController {
         wishlistService.removeWishlist(userId, productId);
     }
 
+    // 친구 위시리스트 조회
+    @GetMapping("/friends/{friendCode}")
+    public List<WishlistResponse> getFriendWishlist(
+            @PathVariable String friendCode
+    ) {
+        return wishlistService.getFriendWishlist(friendCode);
+    }
+
     private Long getUserIdFromToken(String authorization) {
         if (authorization == null || !authorization.startsWith("Bearer ")) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");

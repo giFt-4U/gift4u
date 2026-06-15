@@ -75,3 +75,28 @@ export const isInWishlist = async (productId) => {
         return false;
     }
 };
+
+// 친구 위시리스트 목록 가져오기
+export const getFriendWishlistItems = async (friendCode) => {
+    if (!friendCode) {
+        return [];
+    }
+
+    const res = await axiosInstance.get(`/api/wishlist/friends/${friendCode}`);
+
+    const data = res.data;
+
+    if (Array.isArray(data)) {
+        return data;
+    }
+
+    if (Array.isArray(data?.data)) {
+        return data.data;
+    }
+
+    if (Array.isArray(data?.content)) {
+        return data.content;
+    }
+
+    return [];
+};
