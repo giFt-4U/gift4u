@@ -70,7 +70,7 @@ export const MobileContainer = styled.div`
 export const MainContent = styled.main`
     width: 100%;
 
-    padding-top: 80px; 
+    padding-top: ${({ $noTopPadding }) => ($noTopPadding ? "0" : "80px")};
     padding-left: ${({ $noPadding }) => ($noPadding ? "0" : "20px")};
     padding-right: ${({ $noPadding }) => ($noPadding ? "0" : "20px")};
     padding-bottom: ${({ $noPadding }) => ($noPadding ? "0" : "20px")};

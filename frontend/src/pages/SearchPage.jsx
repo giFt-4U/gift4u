@@ -25,8 +25,49 @@ const DEFAULT_TRENDING = ['유모차', '기저귀', '분유', '아기 침대'];
 const RECENT_SEARCH_KEY = 'recentSearch';
 const POPULAR_SEARCH_KEY = 'popularSearchCount';
 
-const SearchPage = () => {
+// 검색어 정규화
+const normalizeKeyword = (value) => {
+    const trimmed = value.trim().replace(/\s+/g, ' ');
+    const noSpace = trimmed.replace(/\s/g, '');
 
+    // 아기침대라고 입력해도 DB 상품명 기준인 아기 침대로 보정
+    if (noSpace === '아기침대') {
+        return '아기 침대';
+    }
+
+    return trimmed;
+};
+
+// localStorage JSON 파싱 안전 처리
+const getStorageData = (key, defaultValue) => {
+    try {
+        return JSON.parse(
+            localStorage.getItem(key) || JSON.stringify(defaultValue)
+        );
+    } catch (error) {
+        console.error(`${key} localStorage 파싱 실패:`, error);
+        localStorage.removeItem(key);
+        return defaultValue;
+    }
+};
+
+// 인기 검색어 가져오기
+const getPopularKeywords = () => {
+    const saved = getStorageData(POPULAR_SEARCH_KEY, {});
+
+    const sorted = Object.entries(saved)
+        .sort((a, b) => b[1] - a[1])
+        .map(([keyword]) => keyword);
+
+    const merged = [
+        ...sorted,
+        ...DEFAULT_TRENDING.filter((item) => !sorted.includes(item))
+    ];
+
+    return merged.slice(0, 4);
+};
+
+const SearchPage = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
 
@@ -39,43 +80,13 @@ const SearchPage = () => {
     const [popularKeywords, setPopularKeywords] = useState(DEFAULT_TRENDING);
     const [hasSearched, setHasSearched] = useState(false);
 
-    const normalizeKeyword = (value) => {
-        const trimmed = value.trim().replace(/\s+/g, ' ');
-        const noSpace = trimmed.replace(/\s/g, '');
-
-        // 아기침대라고 입력해도 DB 상품명 기준인 아기 침대로 보정
-        if (noSpace === '아기침대') {
-            return '아기 침대';
-        }
-
-        return trimmed;
-    };
-
-    const getPopularKeywords = () => {
-        const saved = JSON.parse(
-            localStorage.getItem(POPULAR_SEARCH_KEY) || '{}'
-        );
-
-        const sorted = Object.entries(saved)
-            .sort((a, b) => b[1] - a[1])
-            .map(([keyword]) => keyword);
-
-        const merged = [
-            ...sorted,
-            ...DEFAULT_TRENDING.filter((item) => !sorted.includes(item))
-        ];
-
-        return merged.slice(0, 4);
-    };
-
+    // 인기 검색어 저장
     const savePopularKeyword = (value) => {
         const searchValue = normalizeKeyword(value);
 
         if (!searchValue) return;
 
-        const saved = JSON.parse(
-            localStorage.getItem(POPULAR_SEARCH_KEY) || '{}'
-        );
+        const saved = getStorageData(POPULAR_SEARCH_KEY, {});
 
         saved[searchValue] = (saved[searchValue] || 0) + 1;
 
@@ -87,6 +98,7 @@ const SearchPage = () => {
         setPopularKeywords(getPopularKeywords());
     };
 
+    // 최근 검색어 저장
     const saveRecent = (value) => {
         const searchValue = normalizeKeyword(value);
 
@@ -107,57 +119,62 @@ const SearchPage = () => {
         });
     };
 
-    const fetchSearch = (value, shouldSaveKeyword = false) => {
+    // 검색 API 호출
+    const fetchSearch = async (value) => {
         const searchValue = normalizeKeyword(value);
 
-        if (!searchValue) return;
-
-        setLoading(true);
-        setHasSearched(true);
-
-        if (shouldSaveKeyword) {
-            saveRecent(searchValue);
-            savePopularKeyword(searchValue);
+        if (!searchValue) {
+            setResults([]);
+            setHasSearched(false);
+            return;
         }
 
-        axiosInstance
-            .get('/api/products', {
+        try {
+            setLoading(true);
+            setHasSearched(true);
+
+            const res = await axiosInstance.get('/api/products', {
                 params: {
                     keyword: searchValue,
                     page: 0,
                     size: 10,
                     sort: 'popular',
                 },
-            })
-            .then((res) => {
-                setResults(res.data.content || []);
-                setSearchParams({ keyword: searchValue });
-            })
-            .catch((error) => {
-                console.error('검색 실패:', error);
-                setResults([]);
-            })
-            .finally(() => {
-                setLoading(false);
             });
+
+            setResults(res.data.content || []);
+        } catch (error) {
+            console.error('검색 실패:', error);
+            setResults([]);
+        } finally {
+            setLoading(false);
+        }
     };
 
+    // 처음 페이지 진입 시 최근 검색어 / 인기 검색어 세팅
     useEffect(() => {
-        const savedRecent = JSON.parse(
-            localStorage.getItem(RECENT_SEARCH_KEY) || '[]'
-        );
+        const savedRecent = getStorageData(RECENT_SEARCH_KEY, []);
 
         setRecent(savedRecent);
         setPopularKeywords(getPopularKeywords());
-
-        const initialKeyword = normalizeKeyword(keywordParam);
-
-        if (initialKeyword) {
-            setKeyword(initialKeyword);
-            fetchSearch(initialKeyword, false);
-        }
     }, []);
 
+    // URL keyword가 바뀌면 검색 결과 갱신
+    useEffect(() => {
+        const searchValue = normalizeKeyword(keywordParam);
+
+        if (!searchValue) {
+            setKeyword('');
+            setResults([]);
+            setHasSearched(false);
+            return;
+        }
+
+        setKeyword(searchValue);
+        fetchSearch(searchValue);
+    }, [keywordParam]);
+
+    // 최근 검색어 삭제
     const removeRecent = (e, value) => {
         e.stopPropagation();
 
@@ -173,6 +190,7 @@ const SearchPage = () => {
         });
     };
 
+    // 검색 제출
     const handleSearchSubmit = (e) => {
         e.preventDefault();
 
@@ -180,17 +198,38 @@ const SearchPage = () => {
 
         if (!searchValue) return;
 
+        saveRecent(searchValue);
+        savePopularKeyword(searchValue);
         setKeyword(searchValue);
-        fetchSearch(searchValue, true);
+
+        const currentKeyword = normalizeKeyword(keywordParam);
+
+        // URL이 이미 같은 검색어면 직접 검색 실행
+        // URL이 다르면 setSearchParams 이후 useEffect에서 검색 실행
+        if (currentKeyword === searchValue) {
+            fetchSearch(searchValue);
+        } else {
+            setSearchParams({ keyword: searchValue });
+        }
     };
 
+    // 인기 검색어 / 최근 검색어 클릭
     const onSearchClick = (value) => {
         const searchValue = normalizeKeyword(value);
 
         if (!searchValue) return;
 
+        saveRecent(searchValue);
+        savePopularKeyword(searchValue);
         setKeyword(searchValue);
-        fetchSearch(searchValue, true);
+
+        const currentKeyword = normalizeKeyword(keywordParam);
+
+        if (currentKeyword === searchValue) {
+            fetchSearch(searchValue);
+        } else {
+            setSearchParams({ keyword: searchValue });
+        }
     };
 
     return (
@@ -293,7 +332,7 @@ const SearchPage = () => {
                                 </h4>
 
                                 <p className="product-price">
-                                    {item.price?.toLocaleString()}원
+                                    {Number(item.price || 0).toLocaleString()}원
                                 </p>
                             </InfoBox>
                         </Card>

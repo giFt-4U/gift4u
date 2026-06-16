@@ -30,7 +30,7 @@ const WishlistPage = () => {
         try {
             setLoading(true);
 
-            const items = await getWishlistItems();
+            const items = await getWishlistItems({ force: true });
             setWishlistItems(items);
         } catch (error) {
             console.error("위시리스트 조회 실패:", error);

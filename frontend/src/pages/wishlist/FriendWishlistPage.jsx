@@ -29,10 +29,14 @@ const FriendWishlistPage = () => {
         fetchFriendWishlist();
     }, [friendCode]);
 
+    // 선물하기
     const handleGift = (productId) => {
-        // 현재는 상품 상세로 이동
-        // 나중에 선물하기 기능이 완성되면 선물 작성 페이지로 바꾸면 됨
-        navigate(`/products/${productId}`);
+        navigate(`/products/${productId}`, {
+            state: {
+                fromFriendWishlist: true,
+                receiverFriendCode: friendCode,
+            },
+        });
     };
 
     return (
@@ -155,7 +159,7 @@ const FriendWishlistPage = () => {
                                     fontWeight: 600,
                                 }}
                             >
-                                선물하기
+                                상품 확인하기
                             </button>
                         </div>
                     ))}

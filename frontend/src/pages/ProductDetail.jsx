@@ -72,6 +72,17 @@ const ProductDetail = () => {
         return <div>로딩중...</div>;
     }
 
+    // 친구 위시리스트에서 상품 상세페이지로 이동
+    const handleGift = (productId) => {
+        navigate(`/products/${productId}`, {
+            state: {
+                fromFriendWishlist: true,
+                receiverFriendCode: friendCode,
+            },
+        });
+    };
+
+
     const brandName = product.brandName || product.brand_name;
     const imageSrc = product.imageUrl || product.image_url || "/images/default.png";
 
