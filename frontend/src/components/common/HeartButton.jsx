@@ -59,32 +59,33 @@ const HeartButton = ({ product }) => {
             return;
         }
 
-        if (!product?.id || loading) return;
+        if (!product?.id || loading) {
+            return;
+        }
+
+        const previousLiked = liked;
 
         try {
             setLoading(true);
 
-            if (liked) {
+            // 먼저 화면 상태를 바꿔서 반응 속도 개선
+            setLiked(!previousLiked);
+
+            if (previousLiked) {
                 await removeFromWishlist(product.id);
-                setLiked(false);
             } else {
                 const success = await addToWishlist(product);
 
-                if (success !== false) {
-                    setLiked(true);
+                if (success === false) {
+                    setLiked(previousLiked);
                 }
             }
         } catch (error) {
             console.error("위시리스트 처리 실패:", error);
             alert("위시리스트 처리에 실패했습니다.");
 
-            // 실패했을 경우 DB 상태 기준으로 다시 맞춤
-            try {
-                const result = await isInWishlist(product.id);
-                setLiked(result);
-            } catch {
-                setLiked(false);
-            }
+            // 실패 시 이전 상태로 복구
+            setLiked(previousLiked);
         } finally {
             setLoading(false);
         }
@@ -95,6 +96,7 @@ const HeartButton = ({ product }) => {
             type="button"
             onClick={handleClick}
             disabled={loading}
+            aria-label={liked ? "위시리스트에서 삭제" : "위시리스트에 추가"}
             style={{
                 position: "absolute",
                 top: "10px",
