@@ -30,3 +30,9 @@ application-local.properties
 
 # 6. Maven 래퍼
 .maven
+
+# 7. 팀 자료 / 키 파일 (레포에 올리지 않음)
+presentation/
+3조/
+*.pem
+*.ppk
