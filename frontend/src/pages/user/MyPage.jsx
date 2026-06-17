@@ -58,15 +58,34 @@ const MyPage = () => {
         navigate('/login');
     };
 
+    const copyText = async (text) => {
+        if (navigator.clipboard?.writeText && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+            return;
+        }
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        const copied = document.execCommand('copy');
+        document.body.removeChild(textarea);
+        if (!copied) {
+            throw new Error('copy failed');
+        }
+    };
+
     const onCopyFriendCode = async () => {
         if (!user?.friendCode) return;
         try {
-            await navigator.clipboard.writeText(user.friendCode);
+            await copyText(user.friendCode);
             setCopied(true);
             setTimeout(() => setCopied(false), 2500);
         } catch (error) {
             console.error(error);
-            alert('복사에 실패했어요. 다시 시도해주세요.');
+            alert('복사에 실패했어요. 코드를 길게 눌러 직접 복사해주세요.');
         }
     };
 
