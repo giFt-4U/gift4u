@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import { getMessages } from '../../api/chatApi';
+import { getChatRooms, getMessages } from '../../api/chatApi';
 import * as S from '../../styles/chat/ChatRoomStyle';
 import useAuthStore from '../../store/authStore';
 
@@ -24,11 +24,20 @@ import useAuthStore from '../../store/authStore';
 const ChatRoom = () => {
     const { roomId } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [connected, setConnected] = useState(false);
-    const [opponentName, setOpponentName] = useState('');
+
+    // 채팅방 상대방 정보
+    const [opponentName, setOpponentName] = useState(location.state?.partnerName ?? '');
+    const [opponentFriendCode, setOpponentFriendCode] = useState(
+        location.state?.opponentFriendCode ?? ''
+    );
+
+    // + 버튼 메뉴 상태
+    const [menuOpen, setMenuOpen] = useState(false);
 
     // STOMP 클라이언트 ref — 렌더링과 무관하게 유지
     const stompClientRef = useRef(null);
@@ -48,10 +57,13 @@ const ChatRoom = () => {
             return null;
         }
     };
+
     const myUserId = user?.id || user?.userId || getUserIdFromToken();
 
     // ── 1. 과거 메시지 조회 ─────────────────────────────
     useEffect(() => {
+        if (!roomId || roomId === 'undefined') return;
+
         getMessages(roomId)
             .then((res) => {
                 // API는 최신순(DESC)으로 내려오므로 뒤집어서 표시
@@ -60,6 +72,30 @@ const ChatRoom = () => {
             })
             .catch(() => { });
     }, [roomId]);
+
+    // ── 1-1. 채팅방 상대방 정보 조회 ─────────────────────
+    // 친구 관리/채팅 목록에서 state로 넘어오지 않거나 새로고침했을 때 대비
+    useEffect(() => {
+        if (!roomId || roomId === 'undefined') return;
+
+        // 이미 상대방 정보가 있으면 다시 조회하지 않음
+        if (opponentName && opponentFriendCode) return;
+
+        getChatRooms()
+            .then((res) => {
+                const currentRoom = res.data.find(
+                    (room) => Number(room.roomId) === Number(roomId)
+                );
+
+                if (!currentRoom) return;
+
+                setOpponentName(currentRoom.opponentNickname ?? '');
+                setOpponentFriendCode(currentRoom.opponentFriendCode ?? '');
+            })
+            .catch(() => {
+                console.error('채팅방 상대방 정보 조회 실패');
+            });
+    }, [roomId, opponentName, opponentFriendCode]);
 
     // ── 2. STOMP 연결 ────────────────────────────────────
     useEffect(() => {
@@ -143,8 +179,19 @@ const ChatRoom = () => {
     // ── 5. GIFT 타입 메시지에서 uuid 파싱 ───────────────
     // BE에서 "선물이 도착했어요! 🎁 {uuid}" 형태로 저장
     const parseGiftUuid = (content) => {
-        const parts = content?.split('🎁 ');
+        const parts = content?.split('🎁');
         return parts?.length > 1 ? parts[1].trim() : null;
+    };
+
+    // ── 6. 친구 위시리스트 이동 ─────────────────────────
+    const handleGiftMenuClick = () => {
+        if (!opponentFriendCode) {
+            alert('상대방 친구 코드를 불러오지 못했습니다.');
+            return;
+        }
+
+        setMenuOpen(false);
+        navigate(`/wishlist/friends/${opponentFriendCode}`);
     };
 
     // ── 렌더링 ────────────────────────────────────────────
@@ -209,6 +256,66 @@ const ChatRoom = () => {
 
             {/* 입력창 */}
             <S.InputArea>
+                <div
+                    style={{
+                        position: 'relative',
+                        display: 'flex',
+                        alignItems: 'center',
+                    }}
+                >
+                    <button
+                        type="button"
+                        onClick={() => setMenuOpen(prev => !prev)}
+                        style={{
+                            width: '36px',
+                            height: '36px',
+                            border: '1px solid #ddd',
+                            borderRadius: '50%',
+                            background: '#fff',
+                            cursor: 'pointer',
+                            fontSize: '22px',
+                            lineHeight: '1',
+                            marginRight: '8px',
+                        }}
+                    >
+                        +
+                    </button>
+
+                    {menuOpen && (
+                        <div
+                            style={{
+                                position: 'absolute',
+                                left: 0,
+                                bottom: '46px',
+                                width: '150px',
+                                padding: '8px',
+                                border: '1px solid #e5e5e5',
+                                borderRadius: '12px',
+                                background: '#fff',
+                                boxShadow: '0 6px 18px rgba(0,0,0,0.12)',
+                                zIndex: 30,
+                            }}
+                        >
+                            <button
+                                type="button"
+                                onClick={handleGiftMenuClick}
+                                style={{
+                                    width: '100%',
+                                    padding: '10px 12px',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    background: 'transparent',
+                                    textAlign: 'left',
+                                    cursor: 'pointer',
+                                    fontSize: '14px',
+                                }}
+                            >
+                                🎁 선물하기
+                            </button>
+                        </div>
+                    )}
+                </div>
+
                 <S.TextInput
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
@@ -216,6 +323,7 @@ const ChatRoom = () => {
                     placeholder="메시지를 입력하세요..."
                     maxLength={500}
                 />
+
                 <S.SendButton
                     onClick={sendMessage}
                     disabled={!connected || !input.trim()}

@@ -49,13 +49,21 @@ export const BackButton = styled.button`
 `;
 
 export const LogoText = styled.div`
-    font-family: 'Pretendard Variable', Pretendard, sans-serif;
+    margin: 0;
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-family: 'Mbc1961', sans-serif;
     font-size: 22px;
     font-weight: 500;
     line-height: 23px;
     letter-spacing: 1.5px;
+    text-transform: uppercase;
 
-    color: #f5c542;
+    color: #FF8D28;
 
     cursor: pointer;
 `;

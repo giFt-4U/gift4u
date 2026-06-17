@@ -12,7 +12,7 @@ import SearchPage from '../pages/SearchPage';
 
 import CartPage from '../pages/CartPage';
 import OrderPage from '../pages/OrderPage';
-import WishlistPage from '../pages/WishlistPage';
+import WishlistPage from '../pages/wishlist/WishlistPage';
 
 import ChatAddFriend from '../pages/chat/ChatAddFriend';
 import ChatList from '../pages/chat/ChatList';
@@ -28,6 +28,8 @@ import PaymentCheckoutPage from '../pages/payment/PaymentCheckoutPage';
 import PaymentSuccess from '../pages/payment/PaymentSuccess';
 
 import FriendRequestList from '../pages/friend/FriendRequstList';
+
+import FriendWishlistPage from '../pages/wishlist/FriendWishlistPage';
 
 import LoginPage from '../pages/user/LoginPage';
 import SignupPage from '../pages/user/SignupPage';
@@ -61,6 +63,8 @@ export default function Router() {
                         <Route path="order" element={<OrderPage />} />
                         <Route path="wishlist" element={<WishlistPage />} />
 
+                        {/* FRIEND WISHLIST */}
+                        <Route path="wishlist/friends/:friendCode" element={<FriendWishlistPage />} />
                         {/* CHAT */}
                         <Route path="chat/add" element={<ChatAddFriend />} />
                         <Route path="chat" element={<ChatList />} />
@@ -90,7 +94,7 @@ export default function Router() {
 
                         {/* FRIEND */}
                         <Route path="friends/requestlist" element={<FriendRequestList />} />
-                        <Route path="/friends/select" element={<FriendsSelect />} />
+                        <Route path="friends/select" element={<FriendsSelect />} />
 
                         {/* SEARCH */}
                         <Route path="search" element={<SearchPage />} />

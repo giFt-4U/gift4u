@@ -1,7 +1,9 @@
 package com.gift4u.app.domain.gift.service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -189,6 +191,47 @@ public class GiftService {
 					return GiftResponse.from(gift, giftMessage);
 				})
 				.toList();
+	}
+	
+
+	@Transactional
+	public Map<String, Object> createGiftFlow(GiftCreateRequest request) {
+	    // 1. 회원 및 상품 검증
+        User sender = userRepository.findById(request.getSenderId()) 
+                .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
+	    
+	    User receiver = userRepository.findById(request.getReceiverId()) 
+	        .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
+	
+	    Product product = productRepository.findById(request.getProductId()) 
+	        .orElseThrow(() -> new GlobalException(ErrorCode.PRODUCT_NOT_FOUND));
+	    
+	    // 2. 선물 Entity 저장
+	    Gift gift = Gift.builder()
+	            .sender(sender)
+	            .receiver(receiver)
+	            .product(product)
+	            .build();
+	    giftRepository.save(gift);
+	    
+	    // 3. 메시지 카드 저장
+	    GiftMessage giftMessage = GiftMessage.builder()
+	            .gift(gift)
+	            .message(request.getMessage())
+	            .cardDesignType(request.getCardDesignType())
+	            .build();
+	    giftMessageRepository.save(giftMessage);
+	    
+        // 채팅방 자동 연동 및 실시간 메시지 발송
+        Long roomId = chatService.sendGiftMessage(gift);
+	    
+        // 결과 패키징 반환
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("status", "SUCCESS");
+        responseMap.put("roomId", roomId); 
+        responseMap.put("gift", GiftResponse.from(gift)); 
+	    
+        return responseMap;
 	}
 	
 }

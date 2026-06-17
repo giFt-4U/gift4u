@@ -22,6 +22,19 @@ export default function PaymentSuccess() {
 
         const token = localStorage.getItem("token");
 
+        let myUserId = null;
+        if (token) {
+            try {
+                const payload = token.split('.')[1];
+                const decoded = JSON.parse(atob(payload));
+                console.log("디코딩된 토큰 정보:", decoded);
+
+                myUserId = decoded.sub;
+            } catch (e) {
+                console.error("토큰 파싱 에러:", e);
+            }
+        }
+
         // 1단계: 내 스프링 백엔드로 토스 결제 승인 + 선물 생성 요청 통합 통신
         fetch(`${API_URL}/api/v1/payments/confirm`, {
             method: "POST",
@@ -33,7 +46,11 @@ export default function PaymentSuccess() {
                 paymentKey,
                 orderId,
                 amount: Number(amount),
-                giftInfo: giftData
+                giftInfo: giftData,
+                giftInfo: {
+                    ...giftData,
+                    senderId: Number(myUserId)
+                }
             }),
         })
             .then((res) => {
@@ -41,13 +58,19 @@ export default function PaymentSuccess() {
                 return res.json();
             })
             .then((data) => {
-                setStatus("🎉 결제 완료! 선물이 성공적으로 전송되었습니다.");
+                setStatus("🎉 결제 완료! 채팅방으로 이동합니다.");
                 localStorage.removeItem("pending_gift_data");
 
-                // 2단계: 선물 저장과 채팅 발송
-                setTimeout(() => {
-                    navigate('/chat');
-                }, 1500);
+                // 핵심: 백엔드가 응답으로 준 데이터에서 roomId를 추출합니다.
+                const targetRoomId = data.roomId;
+
+                // 딜레이 없이 즉시 해당 채팅방으로 이동시킵니다.
+                // 채팅방에 진입(Mount)하면서 useEffect가 백엔드 DB의 최신 선물 메시지를 긁어옵니다!
+                if (targetRoomId) {
+                    navigate(`/chat/${targetRoomId}`);
+                } else {
+                    navigate(`/chat/`); // 폴백
+                }
             })
             .catch((err) => {
                 console.error(err);

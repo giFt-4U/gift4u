@@ -23,7 +23,10 @@ const ChatList = () => {
 
     useEffect(() => {
         getChatRooms()
-            .then((res) => setRooms(res.data))
+            .then((res) => {
+                console.log("채팅방 목록 응답:", res.data);
+                setRooms(res.data);
+            })
             .catch(() => setError('채팅 목록을 불러오지 못했습니다.'))
             .finally(() => setLoading(false));
     }, []);
@@ -75,8 +78,12 @@ const ChatList = () => {
     // 채팅방 클릭 시 읽음 처리
     const handleRoomClick = (room) => {
         localStorage.setItem(`chat_read_${room.roomId}`, new Date().toISOString());
+
         navigate(`/chat/${room.roomId}`, {
-            state: { partnerName: room.opponentNickname }
+            state: {
+                partnerName: room.opponentNickname,
+                opponentFriendCode: room.opponentFriendCode,
+            }
         });
     };
 
