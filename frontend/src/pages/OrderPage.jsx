@@ -1,7 +1,7 @@
 // OrderPage.jsx
 
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import {
     PageWrapper,
@@ -35,14 +35,25 @@ import {
 const OrderPage = () => {
 
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [orderItems, setOrderItems] = useState([]);
 
     useEffect(() => {
-        const savedItems =
-            JSON.parse(localStorage.getItem("orderItems")) || [];
+        try {
+            const savedItems = JSON.parse(
+                localStorage.getItem("orderItems") || "[]"
+            );
 
-        setOrderItems(savedItems);
+            setOrderItems(
+                Array.isArray(savedItems) ? savedItems : []
+            );
+        } catch (error) {
+            console.error("주문 상품 불러오기 실패:", error);
+
+            localStorage.removeItem("orderItems");
+            setOrderItems([]);
+        }
     }, []);
 
     const totalProductPrice = orderItems.reduce((acc, cur) => {
@@ -55,14 +66,54 @@ const OrderPage = () => {
     const deliveryFee = 0;
     const finalPrice = totalProductPrice + deliveryFee;
 
-    const handleMessageCard = () => {
+    // 친구 위시리스트에서 온 경우 친구 코드 유지
+    const receiverFriendCode =
+        location.state?.receiverFriendCode ||
+        orderItems[0]?.receiverFriendCode ||
+        "";
+
+    const fromFriendWishlist =
+        location.state?.fromFriendWishlist ||
+        orderItems[0]?.fromFriendWishlist ||
+        false;
+
+    const handleSelectFriend = (productId, productName) => {
+        navigate('/friends/select', {
+            state: {
+                productId,
+                productName,
+                productPrice: finalPrice
+            },
+        });
+    };
+
+    // 선물할 친구 선택하기 버튼 클릭
+    const handleMessageButtonClick = () => {
         if (orderItems.length === 0) {
-            alert("주문할 상품이 없습니다.");
-            navigate("/cart");
+            alert('주문할 상품이 없습니다.');
             return;
         }
 
-        navigate("/gifts/card");
+        const item = orderItems[0];
+
+        // 이미 친구 위시리스트에서 넘어온 경우 친구 재선택 없이 친구 코드 전달
+        if (receiverFriendCode) {
+            navigate('/friends/select', {
+                state: {
+                    productId: item.id,
+                    productName: item.name,
+                    productPrice: finalPrice,
+                    receiverFriendCode,
+                    fromFriendWishlist,
+                    skipSelect: true,
+                },
+            });
+
+            return;
+        }
+
+        // 일반 상품 상세페이지에서 온 경우 기존처럼 친구 선택
+        handleSelectFriend(item.id, item.name);
     };
 
     return (
@@ -105,41 +156,45 @@ const OrderPage = () => {
                         주문할 상품이 없습니다.
                     </div>
                 ) : (
-                    orderItems.map(item => (
-                        <OrderItem key={item.id}>
+                    orderItems.map(item => {
+                        const imageSrc = item.imageUrl || item.image_url || "/images/default.png";
 
-                            <ProductImage
-                                src={item.imageUrl}
-                                alt={item.name}
-                                onError={(e) => {
-                                    e.target.src = "/images/default.png";
-                                }}
-                            />
+                        return (
+                            <OrderItem key={item.id}>
 
-                            <ProductInfo>
-                                <ProductName>
-                                    [선물 상품] {item.name}
-                                </ProductName>
+                                <ProductImage
+                                    src={imageSrc}
+                                    alt={item.name}
+                                    onError={(e) => {
+                                        e.target.src = "/images/default.png";
+                                    }}
+                                />
 
-                                <QuantityText>
-                                    수량 {item.quantity || 1}개
-                                </QuantityText>
+                                <ProductInfo>
+                                    <ProductName>
+                                        [선물 상품] {item.name}
+                                    </ProductName>
 
-                                <PriceText>
-                                    상품구매금액:
-                                    {" "}
-                                    <strong>
-                                        {(
-                                            Number(item.price || 0) *
-                                            (item.quantity || 1)
-                                        ).toLocaleString()}
-                                    </strong>
-                                    원
-                                </PriceText>
-                            </ProductInfo>
+                                    <QuantityText>
+                                        수량 {item.quantity || 1}개
+                                    </QuantityText>
 
-                        </OrderItem>
-                    ))
+                                    <PriceText>
+                                        상품구매금액:
+                                        {" "}
+                                        <strong>
+                                            {(
+                                                Number(item.price || 0) *
+                                                (item.quantity || 1)
+                                            ).toLocaleString()}
+                                        </strong>
+                                        원
+                                    </PriceText>
+                                </ProductInfo>
+
+                            </OrderItem>
+                        );
+                    })
                 )}
 
             </OrderListSection>
@@ -183,9 +238,11 @@ const OrderPage = () => {
 
                 <MessageButton
                     type="button"
-                    onClick={handleMessageCard}
+                    onClick={handleMessageButtonClick}
                 >
-                    메시지 카드 작성하기
+                    {receiverFriendCode
+                        ? "선물 메시지 작성하기"
+                        : "선물할 친구 선택하기"}
                 </MessageButton>
             </BottomOrderBox>
 

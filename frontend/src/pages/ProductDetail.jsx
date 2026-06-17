@@ -1,7 +1,7 @@
-//ProductDetail.jsx
+// ProductDetail.jsx
 
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
 
 import {
@@ -19,8 +19,13 @@ const ProductDetail = () => {
 
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [product, setProduct] = useState(null);
+
+    // 친구 위시리스트에서 넘어온 경우 친구 코드 유지
+    const receiverFriendCode = location.state?.receiverFriendCode || "";
+    const fromFriendWishlist = location.state?.fromFriendWishlist || false;
 
     useEffect(() => {
         axiosInstance
@@ -58,6 +63,12 @@ const ProductDetail = () => {
         const orderItem = {
             ...product,
             quantity: 1,
+
+            // 친구 위시리스트에서 온 경우 주문페이지까지 친구 코드 전달
+            ...(receiverFriendCode && {
+                receiverFriendCode,
+                fromFriendWishlist,
+            }),
         };
 
         localStorage.setItem(
@@ -65,23 +76,19 @@ const ProductDetail = () => {
             JSON.stringify([orderItem])
         );
 
-        navigate("/order");
+        navigate("/order", {
+            state: {
+                ...(receiverFriendCode && {
+                    receiverFriendCode,
+                    fromFriendWishlist,
+                }),
+            },
+        });
     };
 
     if (!product) {
         return <div>로딩중...</div>;
     }
-
-    // 친구 위시리스트에서 상품 상세페이지로 이동
-    const handleGift = (productId) => {
-        navigate(`/products/${productId}`, {
-            state: {
-                fromFriendWishlist: true,
-                receiverFriendCode: friendCode,
-            },
-        });
-    };
-
 
     const brandName = product.brandName || product.brand_name;
     const imageSrc = product.imageUrl || product.image_url || "/images/default.png";
@@ -114,7 +121,7 @@ const ProductDetail = () => {
                 </h2>
 
                 <p className="product-price">
-                    {product.price?.toLocaleString()}원
+                    {Number(product.price || 0).toLocaleString()}원
                 </p>
             </ProductInfoArea>
 
