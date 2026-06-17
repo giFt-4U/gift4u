@@ -40,11 +40,11 @@ const MainBanner = () => {
 
         width: "42px",
         height: "42px",
+        background: "transparent",
 
         border: "none",
         borderRadius: "50%",
 
-        backgroundColor: "rgba(0, 0, 0, 0.38)",
         color: "#ffffff",
 
         display: "flex",
@@ -58,7 +58,6 @@ const MainBanner = () => {
         cursor: "pointer",
         padding: 0,
 
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.25)",
     };
 
     return (
@@ -159,11 +158,9 @@ const MainBanner = () => {
                             borderRadius: "999px",
                             padding: 0,
                             cursor: "pointer",
-                            backgroundColor:
-                                i === index
-                                    ? "#ffffff"
-                                    : "rgba(255, 255, 255, 0.55)",
-                            transition: "0.3s",
+                            transition: "all 0.3s ease",
+
+                            backgroundColor: i === index ? "#333333" : "#e0e0e0",
                         }}
                     />
                 ))}

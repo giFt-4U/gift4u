@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
 import { getMe } from '../../api/auth';
+import { resolveUserRole, isAdminRole } from '../../utils/authUtils';
 import { getFriendRequests } from '../../api/chatApi';
 import {
     MyPageContainer,
@@ -41,7 +42,11 @@ const MyPage = () => {
 
     useEffect(() => {
         getMe()
-            .then((res) => setUser(res.data))
+            .then((res) => {
+                const token = localStorage.getItem('token');
+                const role = resolveUserRole(res.data, token);
+                setUser({ ...res.data, role });
+            })
             .catch(() => {
                 clearToken();
                 navigate('/login');
@@ -53,19 +58,39 @@ const MyPage = () => {
         navigate('/login');
     };
 
+    const copyText = async (text) => {
+        if (navigator.clipboard?.writeText && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+            return;
+        }
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        const copied = document.execCommand('copy');
+        document.body.removeChild(textarea);
+        if (!copied) {
+            throw new Error('copy failed');
+        }
+    };
+
     const onCopyFriendCode = async () => {
         if (!user?.friendCode) return;
         try {
-            await navigator.clipboard.writeText(user.friendCode);
+            await copyText(user.friendCode);
             setCopied(true);
             setTimeout(() => setCopied(false), 2500);
         } catch (error) {
             console.error(error);
-            alert('복사에 실패했어요. 다시 시도해주세요.');
+            alert('복사에 실패했어요. 코드를 길게 눌러 직접 복사해주세요.');
         }
     };
 
     const isKakao = user?.loginProvider === 'KAKAO';
+    const isAdmin = isAdminRole(user?.role);
     const initial = user?.nickname?.charAt(0)?.toUpperCase() || '?';
 
     // 친구요청 개수
@@ -136,6 +161,13 @@ const MyPage = () => {
             </ProfileSection>
 
             <MenuSection>
+                {isAdmin && (
+                    <MenuItem onClick={() => navigate('/admin')}>
+                        관리자 페이지
+                        <span className="arrow">›</span>
+                    </MenuItem>
+                )}
+
                 <MenuItem onClick={() => navigate('/mypage/edit')}>
                     회원정보 수정
                     <span className="arrow">›</span>
@@ -161,6 +193,16 @@ const MyPage = () => {
 
                 <MenuItem onClick={() => navigate('/mypage/gifts')}>
                     받은 선물함
+                    <span className="arrow">›</span>
+                </MenuItem>
+                {!isKakao && (
+                    <MenuItem onClick={() => navigate('/mypage/password')}>
+                        비밀번호 변경
+                        <span className="arrow">›</span>
+                    </MenuItem>
+                )}
+                <MenuItem onClick={() => navigate('/mypage/withdraw')} $danger>
+                    회원탈퇴
                     <span className="arrow">›</span>
                 </MenuItem>
             </MenuSection>
