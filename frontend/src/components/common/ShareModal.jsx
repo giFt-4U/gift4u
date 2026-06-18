@@ -77,26 +77,17 @@ const ShareModal = ({ open, onClose, shareUrl, kakao, smsText }) => {
             return;
         }
 
+        // feed 카드 description에는 URL이 화면에 안 보이는 경우가 많아 text 템플릿 사용
+        const shareText = `${kakao.title}\n${kakao.description}\n${shareUrl}`;
+
         window.Kakao.Share.sendDefault({
-            objectType: 'feed',
-            content: {
-                title: kakao.title,
-                description: kakao.description,
-                imageUrl: kakao.imageUrl,
-                link: {
-                    mobileWebUrl: shareUrl,
-                    webUrl: shareUrl,
-                },
+            objectType: 'text',
+            text: shareText,
+            link: {
+                mobileWebUrl: shareUrl,
+                webUrl: shareUrl,
             },
-            buttons: [
-                {
-                    title: kakao.buttonTitle || '따숨품에서 보기',
-                    link: {
-                        mobileWebUrl: shareUrl,
-                        webUrl: shareUrl,
-                    },
-                },
-            ],
+            buttonTitle: kakao.buttonTitle || '따숨품에서 보기',
         });
         onClose();
     };
