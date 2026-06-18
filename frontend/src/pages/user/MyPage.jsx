@@ -21,16 +21,42 @@ import {
     FriendCodeRow,
     FriendCode,
     CopyFriendCodeButton,
+    ShareFriendCodeButton,
     MenuSection,
     MenuItem,
     MenuRight,
     RedDot,
     LogoutButton,
 } from '../../styles/MyPageStyle';
+import ShareModal from '../../components/common/ShareModal';
+import { copyText, buildFriendInviteUrl, getDefaultShareImageUrl } from '../../utils/shareUtils';
 
 const KakaoIcon = () => (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
         <path d="M12 3C6.48 3 2 6.693 2 11.215c0 2.82 1.682 5.302 4.243 6.84-.16.558-.94 3.394-.97 3.607-.038.28.104.557.382.557.18 0 .312-.08.443-.17l4.27-2.835c.685.1 1.386.15 2.1.15C17.52 19.363 22 15.67 22 11.215 22 6.693 17.52 3 12 3z" />
+    </svg>
+);
+
+const CopyIcon = () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+        <rect x="8" y="8" width="12" height="12" rx="2" />
+        <path d="M6 16V6a2 2 0 0 1 2-2h10" strokeLinecap="round" />
+    </svg>
+);
+
+const CheckIcon = () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+        <path d="M5 12.5 10 17.5 19 7.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+);
+
+const ShareIcon = () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+        <circle cx="6" cy="12" r="2.2" />
+        <circle cx="17" cy="7" r="2.2" />
+        <circle cx="17" cy="17" r="2.2" />
+        <path d="M8.2 11.1 14.8 8.2" strokeLinecap="round" />
+        <path d="M8.2 12.9 14.8 15.8" strokeLinecap="round" />
     </svg>
 );
 
@@ -39,6 +65,7 @@ const MyPage = () => {
     const { user, setUser, clearToken } = useAuthStore();
     const [hasNewRequest, setHasNewRequest] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [shareOpen, setShareOpen] = useState(false);
 
     useEffect(() => {
         getMe()
@@ -58,25 +85,6 @@ const MyPage = () => {
         navigate('/login');
     };
 
-    const copyText = async (text) => {
-        if (navigator.clipboard?.writeText && window.isSecureContext) {
-            await navigator.clipboard.writeText(text);
-            return;
-        }
-        const textarea = document.createElement('textarea');
-        textarea.value = text;
-        textarea.setAttribute('readonly', '');
-        textarea.style.position = 'fixed';
-        textarea.style.opacity = '0';
-        document.body.appendChild(textarea);
-        textarea.select();
-        const copied = document.execCommand('copy');
-        document.body.removeChild(textarea);
-        if (!copied) {
-            throw new Error('copy failed');
-        }
-    };
-
     const onCopyFriendCode = async () => {
         if (!user?.friendCode) return;
         try {
@@ -92,6 +100,7 @@ const MyPage = () => {
     const isKakao = user?.loginProvider === 'KAKAO';
     const isAdmin = isAdminRole(user?.role);
     const initial = user?.nickname?.charAt(0)?.toUpperCase() || '?';
+    const friendInviteUrl = user?.friendCode ? buildFriendInviteUrl(user.friendCode) : '';
 
     // 친구요청 개수
     useEffect(() => {
@@ -147,8 +156,16 @@ const MyPage = () => {
                             aria-label={copied ? '복사 완료' : '코드 복사'}
                             title={copied ? '복사 완료' : '코드 복사'}
                         >
-                            {copied ? '✓' : '⧉'}
+                            {copied ? <CheckIcon /> : <CopyIcon />}
                         </CopyFriendCodeButton>
+                        <ShareFriendCodeButton
+                            type="button"
+                            onClick={() => setShareOpen(true)}
+                            aria-label="친구 코드 공유"
+                            title="친구 코드 공유"
+                        >
+                            <ShareIcon />
+                        </ShareFriendCodeButton>
                     </FriendCodeRow>
                 )}
 
@@ -208,6 +225,21 @@ const MyPage = () => {
             </MenuSection>
 
             <LogoutButton onClick={onLogout}>로그아웃</LogoutButton>
+
+            {user?.friendCode && (
+                <ShareModal
+                    open={shareOpen}
+                    onClose={() => setShareOpen(false)}
+                    shareUrl={friendInviteUrl}
+                    kakao={{
+                        title: `[따숨품] ${user.nickname || '친구'}님의 친구 초대`,
+                        description: `친구 코드: ${user.friendCode}\n친구 추가 후 선물을 주고받아보세요!`,
+                        imageUrl: getDefaultShareImageUrl(),
+                        buttonTitle: '친구 추가하기',
+                    }}
+                    smsText={`[따숨품] 친구로 추가해주세요!\n친구 코드: ${user.friendCode}\n${friendInviteUrl}`}
+                />
+            )}
         </MyPageContainer>
     );
 };

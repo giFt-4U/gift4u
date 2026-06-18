@@ -122,14 +122,20 @@ export const CopyFriendCodeButton = styled.button`
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 15px;
     transition: all 0.15s;
     cursor: pointer;
+
+    svg {
+        width: 15px;
+        height: 15px;
+    }
 
     &:active {
         transform: scale(0.95);
     }
 `;
+
+export const ShareFriendCodeButton = styled(CopyFriendCodeButton)``;
 
 export const ProfileBadge = styled.span`
     display: inline-flex;
