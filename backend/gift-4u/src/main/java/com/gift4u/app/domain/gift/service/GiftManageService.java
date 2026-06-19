@@ -44,7 +44,6 @@ public class GiftManageService {
         Payment payment = paymentService.confirmPayment(confirmRequest);
 
         // 2. 승인 완료된 결제 객체를 매핑하여 선물 생성 (GiftService 호출)
-        // ※ giftService.createGift 메서드가 파라미터로 Payment 객체를 받을 수 있도록 수정되어야 합니다.
         GiftResponse giftResponse = giftService.createGift(senderId, confirmRequest.getGiftInfo(), payment);
 
         // 3. 채팅 메시지 발송

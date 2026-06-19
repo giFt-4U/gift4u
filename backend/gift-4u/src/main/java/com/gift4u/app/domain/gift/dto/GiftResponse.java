@@ -50,10 +50,10 @@ public class GiftResponse {
     // 기존 호환용
     private List<String> bundleProductNames;
 
-    // 프론트에서 상품 상세 API 재조회할 때 사용 가능
+    // FE 상품 상세 API 재조회할 때 사용 가능
     private List<Long> bundleProductIds;
 
-    // 권장: 프론트가 바로 렌더링할 수 있는 상품 묶음
+    // FE 바로 렌더링할 수 있는 상품 묶음
     private List<BundleProductResponse> bundleProducts;
 
     @Getter
