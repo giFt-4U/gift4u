@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { copyText, initKakaoSdk, canUseKakaoFeedImage } from '../../utils/shareUtils';
+import { copyText, initKakaoSdk } from '../../utils/shareUtils';
 import {
     ShareOverlay,
     ShareModalBox,
@@ -79,45 +79,19 @@ const ShareModal = ({ open, onClose, shareUrl, kakao, smsText }) => {
 
         onClose();
 
-        const link = {
-            mobileWebUrl: shareUrl,
-            webUrl: shareUrl,
-        };
+        const buttonTitle = kakao.buttonTitle || '따숨품에서 보기';
+        const shareText = kakao.linkGuide
+            ? `${kakao.title}\n${kakao.description}\n\n아래 링크를 클릭하세요\n${shareUrl}`
+            : `${kakao.title}\n${kakao.description}\n${shareUrl}`;
 
         try {
-            const buttonTitle = kakao.buttonTitle || '따숨품에서 보기';
-            const useFeed = kakao.dualShare && kakao.imageUrl && canUseKakaoFeedImage(kakao.imageUrl);
-
-            // 상품(서버): feed(이미지+상품명+가격) → text(링크 안내)
-            if (useFeed) {
-                await window.Kakao.Share.sendDefault({
-                    objectType: 'feed',
-                    content: {
-                        title: kakao.title,
-                        description: kakao.description,
-                        imageUrl: kakao.imageUrl,
-                        link,
-                    },
-                });
-
-                await window.Kakao.Share.sendDefault({
-                    objectType: 'text',
-                    text: `따숨품에서 보기\n아래 링크를 클릭하세요\n${shareUrl}`,
-                    link,
-                    buttonTitle: buttonTitle,
-                });
-                return;
-            }
-
-            // 상품(로컬) / 친구코드: text 한 번 (feed 이미지는 localhost에서 불가)
-            const shareText = kakao.dualShare
-                ? `${kakao.title}\n${kakao.description}\n\n따숨품에서 보기\n아래 링크를 클릭하세요\n${shareUrl}`
-                : `${kakao.title}\n${kakao.description}\n${shareUrl}`;
-
             await window.Kakao.Share.sendDefault({
                 objectType: 'text',
                 text: shareText,
-                link,
+                link: {
+                    mobileWebUrl: shareUrl,
+                    webUrl: shareUrl,
+                },
                 buttonTitle,
             });
         } catch {

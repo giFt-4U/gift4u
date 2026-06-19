@@ -29,7 +29,7 @@ import {
     LogoutButton,
 } from '../../styles/MyPageStyle';
 import ShareModal from '../../components/common/ShareModal';
-import { copyText, buildFriendInviteUrl, getDefaultShareImageUrl } from '../../utils/shareUtils';
+import { copyText, buildFriendInviteUrl } from '../../utils/shareUtils';
 
 const KakaoIcon = () => (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -234,7 +234,6 @@ const MyPage = () => {
                     kakao={{
                         title: `[따숨품] ${user.nickname || '친구'}님의 친구 초대`,
                         description: `친구 코드: ${user.friendCode}\n친구 추가 후 선물을 주고받아보세요!`,
-                        imageUrl: getDefaultShareImageUrl(),
                         buttonTitle: '친구 추가하기',
                     }}
                     smsText={`[따숨품] 친구로 추가해주세요!\n친구 코드: ${user.friendCode}\n${friendInviteUrl}`}
