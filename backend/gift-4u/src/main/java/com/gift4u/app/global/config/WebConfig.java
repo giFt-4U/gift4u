@@ -24,5 +24,10 @@ public class WebConfig implements WebMvcConfigurer {
 
 		registry.addResourceHandler("/uploads/profiles/**")
 				.addResourceLocations(location);
+
+		// 메시지 카드 전용 자원 매핑
+        String messageLocation = "file:" + System.getProperty("user.dir") + "/uploads/messages/";
+        registry.addResourceHandler("/uploads/messages/**")
+                .addResourceLocations(messageLocation);
 	}
 }

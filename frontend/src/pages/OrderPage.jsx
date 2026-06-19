@@ -55,11 +55,12 @@ const OrderPage = () => {
     const deliveryFee = 0;
     const finalPrice = totalProductPrice + deliveryFee;
 
-    const handleSelectFriend = (productId, productName) => {
+    const handleSelectFriend = (productId, productName, productImageUrl) => {
         navigate('/friends/select', {
             state: {
                 productId,
                 productName,
+                productImageUrl,
                 productPrice: finalPrice
             },
         });

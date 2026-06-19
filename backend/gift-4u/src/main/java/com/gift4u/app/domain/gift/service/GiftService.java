@@ -1,13 +1,16 @@
 package com.gift4u.app.domain.gift.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.gift4u.app.domain.Product.entity.Product;
 import com.gift4u.app.domain.Product.repository.ProductRepository;
@@ -21,6 +24,8 @@ import com.gift4u.app.domain.gift.entity.GiftShipping;
 import com.gift4u.app.domain.gift.repository.GiftMessageRepository;
 import com.gift4u.app.domain.gift.repository.GiftRepository;
 import com.gift4u.app.domain.gift.repository.GiftShippingRepository;
+import com.gift4u.app.domain.payment.entity.Payment;
+import com.gift4u.app.domain.payment.service.PaymentService;
 import com.gift4u.app.domain.user.entity.User;
 import com.gift4u.app.domain.user.repository.UserRepository;
 import com.gift4u.app.global.exception.ErrorCode;
@@ -45,8 +50,10 @@ public class GiftService {
 	private final UserRepository userRepository;
 	private final ProductRepository productRepository;
 	
-	@Lazy // ChatService <> GiftService 순환참조방지
 	private final ChatService chatService;
+	private final PaymentService paymentService;
+	
+	private final String uploadDir = System.getProperty("user.dir") + "/uploads/messages/";
 	
 	
 	/** 선물 생성 (REQ-011 / 010)
@@ -56,7 +63,7 @@ public class GiftService {
 	 * 3. 생성된 선물 정보 반환 (uuid 포함-> FE에서 링크 생성에 이용)
 	 */
 	@Transactional
-	public GiftResponse createGift (Long senderId, GiftCreateRequest request) {
+	public GiftResponse createGift (Long senderId, GiftCreateRequest request, Payment payment) {
 
         User sender = userRepository.findById(senderId) 
             .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
@@ -64,14 +71,15 @@ public class GiftService {
         User recevier = userRepository.findById(request.getReceiverId()) 
             .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
 
-	        Product product = productRepository.findById(request.getProductId()) 
-	            .orElseThrow(() -> new GlobalException(ErrorCode.PRODUCT_NOT_FOUND));
-		
+        Product product = productRepository.findById(request.getProductId()) 
+            .orElseThrow(() -> new GlobalException(ErrorCode.PRODUCT_NOT_FOUND));
+
 		// 선물 생성
 		Gift gift = Gift.builder()
 				.sender(sender)
 				.receiver(recevier)
 				.product(product)
+		        .payment(payment)
 				.build();
 		giftRepository.save(gift);
 		
@@ -81,13 +89,14 @@ public class GiftService {
 				.gift(gift)
 				.message(request.getMessage())
 				.cardDesignType(request.getCardDesignType())
+		        .uploadedImgUrl(request.getUploadedImgUrl())
 				.build();
 		giftMessageRepository.save(giftMessage);
 		
 		// 선물 생성 시 채팅방에 GIFT 메시지 자동 전송 (REQ-C05)
 		chatService.sendGiftMessage(gift);
 		
-		return GiftResponse.from(gift);
+		return GiftResponse.from(gift, giftMessage);
 	}
 	
 	
@@ -115,12 +124,12 @@ public class GiftService {
 	    );
 	    
 	    // 5. 함께 결제된 모든 상품들의 이름을 추출하여 리스트화
-	    List<String> bundleProductNames = bundleGifts.stream()
-	            .map(bGift -> bGift.getProduct().getName())
+	    List<GiftResponse.BundleProductResponse> bundleProducts = bundleGifts.stream()
+	            .map(bGift -> GiftResponse.BundleProductResponse.from(bGift.getProduct()))
 	            .toList();
 	            
 	    // 6. 묶음 정보 및 메시지 카드가 통합된 빌더 메서드로 응답 반환
-	    return GiftResponse.from(gift, giftMessage, bundleProductNames);
+	    return GiftResponse.from(gift, giftMessage, bundleProducts);
 	}
 	
 	
@@ -168,32 +177,66 @@ public class GiftService {
 	}
 	
 	
+	/** 선물 거절
+	 * 1. uuid 선물 조회
+	 * 2. 수령자 본인 확인
+	 * 3. Gift.refuse() 호출 - 상태/만료 검증은 엔티티 내부에서 처리
+	 */
+	@Transactional
+	public GiftResponse refuseGift(Long currentUserId, String uuid) {
+	    Gift gift = giftRepository.findByUuid(uuid)
+	            .orElseThrow(() -> new GlobalException(ErrorCode.GIFT_LINK_INVALID));
+	    
+	    if(!gift.getReceiver().getId().equals(currentUserId)) {
+	        throw new GlobalException(ErrorCode.FORBIDDEN);
+	    }
+	    
+	    // 1. 거절 상태 변경
+	    gift.refuse();
+	    
+	    // 2. 환불 연동
+	    Payment payment = gift.getPayment();
+	    if (payment != null) {
+	        paymentService.cancelPayment(payment.getPaymentKey(), "수령자 선물 거절로 인한 환불");
+	        payment.cancel();
+	    }
+	    
+	    GiftMessage giftMessage = giftMessageRepository.findByGiftId(gift.getId()).orElse(null);
+	    return GiftResponse.from(gift, giftMessage);
+	}
+	
+	
 	/** 내가 보낸 선물 목록 조회 (REQ-012)	 **/
 	public List<GiftResponse> getSentGifts(Long senderId){
-		return giftRepository.findAllBySenderId(senderId)
-				.stream()
-				.map(gift->{
-					GiftMessage giftMessage = giftMessageRepository.findByGiftId(gift.getId())
-							.orElseThrow(()-> new GlobalException(ErrorCode.INTERNAL_SERVER_ERROR));
-					return GiftResponse.from(gift, giftMessage);
-				})
-				.toList();
+	    return giftRepository.findAllBySenderId(senderId)
+	            .stream()
+	            .map(gift -> {
+	                GiftMessage giftMessage = giftMessageRepository.findByGiftId(gift.getId())
+	                        .orElse(null);
+	                return GiftResponse.from(gift, giftMessage);
+	            })
+	            .toList();
 	}
 	
 	
 	/** 내가 받은 선물 목록 조회 (REQ-013) **/
 	public List<GiftResponse> getReceivedGifts(Long receiverId){
-		return giftRepository.findAllByReceiverId(receiverId)
-				.stream()
-				.map(gift-> {
-					GiftMessage giftMessage = giftMessageRepository.findByGiftId(gift.getId())
-							.orElseThrow(()-> new GlobalException(ErrorCode.INTERNAL_SERVER_ERROR));
-					return GiftResponse.from(gift, giftMessage);
-				})
-				.toList();
+	    return giftRepository.findAllByReceiverId(receiverId)
+	            .stream()
+	            .map(gift -> {
+	                GiftMessage giftMessage = giftMessageRepository.findByGiftId(gift.getId())
+	                        .orElse(null);
+	                return GiftResponse.from(gift, giftMessage);
+	            })
+	            .toList();
 	}
 	
 
+	/**
+	 * 선물 전송 (결제 toss payment)
+	 * @param request
+	 * @return
+	 */
 	@Transactional
 	public Map<String, Object> createGiftFlow(GiftCreateRequest request) {
 	    // 1. 회원 및 상품 검증
@@ -219,6 +262,7 @@ public class GiftService {
 	            .gift(gift)
 	            .message(request.getMessage())
 	            .cardDesignType(request.getCardDesignType())
+	            .uploadedImgUrl(request.getUploadedImgUrl())
 	            .build();
 	    giftMessageRepository.save(giftMessage);
 	    
@@ -229,9 +273,41 @@ public class GiftService {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.put("status", "SUCCESS");
         responseMap.put("roomId", roomId); 
-        responseMap.put("gift", GiftResponse.from(gift)); 
+        responseMap.put("gift", GiftResponse.from(gift, giftMessage)); 
 	    
         return responseMap;
 	}
+	
+	/** 메시지카드 이미지 추가
+	 *  /uploads/messages/
+	 */
+    @Transactional
+    public String uploadGiftImage(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new GlobalException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
+
+        try {
+            File folder = new File(uploadDir);
+            if (!folder.exists()) {
+                folder.mkdirs();
+            }
+
+            String originalFilename = file.getOriginalFilename();
+            String extension = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            }
+            String savedFilename = UUID.randomUUID().toString() + extension;
+
+            File dest = new File(uploadDir + savedFilename);
+            file.transferTo(dest);
+
+            return "http://localhost:8080/uploads/messages/" + savedFilename;
+
+        } catch (IOException e) {
+            throw new RuntimeException("저장 실패", e);
+        }
+    }
 	
 }

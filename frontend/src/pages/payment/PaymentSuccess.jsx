@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -8,7 +8,11 @@ export default function PaymentSuccess() {
     const navigate = useNavigate();
     const [status, setStatus] = useState("결제를 검증하는 중입니다...");
 
+    const isProcessing = useRef(false);
+
     useEffect(() => {
+        if (isProcessing.current) return;
+
         const paymentKey = searchParams.get("paymentKey");
         const orderId = searchParams.get("orderId");
         const amount = searchParams.get("amount");
@@ -19,6 +23,9 @@ export default function PaymentSuccess() {
             setStatus("결제 데이터가 만료되었습니다. 다시 시도해주세요.");
             return;
         }
+
+        // 유효성 검사를 통과하면 즉시 true로 변경하여 락(Lock)
+        isProcessing.current = true;
 
         const token = localStorage.getItem("token");
 
@@ -35,7 +42,7 @@ export default function PaymentSuccess() {
             }
         }
 
-        // 1단계: 내 스프링 백엔드로 토스 결제 승인 + 선물 생성 요청 통합 통신
+        // BE 토스 결제 승인 + 선물 생성 요청 통합 통신
         fetch(`${API_URL}/api/v1/payments/confirm`, {
             method: "POST",
             headers: {
@@ -61,20 +68,19 @@ export default function PaymentSuccess() {
                 setStatus("🎉 결제 완료! 채팅방으로 이동합니다.");
                 localStorage.removeItem("pending_gift_data");
 
-                // 핵심: 백엔드가 응답으로 준 데이터에서 roomId를 추출합니다.
                 const targetRoomId = data.roomId;
 
-                // 딜레이 없이 즉시 해당 채팅방으로 이동시킵니다.
-                // 채팅방에 진입(Mount)하면서 useEffect가 백엔드 DB의 최신 선물 메시지를 긁어옵니다!
                 if (targetRoomId) {
                     navigate(`/chat/${targetRoomId}`);
                 } else {
-                    navigate(`/chat/`); // 폴백
+                    navigate(`/chat/`);
                 }
             })
             .catch((err) => {
                 console.error(err);
                 setStatus("결제 승인 도중 오류가 발생했습니다. 다시 시도해 주세요.");
+                // 실패 시 사용자가 새로고침 or 재시도할 수 있도록 다시 false로 변경
+                isProcessing.current = false;
             });
     }, [searchParams, navigate]);
 

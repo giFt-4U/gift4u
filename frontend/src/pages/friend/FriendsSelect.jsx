@@ -12,8 +12,7 @@ const FriendsSelect = () => {
     const [loading, setLoading] = useState(true);
 
     // 카트에서 전달받은 상품 정보
-    // navigate('/friends/select', { state: { productId, productName } })
-    const { productId, productName } = location.state ?? {};
+    const { productId, productName, productImageUrl } = location.state ?? {};
 
     useEffect(() => {
         if (!token) {
@@ -38,11 +37,11 @@ const FriendsSelect = () => {
             return;
         }
 
-        // GiftCard로 productId + receiverId + productName 전달
         navigate('/gifts/card', {
             state: {
                 productId,
                 productName,
+                imageUrl: productImageUrl,
                 receiverId,
                 receiverNickname: friend.nickname,
                 productPrice: location.state.productPrice

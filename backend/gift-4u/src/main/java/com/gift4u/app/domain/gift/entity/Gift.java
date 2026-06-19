@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.gift4u.app.domain.Product.entity.Product;
 import com.gift4u.app.domain.gift.enums.GiftStatus;
+import com.gift4u.app.domain.payment.entity.Payment;
 import com.gift4u.app.domain.user.entity.User;
 import com.gift4u.app.global.exception.ErrorCode;
 import com.gift4u.app.global.exception.GlobalException;
@@ -65,13 +66,18 @@ public class Gift {
 	
 	@OneToOne(mappedBy = "gift", fetch = FetchType.LAZY)
 	private GiftMessage giftMessage;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id") 
+    private Payment payment;
 	
 	@Builder
-	public Gift(User sender, User receiver, Product product) {
+	public Gift(User sender, User receiver, Product product, Payment payment) {
 		this.uuid = UUID.randomUUID().toString();
 		this.sender = sender;
 		this.receiver = receiver;
 		this.product = product;
+        this.payment = payment;
 		this.status = GiftStatus.PENDING;
 		this.createdAt = LocalDateTime.now();
 		this.expiredAt = LocalDateTime.now().plusDays(7); // 7일 후 만료
@@ -97,5 +103,17 @@ public class Gift {
 		}
 	}
 	
+	// 거절 처리.
+	public void refuse() {
+	    // 선물이 대기 상태가 아니라면 이미 처리된 것
+	    if (this.status != GiftStatus.PENDING) {
+	        throw new GlobalException(ErrorCode.GIFT_REFUSE_RECEIVED);
+	    }
+	    // 선물 만료 여부 검증
+	    if (LocalDateTime.now().isAfter(this.expiredAt)) {
+	        throw new GlobalException(ErrorCode.GIFT_EXPIRED);
+	    }
+	    this.status = GiftStatus.REFUSED;
+	}
 	
 }
