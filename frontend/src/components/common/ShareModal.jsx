@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { copyText, initKakaoSdk } from '../../utils/shareUtils';
+import { copyText, initKakaoSdk, canUseKakaoFeedImage } from '../../utils/shareUtils';
 import {
     ShareOverlay,
     ShareModalBox,
@@ -71,25 +71,58 @@ const ShareModal = ({ open, onClose, shareUrl, kakao, smsText }) => {
         }
     };
 
-    const handleKakaoShare = () => {
+    const handleKakaoShare = async () => {
         if (!window.Kakao?.isInitialized()) {
             alert('카카오 SDK가 준비되지 않았습니다.');
             return;
         }
 
-        // feed 카드 description에는 URL이 화면에 안 보이는 경우가 많아 text 템플릿 사용
-        const shareText = `${kakao.title}\n${kakao.description}\n${shareUrl}`;
-
-        window.Kakao.Share.sendDefault({
-            objectType: 'text',
-            text: shareText,
-            link: {
-                mobileWebUrl: shareUrl,
-                webUrl: shareUrl,
-            },
-            buttonTitle: kakao.buttonTitle || '따숨품에서 보기',
-        });
         onClose();
+
+        const link = {
+            mobileWebUrl: shareUrl,
+            webUrl: shareUrl,
+        };
+
+        try {
+            const buttonTitle = kakao.buttonTitle || '따숨품에서 보기';
+            const useFeed = kakao.dualShare && kakao.imageUrl && canUseKakaoFeedImage(kakao.imageUrl);
+
+            // 상품(서버): feed(이미지+상품명+가격) → text(링크 안내)
+            if (useFeed) {
+                await window.Kakao.Share.sendDefault({
+                    objectType: 'feed',
+                    content: {
+                        title: kakao.title,
+                        description: kakao.description,
+                        imageUrl: kakao.imageUrl,
+                        link,
+                    },
+                });
+
+                await window.Kakao.Share.sendDefault({
+                    objectType: 'text',
+                    text: `따숨품에서 보기\n아래 링크를 클릭하세요\n${shareUrl}`,
+                    link,
+                    buttonTitle: buttonTitle,
+                });
+                return;
+            }
+
+            // 상품(로컬) / 친구코드: text 한 번 (feed 이미지는 localhost에서 불가)
+            const shareText = kakao.dualShare
+                ? `${kakao.title}\n${kakao.description}\n\n따숨품에서 보기\n아래 링크를 클릭하세요\n${shareUrl}`
+                : `${kakao.title}\n${kakao.description}\n${shareUrl}`;
+
+            await window.Kakao.Share.sendDefault({
+                objectType: 'text',
+                text: shareText,
+                link,
+                buttonTitle,
+            });
+        } catch {
+            // 사용자가 공유 취소한 경우 등
+        }
     };
 
     const handleSmsShare = () => {

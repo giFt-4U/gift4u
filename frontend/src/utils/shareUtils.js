@@ -49,3 +49,13 @@ export const getProductImageUrl = (product) => {
 };
 
 export const getDefaultShareImageUrl = () => `${window.location.origin}/images/default.png`;
+
+/** feed 카드용 — 카카오 서버가 이미지를 가져올 수 있는 공개 URL인지 */
+export const canUseKakaoFeedImage = (url) => {
+    try {
+        const { hostname } = new URL(url);
+        return hostname !== 'localhost' && hostname !== '127.0.0.1';
+    } catch {
+        return false;
+    }
+};
