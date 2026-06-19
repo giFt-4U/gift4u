@@ -39,11 +39,7 @@ import ShareModal from '../components/common/ShareModal';
 import { addToCart } from '../utils/Cart';
 
 import {
-
     buildProductShareUrl,
-
-    getProductImageUrl,
-
 } from '../utils/shareUtils';
 
 
@@ -192,10 +188,6 @@ const ProductDetail = () => {
 
     const shareUrl = buildProductShareUrl(id, friendCode);
 
-    const shareImageUrl = getProductImageUrl(product);
-
-
-
     return (
 
         <DetailWrapper>
@@ -284,11 +276,9 @@ const ProductDetail = () => {
 
                     description: `${Number(product.price || 0).toLocaleString()}원`,
 
-                    imageUrl: shareImageUrl,
-
                     buttonTitle: '따숨품에서 보기',
 
-                    dualShare: true,
+                    linkGuide: true,
 
                 }}
 
