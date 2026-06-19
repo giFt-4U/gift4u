@@ -63,9 +63,6 @@ const FriendsPage = () => {
     return (
         <S.Container>
             <S.Header>
-                <S.BackButton onClick={() => navigate('/mypage')} aria-label="뒤로가기">
-                    ‹
-                </S.BackButton>
                 {!error && <S.FriendCount>{friends.length}명</S.FriendCount>}
             </S.Header>
 

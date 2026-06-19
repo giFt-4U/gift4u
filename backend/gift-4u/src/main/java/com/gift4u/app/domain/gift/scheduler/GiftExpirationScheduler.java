@@ -1,15 +1,16 @@
 package com.gift4u.app.domain.gift.scheduler;
 
 import java.time.LocalDateTime;
+
 import java.util.List;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.gift4u.app.domain.gift.entity.Gift;
 import com.gift4u.app.domain.gift.enums.GiftStatus;
 import com.gift4u.app.domain.gift.repository.GiftRepository;
+import com.gift4u.app.domain.gift.service.GiftManageService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 public class GiftExpirationScheduler {
 	
 	private final GiftRepository giftRepository;
+    private final GiftManageService giftManageService;
 
 	/** 매일 새벽 2시 - 만료 선물 일괄 처리
 	 * 
@@ -35,24 +37,31 @@ public class GiftExpirationScheduler {
 	 * 	중간에 예외 발생 시 전체 롤백되어 데이터 불일치 방지!!
 	 */
 
-	@Scheduled(cron= "0 0 2 * * *")
-	@Transactional
-	public void expiredOverduGifts() {
-		LocalDateTime now = LocalDateTime.now();
-		
-		// PENDING 상태이면서 만료 시각이 지난 선물 조회
-		List<Gift> overdueGifts = giftRepository
-				.findAllByStatusAndExpiredAtBefore(GiftStatus.PENDING, now);
-		
-		if(overdueGifts.isEmpty()) {
-			log.info("[GiftScheduler] 만료 처리할 선물 없음");
-			return;
-		}
-		
-		// 각 선물의 expire() 호출 > EXPIRED 상태로 전환
-		overdueGifts.forEach(Gift::expire);
-		
-		log.info("[GiftScheduler] 만료 처리 완료 - 대상: {}건, 기준 시각: {}", overdueGifts.size(), now);
-				
-	}
+    @Scheduled(cron = "0 0 2 * * *")
+    public void expiredOverdueGifts() {
+        LocalDateTime now = LocalDateTime.now();
+        
+        List<Gift> overdueGifts = giftRepository
+                .findAllByStatusAndExpiredAtBefore(GiftStatus.PENDING, now);
+        
+        if (overdueGifts.isEmpty()) {
+            log.info("[GiftScheduler] 만료 처리할 선물 없음");
+            return;
+        }
+
+        int successCount = 0;
+        for (Gift gift : overdueGifts) {
+            try {
+                // 개별 건마다 독립된 트랜잭션으로 처리
+                giftManageService.processExpirationAndRefund(gift.getId());
+                successCount++;
+            } catch (Exception e) {
+                log.error("[GiftScheduler] 선물 ID {} 만료/환불 처리 중 오류 발생: {}", gift.getId(), e.getMessage());
+            }
+        }
+        
+        log.info("[GiftScheduler] 만료 처리 완료 - 성공: {}/{}건, 기준 시각: {}", 
+                successCount, overdueGifts.size(), now);
+    }
+
 }

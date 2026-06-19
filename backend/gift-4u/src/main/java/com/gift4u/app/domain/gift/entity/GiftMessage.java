@@ -34,15 +34,19 @@ public class GiftMessage {
 	@Column(nullable = false, length=2000)
 	private String message;
 	
+	@Column(length = 1000)
+	private String uploadedImgUrl;
+	
 	private Integer cardDesignType;
 	private LocalDateTime createdAt;
 
 	@Builder
-	public GiftMessage(Gift gift, String message, Integer cardDesignType) {
+	public GiftMessage(Gift gift, String message, Integer cardDesignType, String uploadedImgUrl) {
 		this.gift = gift;
 		this.message = message;
 		this.cardDesignType = cardDesignType;
 		this.createdAt = LocalDateTime.now();
+		this.uploadedImgUrl = uploadedImgUrl;
 	}
 	
 }

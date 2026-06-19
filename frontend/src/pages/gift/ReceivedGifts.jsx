@@ -21,20 +21,6 @@ const ReceivedGifts = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        getReceivedGifts()
-            .then((res) => setGifts(res.data))
-            .catch(() => { })
-            .finally(() => setLoading(false));
-    }, []);
-
-    const statusLabel = (status) => {
-        if (status === 'PENDING') return { text: '수령 대기', color: '#FF8C00' };
-        if (status === 'ACCEPTED') return { text: '수령 완료', color: '#4CAF50' };
-        if (status === 'EXPIRED') return { text: '만료됨', color: '#aaa' };
-        return { text: status, color: '#888' };
-    };
-
-    useEffect(() => {
         const fetchListData = async () => {
             try {
                 // 1. 받은 선물 목록과 내 친구 목록을 동시에 서버에서 가져옴
@@ -43,8 +29,27 @@ const ReceivedGifts = () => {
                     getFriends()
                 ]);
 
-                setGifts(giftRes.data || []);
+                const giftList = giftRes.data || [];
                 setFriends(friendRes.data || []);
+
+                // 2. 선물 데이터에 상품 이미지가 없으면 상품 API로 보강
+                const enrichedGifts = await Promise.all(
+                    giftList.map(async (gift) => {
+                        if (gift.imageUrl || gift.image_url || !gift.productId) {
+                            return gift;
+                        }
+                        try {
+                            const pRes = await axiosInstance.get(`/api/products/${gift.productId}`);
+                            const img = pRes.data?.imageUrl || pRes.data?.image_url;
+                            return img ? { ...gift, imageUrl: img } : gift;
+                        } catch (e) {
+                            console.error('선물함 상품 이미지 조회 실패:', e);
+                            return gift;
+                        }
+                    })
+                );
+
+                setGifts(enrichedGifts);
             } catch (error) {
                 console.error("데이터 로딩 실패:", error);
             } finally {
@@ -55,10 +60,15 @@ const ReceivedGifts = () => {
         fetchListData();
     }, []);
 
-    const getSenderNickname = (senderId) => {
-        if (!senderId) return '익명의 친구';
+    const statusLabel = (status) => {
+        if (status === 'PENDING') return { text: '수령 대기', color: '#FF8C00' };
+        if (status === 'ACCEPTED') return { text: '수령 완료', color: '#4CAF50' };
+        if (status === 'EXPIRED') return { text: '만료됨', color: '#aaa' };
+        if (status === 'REFUSED') return { text: '거절함', color: '#777' };
+        return { text: status, color: '#888' };
+    };
 
-        // 내 친구 목록 데이터에서 고유 유저 ID가 일치하는 단 한 명을 매칭
+    const getSenderNickname = (senderId) => {
         const matchedFriend = friends.find(f =>
             Number(f.friendId) === Number(senderId) ||
             Number(f.userId) === Number(senderId)
@@ -66,22 +76,6 @@ const ReceivedGifts = () => {
 
         return matchedFriend ? matchedFriend.nickname : '선물한 사용자';
     };
-
-    const GiftItemRow = ({ gift, navigate, statusLabel, getSenderNickname }) => {
-        const [productImg, setProductImg] = useState("/images/default.png");
-        const label = statusLabel(gift.status);
-
-        useEffect(() => {
-            if (!gift.productId) return;
-
-            axios.get(`/api/products/${gift.productId}`)
-                .then((res) => {
-                    const img = res.data?.imageUrl || res.data?.image_url;
-                    if (img) setProductImg(img);
-                })
-                .catch((err) => console.error("선물함 상품 이미지 가치 조회 실패:", err));
-        }, [gift.productId]);
-    }
 
     if (loading) return <S.CenterText>로딩 중...</S.CenterText>;
 
@@ -104,7 +98,7 @@ const ReceivedGifts = () => {
                                         src={currentImgSrc}
                                         alt={gift.productName}
                                         onError={(e) => {
-                                            e.target.src = "/images/default.png"; // 깨짐 방지용 방어막
+                                            e.target.src = "/images/default.png";
                                         }}
                                     />
                                 </S.ProductThumb>
@@ -117,9 +111,16 @@ const ReceivedGifts = () => {
                                     <S.StatusBadge $color={label.color}>
                                         {label.text}
                                     </S.StatusBadge>
-                                    <S.ExpireText>
-                                        만료: {new Date(gift.expiredAt).toLocaleDateString('ko-KR')}
-                                    </S.ExpireText>
+
+                                    {gift.status !== 'EXPIRED' && gift.status !== 'REFUSED' ? (
+                                        <S.ExpireText>
+                                            만료: {new Date(gift.expiredAt).toLocaleDateString('ko-KR')}
+                                        </S.ExpireText>
+                                    ) : (
+                                        <S.ExpireText style={{ color: '#ff4d4f' }}>
+                                            {gift.status === 'EXPIRED' ? '기간 만료로 수령 불가' : '거절된 선물 (환불 완료)'}
+                                        </S.ExpireText>
+                                    )}
                                     <S.SenderText>
                                         보낸 사람: <strong style={{ color: '#222', fontWeight: '600' }}>{getSenderNickname(gift.sender)}</strong>
                                     </S.SenderText>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
-import { getGift, getReceivedGifts } from '../../api/giftApi';
+import { getGift, getReceivedGifts, refuseGift } from '../../api/giftApi';
 import * as S from '../../styles/gift/GiftCardViewStyle';
 import axiosInstance from '../../api/axiosInstance';
 
@@ -55,7 +55,7 @@ const GiftCardView = () => {
                 const targetIds = gift.bundleProductIds || (gift.productId ? [gift.productId] : []);
 
                 if (targetIds.length > 0) {
-                    const productRequests = targetIds.map(id => axios.get(`/api/products/${id}`));
+                    const productRequests = targetIds.map(id => axiosInstance.get(`/api/products/${id}`));
                     const productResponses = await Promise.all(productRequests);
 
                     const formatted = productResponses.map(pRes => ({
@@ -85,8 +85,12 @@ const GiftCardView = () => {
     const isPreview = !uuid; // 경로 A 여부
     const isExpired = status === 'EXPIRED';
     const isAccepted = status === 'ACCEPTED';
+    const isRefused = status === 'REFUSED';
+    const isPending = status === 'PENDING';
 
-    const userUploadedImg = isPreview ? previewState?.uploadedImgUrl : giftData?.uploadedImgUrl;
+    const userUploadedImg = isPreview
+        ? (previewState?.uploadedImgUrl || previewState?.uploadedImageUrl || previewState?.customImageUrl)
+        : (giftData?.uploadedImgUrl || giftData?.uploadedImageUrl || giftData?.customImageUrl || giftData?.giftImageUrl);
 
     const getLocalStorageProducts = () => {
         try {
@@ -122,6 +126,22 @@ const GiftCardView = () => {
         }
     };
 
+    // 선물 거절
+    const handleRefuseGift = async () => {
+        if (!window.confirm("정말 선물을 거절하시겠습니까?\n거절 시 보낸 분에게 전액 환불됩니다.")) return;
+
+        try {
+            // 백엔드 patch API 호출 (import 확인 필요)
+            await refuseGift(uuid);
+            alert("선물이 거절 처리되었습니다.");
+
+            // 페이지 새로고침하여 상태 갱신 혹은 리로드 함수 호출
+            window.location.reload();
+        } catch (error) {
+            alert(error.response?.data?.message || "선물 거절 처리 중 오류가 발생했습니다.");
+        }
+    };
+
     const displayProducts = getFormattedProducts();
 
     // ── 로딩 / 에러 처리 ─────────────────────────────────
@@ -150,20 +170,32 @@ const GiftCardView = () => {
 
                 {/* 2. 와이어프레임 중앙: 다른 화면들과 완벽히 일치하는 상품 리스트 출력 (여러 개면 밑으로 차례대로 렌더링) */}
                 <S.ProductContainer>
-                    {displayProducts.map((item, idx) => (
-                        <S.ProductBox key={idx}>
-                            <S.SmallThumbBox>
-                                <S.RealProductImage
-                                    src={item.imageUrl}
-                                    alt={item.name}
-                                    onError={(e) => { e.target.src = "/images/default.png"; }}
-                                />
-                            </S.SmallThumbBox>
-                            <S.ProductTextGroup>
-                                <S.ProductName>{item.name}</S.ProductName>
-                            </S.ProductTextGroup>
-                        </S.ProductBox>
-                    ))}
+                    {displayProducts.map((item, idx) => {
+                        const thumbSrc =
+                            item?.imageUrl ||
+                            item?.image_url ||
+                            item?.productImageUrl ||
+                            item?.productImage ||
+                            '/images/default.png';
+
+                        return (
+                            <S.ProductBox key={idx}>
+                                <S.SmallThumbBox>
+                                    <S.RealProductImage
+                                        src={thumbSrc}
+                                        alt={item?.name || '선물 상품'}
+                                        onError={(e) => {
+                                            e.currentTarget.onerror = null;
+                                            e.currentTarget.src = "/images/default.png";
+                                        }}
+                                    />
+                                </S.SmallThumbBox>
+                                <S.ProductTextGroup>
+                                    <S.ProductName>{item.name}</S.ProductName>
+                                </S.ProductTextGroup>
+                            </S.ProductBox>
+                        );
+                    })}
                 </S.ProductContainer>
 
                 {/* 메시지 */}
@@ -195,17 +227,31 @@ const GiftCardView = () => {
                         {isAccepted && (
                             <S.DisabledButton>이미 수령한 선물입니다</S.DisabledButton>
                         )}
-                        {!isExpired && !isAccepted && (
-                            <S.ActionButton
-                                $accent={design.accent}
-                                onClick={() => navigate(`/gifts/${uuid}/address`)}
-                            >
-                                주소 입력하기
-                            </S.ActionButton>
+                        {isRefused && (
+                            <S.DisabledButton $danger>거절한 선물입니다</S.DisabledButton>
+                        )}
+
+                        {isPending && (
+                            <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
+                                <S.ActionButton
+                                    $accent={design.accent}
+                                    onClick={() => navigate(`/gifts/${uuid}/address`)}
+                                    style={{ flex: 2 }}
+                                >
+                                    주소 입력하기
+                                </S.ActionButton>
+
+                                <S.ActionButton
+                                    $accent="#e53e3e"
+                                    onClick={handleRefuseGift}
+                                    style={{ flex: 1, backgroundColor: '#fff', color: '#e53e3e', border: '1px solid #e53e3e' }}
+                                >
+                                    거절하기
+                                </S.ActionButton>
+                            </div>
                         )}
                     </>
                 )}
-
             </S.ButtonArea>
 
         </S.Container>

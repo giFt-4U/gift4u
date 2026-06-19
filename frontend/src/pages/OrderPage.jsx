@@ -77,11 +77,13 @@ const OrderPage = () => {
         orderItems[0]?.fromFriendWishlist ||
         false;
 
-    const handleSelectFriend = (productId, productName) => {
+    const handleSelectFriend = (productId, productName, productImageUrl) => {
+
         navigate('/friends/select', {
             state: {
                 productId,
                 productName,
+                productImageUrl,
                 productPrice: finalPrice
             },
         });

@@ -1,6 +1,5 @@
 import styled from "styled-components";
 
-
 export const Container = styled.div`
     display: flex;
     flex-direction: column;
@@ -9,14 +8,6 @@ export const Container = styled.div`
     overflow: hidden;
     margin: -20px;
 `;
-
-export const Title = styled.h1`
-    font-size: 18px;
-    font-weight: 700;
-    color: #FF8C00;
-    margin: 0;
-`;
-
 
 export const MessageList = styled.div`
     flex: 1;
@@ -55,26 +46,6 @@ export const BubbleTime = styled.span`
     text-align: right;
 `;
 
-/* GIFT 타입 말풍선 */
-export const GiftCard = styled.div`
-    background: #FFF8F0;
-    border: 1.5px solid #FF8C00;
-    border-radius: 12px;
-    padding: 16px 20px;
-    text-align: center;
-    cursor: pointer;
-    max-width: 200px;
-
-    &:active {
-        opacity: 0.8;
-    }
-`;
-
-export const GiftCardIcon = styled.div`
-    font-size: 32px;
-    margin-bottom: 8px;
-`;
-
 export const GiftCardText = styled.p`
     font-size: 14px;
     font-weight: 600;
@@ -82,13 +53,6 @@ export const GiftCardText = styled.p`
     margin: 0 0 4px;
 `;
 
-export const GiftCardSub = styled.p`
-    font-size: 12px;
-    color: #FF8C00;
-    margin: 0;
-`;
-
-/* 입력창 */
 export const InputArea = styled.div`
     display: flex;
     align-items: center;
@@ -126,58 +90,129 @@ export const SendButton = styled.button`
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    
     padding-left: 4px;
     padding-bottom: 3px;
-    
 `;
+
 
 export const GiftCardWrapper = styled.div`
-    width: 240px;
-    border: 1.5px solid #FF8C00;
+    width: 250px; /* 대화창 내부 최적화 너비 */
+    background-image: ${({ $bgImg }) => `url(${$bgImg})`};
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     border-radius: 12px;
     overflow: hidden;
-    background: #fff;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+    box-sizing: border-box;
 `;
 
-export const GiftCardImage = styled.div`
+export const GiftCardImageFrame = styled.div`
     width: 100%;
-    height: 140px;
-    background: #f5f5f5;
+    aspect-ratio: 1.3 / 1;
+    background: #fff;
+    border: 1px solid #ccc;
+    position: relative;
+    box-sizing: border-box;
+    overflow: hidden;
+    border-radius: 4px;
+`;
+
+export const ImagePlaceholderLine = styled.div`
+    width: 100%;
+    height: 100%;
+    position: relative;
+
+    &::before, &::after {
+        content: "";
+        position: absolute;
+        width: 141.4%;
+        height: 1px;
+        background: #ddd;
+        top: 0;
+    }
+    &::before { left: 0; transform: rotate(37.5deg); transform-origin: top left; }
+    &::after { right: 0; transform: rotate(-37.5deg); transform-origin: top right; }
+`;
+
+export const RealGiftImage = styled.img`
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+`;
+
+export const GiftCardInfoRow = styled.div`
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 48px;
-    border-bottom: 1px solid #eee;
-`;
-
-export const GiftCardInfo = styled.div`
-    padding: 10px 14px;
-    border-bottom: 1px solid #eee;
-`;
-
-export const GiftCardBrand = styled.p`
-    font-size: 11px;
-    color: #aaa;
-    margin: 0 0 2px;
-`;
-
-export const GiftCardName = styled.p`
-    font-size: 14px;
-    font-weight: 600;
-    color: #333;
-    margin: 0;
-`;
-
-export const GiftCardButton = styled.button`
+    gap: 12px;
     width: 100%;
-    padding: 12px;
-    background: ${({ $secondary }) => $secondary ? '#fff' : '#FF8C00'};
-    color: ${({ $secondary }) => $secondary ? '#FF8C00' : '#fff'};
-    border: none;
-    border-top: ${({ $secondary }) => $secondary ? '1px solid #eee' : 'none'};
-    font-size: 14px;
+    background: rgba(255, 255, 255, 0.9); /* 뒤 일러스트지가 은은히 비치는 투명 화이트 패널 */
+    padding: 10px;
+    border-radius: 6px;
+    box-sizing: border-box;
+`;
+
+export const SmallThumbBox = styled.div`
+    width: 46px;
+    height: 46px;
+    background: #fff;
+    border: 1px solid #ccc;
+    position: relative;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 2px;
+`;
+
+export const GiftCardTextGroup = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+    text-align: left;
+`;
+
+export const GiftCardBrand = styled.span`
+    font-size: 11px;
+    color: #666;
+    font-weight: 500;
+`;
+
+export const GiftCardName = styled.h2`
+    font-size: 13px;
+    font-weight: 600;
+    color: #222;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+`;
+
+export const GiftCardButtonGroup = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+`;
+
+export const GiftCardActionButton = styled.button`
+    width: 100%;
+    padding: 11px;
+    background: #ffffff;
+    color: #333333;
+    border: 1px solid #e2e2e2;
+    border-radius: 8px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    display: block;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+    transition: background 0.1s;
+
+    &:active {
+        background: #f7f7f7;
+    }
 `;

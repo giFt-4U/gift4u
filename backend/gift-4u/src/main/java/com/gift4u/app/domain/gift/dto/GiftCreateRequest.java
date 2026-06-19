@@ -20,7 +20,12 @@ public class GiftCreateRequest {
 
     @NotNull
     private Long senderId;
-	
+
+    @NotBlank
+    private String orderId;
+
+    private String uploadedImgUrl;
+    
 	// REQ-010
 	@NotBlank
 	@Size(max = 200, message = "메시지는 200자를 초과할 수 없습니다.")
