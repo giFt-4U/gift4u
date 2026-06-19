@@ -1,7 +1,12 @@
 // SignupPage.jsx
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { signup } from '../../api/auth';
+import {
+    getRedirectFromSearch,
+    resolvePostAuthPath,
+    stashAuthRedirect,
+} from '../../utils/authRedirect';
 import {
     AuthContainer,
     AuthHeader,
@@ -20,7 +25,7 @@ import {
 } from '../../styles/AuthStyle';
 
 const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
-const KAKAO_REDIRECT_URI = 'http://localhost:5173/kakao/auth-code';
+const KAKAO_REDIRECT_URI = `${window.location.origin}/kakao/auth-code`;
 
 const KakaoIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -39,6 +44,7 @@ const INIT_FORM = {
 
 const SignupPage = () => {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
     const [form, setForm] = useState(INIT_FORM);
     const [error, setError] = useState('');
@@ -49,6 +55,7 @@ const SignupPage = () => {
             alert('.env에 VITE_KAKAO_REST_API_KEY를 추가해주세요.');
             return;
         }
+        stashAuthRedirect(resolvePostAuthPath(searchParams));
         const url =
             `https://kauth.kakao.com/oauth/authorize` +
             `?client_id=${KAKAO_REST_API_KEY}` +
@@ -91,7 +98,8 @@ const SignupPage = () => {
         try {
             await signup(form);
             alert('회원가입이 완료되었습니다!\n로그인해주세요.');
-            navigate('/login');
+            const redirect = getRedirectFromSearch(searchParams);
+            navigate(redirect ? `/login?redirect=${encodeURIComponent(redirect)}` : '/login');
         } catch (err) {
             const serverMsg = err.response?.data?.message;
             setError(serverMsg || '회원가입에 실패했습니다. 다시 시도해주세요.');
@@ -213,7 +221,14 @@ const SignupPage = () => {
 
             <BottomLink>
                 이미 회원이신가요?
-                <span onClick={() => navigate('/login')}>로그인</span>
+                <span
+                    onClick={() => {
+                        const redirect = getRedirectFromSearch(searchParams);
+                        navigate(redirect ? `/login?redirect=${encodeURIComponent(redirect)}` : '/login');
+                    }}
+                >
+                    로그인
+                </span>
             </BottomLink>
         </AuthContainer>
     );

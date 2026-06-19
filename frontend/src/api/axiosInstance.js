@@ -45,7 +45,10 @@ axiosInstance.interceptors.response.use(
             localStorage.removeItem("token");
             localStorage.removeItem("user");
             localStorage.removeItem("userId");
-            window.location.href = "/login";
+            const redirect = encodeURIComponent(
+                window.location.pathname + window.location.search
+            );
+            window.location.href = `/login?redirect=${redirect}`;
         }
 
         return Promise.reject(error);

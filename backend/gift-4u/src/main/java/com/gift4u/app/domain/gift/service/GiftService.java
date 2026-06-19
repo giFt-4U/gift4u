@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -54,8 +55,10 @@ public class GiftService {
 	private final PaymentService paymentService;
 	
 	private final String uploadDir = System.getProperty("user.dir") + "/uploads/messages/";
-	
-	
+
+	@Value("${app.base-url:http://localhost:8080}")
+	private String baseUrl;
+
 	/** 선물 생성 (REQ-011 / 010)
 	 * 
 	 * 1. 보낸 사람(sender), 받는 사람(receiver), 상품(product) 존재 확인
@@ -303,7 +306,7 @@ public class GiftService {
             File dest = new File(uploadDir + savedFilename);
             file.transferTo(dest);
 
-            return "http://localhost:8080/uploads/messages/" + savedFilename;
+            return baseUrl + "/uploads/messages/" + savedFilename;
 
         } catch (IOException e) {
             throw new RuntimeException("저장 실패", e);

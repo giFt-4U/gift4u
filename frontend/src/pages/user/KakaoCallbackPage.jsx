@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
 import { kakaoLogin, getMe } from '../../api/auth';
 import { resolveUserRole, isAdminRole } from '../../utils/authUtils';
+import { clearAuthRedirect, resolvePostAuthPath } from '../../utils/authRedirect';
 
 const KakaoCallbackPage = () => {
     const navigate = useNavigate();
@@ -24,9 +25,13 @@ const KakaoCallbackPage = () => {
                     const meRes = await getMe();
                     const role = resolveUserRole(meRes.data, res.data.accessToken);
                     setUser({ ...meRes.data, role });
-                    navigate(isAdminRole(role) ? '/admin' : '/', { replace: true });
+                    const nextPath = isAdminRole(role) ? '/admin' : resolvePostAuthPath();
+                    clearAuthRedirect();
+                    navigate(nextPath, { replace: true });
                 } catch {
-                    navigate('/', { replace: true });
+                    const nextPath = resolvePostAuthPath();
+                    clearAuthRedirect();
+                    navigate(nextPath, { replace: true });
                 }
             })
             .catch(() => {
