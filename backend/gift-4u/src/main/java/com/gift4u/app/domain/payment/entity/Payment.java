@@ -12,8 +12,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
 
 @Entity
+@Getter
 @Table(name = "PAYMENT")
 public class Payment {
 
@@ -71,6 +73,13 @@ public class Payment {
         this.updatedAt = LocalDateTime.now();
     }
 	
+    // 취소, 환불 메서드
+    public void cancel() {
+        this.status = PaymentStatus.CANCELED;
+        this.updatedAt = LocalDateTime.now();
+    }
+    
+    
 	public PaymentStatus getStatus() {
 	    return this.status;
 	}

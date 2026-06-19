@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { getChatRooms, getMessages } from '../../api/chatApi';
+import { getGift } from '../../api/giftApi';
+import axiosInstance from '../../api/axiosInstance';
 import * as S from '../../styles/chat/ChatRoomStyle';
 import useAuthStore from '../../store/authStore';
 
@@ -29,6 +31,7 @@ const ChatRoom = () => {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [connected, setConnected] = useState(false);
+    const [giftCardMap, setGiftCardMap] = useState({});
 
     // 채팅방 상대방 정보
     const [opponentName, setOpponentName] = useState(location.state?.partnerName ?? '');
@@ -60,8 +63,16 @@ const ChatRoom = () => {
 
     const myUserId = user?.id || user?.userId || getUserIdFromToken();
 
+    // ── GIFT 타입 메시지에서 uuid 파싱 ───────────────
+    // BE에서 "선물이 도착했어요! 🎁 {uuid}" 형태로 저장
+    const parseGiftUuid = (content) => {
+        const parts = content?.split('🎁');
+        return parts?.length > 1 ? parts[1].trim() : null;
+    };
+
     // ── 1. 과거 메시지 조회 ─────────────────────────────
     useEffect(() => {
+
         if (!roomId || roomId === 'undefined') return;
 
         getMessages(roomId)
@@ -96,6 +107,76 @@ const ChatRoom = () => {
                 console.error('채팅방 상대방 정보 조회 실패');
             });
     }, [roomId, opponentName, opponentFriendCode]);
+
+
+    // ── 1-2. GIFT 메시지는 content에 uuid만 있는 경우가 많아서 카드 데이터 보강 ─────
+    useEffect(() => {
+        const uuids = Array.from(
+            new Set(
+                messages
+                    .filter((msg) => msg.messageType === 'GIFT')
+                    .map((msg) => parseGiftUuid(msg.content))
+                    .filter((giftUuid) => giftUuid && !giftCardMap[giftUuid])
+            )
+        );
+
+        if (uuids.length === 0) return;
+
+        let cancelled = false;
+
+        const fetchGiftCards = async () => {
+            const entries = await Promise.all(
+                uuids.map(async (giftUuid) => {
+                    try {
+                        const res = await getGift(giftUuid);
+                        const gift = res.data || {};
+
+                        let productImageUrl =
+                            gift.productImageUrl ||
+                            gift.productImage ||
+                            gift.imageUrl ||
+                            gift.image_url ||
+                            null;
+
+                        if (!productImageUrl && gift.productId) {
+                            try {
+                                const pRes = await axiosInstance.get(`/api/products/${gift.productId}`);
+                                productImageUrl =
+                                    pRes.data?.imageUrl ||
+                                    pRes.data?.image_url ||
+                                    pRes.data?.productImageUrl ||
+                                    pRes.data?.productImage ||
+                                    null;
+                            } catch (e) {
+                                console.error('채팅 선물 카드 상품 이미지 조회 실패:', e);
+                            }
+                        }
+
+                        return [giftUuid, { ...gift, productImageUrl }];
+                    } catch (e) {
+                        console.error('채팅 선물 카드 조회 실패:', e);
+                        return [giftUuid, null];
+                    }
+                })
+            );
+
+            if (cancelled) return;
+
+            setGiftCardMap((prev) => {
+                const next = { ...prev };
+                entries.forEach(([giftUuid, gift]) => {
+                    if (gift) next[giftUuid] = gift;
+                });
+                return next;
+            });
+        };
+
+        fetchGiftCards();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [messages, giftCardMap]);
 
     // ── 2. STOMP 연결 ────────────────────────────────────
     useEffect(() => {
@@ -176,13 +257,6 @@ const ChatRoom = () => {
         }
     };
 
-    // ── 5. GIFT 타입 메시지에서 uuid 파싱 ───────────────
-    // BE에서 "선물이 도착했어요! 🎁 {uuid}" 형태로 저장
-    const parseGiftUuid = (content) => {
-        const parts = content?.split('🎁');
-        return parts?.length > 1 ? parts[1].trim() : null;
-    };
-
     // ── 6. 친구 위시리스트 이동 ─────────────────────────
     const handleGiftMenuClick = () => {
         if (!opponentFriendCode) {
@@ -204,34 +278,88 @@ const ChatRoom = () => {
                     const isMine = Number(msg.senderId) === Number(myUserId);
                     const isGift = msg.messageType === 'GIFT';
                     const uuid = isGift ? parseGiftUuid(msg.content) : null;
+                    const gift = uuid ? { ...(giftCardMap[uuid] || {}), ...(msg?.giftData || {}) } : {};
+
+                    const uploadedImageSrc =
+                        gift?.uploadedImgUrl ||
+                        gift?.uploadedImageUrl ||
+                        gift?.customImageUrl ||
+                        gift?.giftImageUrl ||
+                        msg?.uploadedImgUrl ||
+                        msg?.uploadedImageUrl ||
+                        msg?.customImageUrl ||
+                        null;
+
+                    const productImageSrc =
+                        gift?.productImageUrl ||
+                        gift?.productImage ||
+                        gift?.imageUrl ||
+                        gift?.image_url ||
+                        msg?.productImageUrl ||
+                        msg?.productImage ||
+                        msg?.imageUrl ||
+                        msg?.image_url ||
+                        null;
+
+                    const giftCardDesignType = gift?.cardDesignType || msg?.cardDesignType || 1;
+                    const giftProductName = gift?.productName || msg?.productName || '선물이 도착했어요!';
+                    const giftBrandName = gift?.brandName || msg?.brandName || '따숨품';
 
                     return (
                         <S.MessageRow key={msg.id ?? idx} $isMine={isMine}>
 
                             {/* GIFT 타입 — 와이어프레임 기준 선물 카드 */}
                             {isGift && uuid ? (
-                                <S.GiftCardWrapper>
-                                    {/* 상품 이미지 영역 (와이어프레임의 X박스) */}
-                                    <S.GiftCardImage>🎁</S.GiftCardImage>
+                                <S.GiftCardWrapper $bgImg={`/images/cards/card${giftCardDesignType}.png`}>
 
-                                    {/* 상품 정보 */}
-                                    <S.GiftCardInfo>
-                                        <S.GiftCardBrand>따숨품</S.GiftCardBrand>
-                                        <S.GiftCardName>선물이 도착했어요!</S.GiftCardName>
-                                    </S.GiftCardInfo>
+                                    {/* 1. 상단 대형 X박스 이미지 영역 */}
+                                    <S.GiftCardImageFrame>
+                                        {uploadedImageSrc ? (
+                                            <S.RealGiftImage
+                                                src={uploadedImageSrc}
+                                                alt="선물 카드 메인 이미지"
+                                                onError={(e) => {
+                                                    e.currentTarget.onerror = null;
+                                                    e.currentTarget.style.display = 'none';
+                                                }}
+                                            />
+                                        ) : (
+                                            <S.ImagePlaceholderLine />
+                                        )}
+                                    </S.GiftCardImageFrame>
 
-                                    {/* 버튼 두 개 — 선물 확인하기 / 주소 입력하기 */}
-                                    <S.GiftCardButton
-                                        onClick={() => navigate(`/gifts/${uuid}`)}
-                                    >
-                                        선물 확인하기
-                                    </S.GiftCardButton>
-                                    <S.GiftCardButton
-                                        $secondary
-                                        onClick={() => navigate(`/gifts/${uuid}/address`)}
-                                    >
-                                        주소 입력하기
-                                    </S.GiftCardButton>
+                                    {/* 2. 중앙 가로배치형 상품 정보 세트 */}
+                                    <S.GiftCardInfoRow>
+                                        <S.SmallThumbBox>
+                                            {productImageSrc ? (
+                                                <S.RealGiftImage
+                                                    src={productImageSrc}
+                                                    alt={giftProductName}
+                                                    onError={(e) => {
+                                                        e.currentTarget.onerror = null;
+                                                        e.currentTarget.src = '/images/default.png';
+                                                    }}
+                                                />
+                                            ) : (
+                                                <S.ImagePlaceholderLine />
+                                            )}
+                                        </S.SmallThumbBox>
+                                        <S.GiftCardTextGroup>
+                                            <S.GiftCardBrand>{giftBrandName}</S.GiftCardBrand>
+                                            <S.GiftCardName>{giftProductName}</S.GiftCardName>
+                                        </S.GiftCardTextGroup>
+                                    </S.GiftCardInfoRow>
+
+                                    {/* 3. 하단 독립형 흰색 둥근 버튼 그룹 */}
+                                    <S.GiftCardButtonGroup>
+                                        <S.GiftCardActionButton onClick={() => navigate(`/gifts/${uuid}`)}>
+                                            선물 확인하기
+                                        </S.GiftCardActionButton>
+                                        <S.GiftCardActionButton onClick={() => navigate(`/gifts/${uuid}/address`)}>
+                                            주소 입력하기
+                                        </S.GiftCardActionButton>
+                                    </S.GiftCardButtonGroup>
+
                                 </S.GiftCardWrapper>
                             ) : (/* TEXT 타입 — 일반 말풍선 */
                                 <S.Bubble $isMine={isMine}>
@@ -332,7 +460,7 @@ const ChatRoom = () => {
                 </S.SendButton>
             </S.InputArea>
 
-        </S.Container>
+        </S.Container >
     );
 };
 

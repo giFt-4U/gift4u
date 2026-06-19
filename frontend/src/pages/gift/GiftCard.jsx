@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { createGift } from '../../api/giftApi';
+import { confirmPaymentAndCreateGift, uploadGiftImage } from '../../api/giftApi';
 import * as S from '../../styles/gift/GiftCardStyle';
 
 // 봉투 디자인 목록 (이미지 경로 매핑)
@@ -31,6 +31,7 @@ const GiftCard = () => {
     const [message, setMessage] = useState(location.state?.message || '');
     const [selectedDesign, setSelectedDesign] = useState(location.state?.cardDesignType || 1);
     const [uploadedImgUrl, setUploadedImgUrl] = useState(location.state?.uploadedImgUrl || null);
+    const [uploading, setUploading] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -45,11 +46,33 @@ const GiftCard = () => {
     };
 
     // 파일 선택 완료 시 미리보기 URL 생성 및 저장
-    const handleFileChange = (e) => {
+    const handleFileChange = async (e) => {
         const file = e.target.files[0];
-        if (file) {
-            const previewUrl = URL.createObjectURL(file);
-            setUploadedImgUrl(previewUrl);
+        if (!file) return;
+
+        // 1) 즉시 미리보기 (blob URL)
+        const previewUrl = URL.createObjectURL(file);
+        setUploadedImgUrl(previewUrl);
+
+        // 2) 실제 서버 업로드 후, 영구 URL로 교체
+        try {
+            setUploading(true);
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const res = await uploadGiftImage(formData);
+            const realUrl = res.data?.imageUrl || res.data?.url;
+
+            if (realUrl) {
+                setUploadedImgUrl(realUrl);
+            } else {
+                setError('이미지 업로드 응답이 올바르지 않습니다.');
+            }
+        } catch (err) {
+            setError('이미지 업로드에 실패했습니다. 다시 시도해주세요.');
+            setUploadedImgUrl(null);
+        } finally {
+            setUploading(false);
         }
     };
 
@@ -111,6 +134,7 @@ const GiftCard = () => {
                     ) : (
                         <S.PreviewPlaceholderText>📸 클릭하여 카드에 넣을 사진 고르기</S.PreviewPlaceholderText>
                     )}
+                    {uploading && <S.PreviewPlaceholderText>업로드 중...</S.PreviewPlaceholderText>}
                 </S.TopPreviewBox>
 
                 {/* 숨겨진 파일 인풋 태그 */}
@@ -170,8 +194,8 @@ const GiftCard = () => {
                 <S.PreviewButton onClick={handlePreview}>
                     카드 미리보기
                 </S.PreviewButton>
-                <S.SubmitButton onClick={handleSubmit} disabled={loading}>
-                    {loading ? '전송 중...' : '결제하기'}
+                <S.SubmitButton onClick={handleSubmit} disabled={loading || uploading}>
+                    {loading ? '전송 중...' : uploading ? '사진 업로드 중...' : '결제하기'}
                 </S.SubmitButton>
             </S.ButtonRow>
         </S.Container>

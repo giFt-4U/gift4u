@@ -57,12 +57,14 @@ public enum ErrorCode {
     CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "CHAT_ROOM_NOT_FOUND", "채팅방을 찾을 수 없습니다."),
     PRODUCT_INACTIVE(HttpStatus.NOT_FOUND, "PRODUCT_INACTIVE", "판매가 종료된 상품입니다."),
     FRIENDSHIP_NOT_FOUND(HttpStatus.NOT_FOUND, "FRIENDSHIP_NOT_FOUND", "친구 요청을 찾을 수 없습니다."),
+    PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "PAYMENT_NOT_FOUND", "결제 정보를 찾을 수 없습니다."),
 
     /////////// 409 - 현재 상태와 충돌하는 요청 ///////////
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "DUPLICATE_EMAIL", "이미 사용 중인 이메일입니다."),
     DUPLICATE_NICKNAME(HttpStatus.CONFLICT, "DUPLICATE_NICKNAME", "이미 사용 중인 닉네임입니다."),
     FRIEND_REQUEST_ALREADY_EXISTS(HttpStatus.CONFLICT, "FRIEND_REQUEST_ALREADY_EXISTS", "이미 친구이거나 요청 대기 중입니다."),
     GIFT_ALREADY_RECEIVED(HttpStatus.CONFLICT, "GIFT_ALREADY_RECEIVED", "이미 수령한 선물입니다."),
+    GIFT_REFUSE_RECEIVED(HttpStatus.CONFLICT, "GIFT_REFUSE_RECEIVED", "이미 거절한 선물입니다."),
 
     /////////// 410 - 존재했지만 더 이상 유효하지 않음 ///////////
     GIFT_EXPIRED(HttpStatus.EXPECTATION_FAILED, "GFIT_EXPIRED", "만료된 선물 입니다."),
