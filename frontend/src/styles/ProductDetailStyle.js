@@ -35,7 +35,9 @@ export const ProductInfoArea = styled.section`
     }
 
     .product-name {
-        margin: 6px 0 0;
+        margin: 0;
+        flex: 1;
+        min-width: 0;
 
         font-size: 15px;
         font-weight: 500;
@@ -51,6 +53,14 @@ export const ProductInfoArea = styled.section`
         color: #111;
         line-height: 20px;
     }
+`;
+
+export const ProductTitleRow = styled.div`
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 6px;
 `;
 
 export const BuyBox = styled.div`
@@ -107,5 +117,28 @@ export const DescArea = styled.section`
         font-weight: 400;
         color: #333;
         line-height: 22px;
+    }
+`;
+
+export const ShareTrigger = styled.button`
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #666;
+    font-size: 13px;
+    font-weight: 500;
+
+    svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    &:hover {
+        color: #111;
     }
 `;

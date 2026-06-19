@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import axiosInstance from '../../api/axiosInstance';
 import { sendFriendRequest } from '../../api/chatApi';
@@ -19,10 +19,18 @@ import * as S from '../../styles/chat/ChatAddFriendStyle';
  */
 const ChatAddFriend = () => {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [friendCode, setFriendCode] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [modal, setModal] = useState(null);
+
+    useEffect(() => {
+        const codeFromUrl = searchParams.get('code');
+        if (codeFromUrl) {
+            setFriendCode(codeFromUrl);
+        }
+    }, [searchParams]);
 
     const handleSubmit = async () => {
         if (!friendCode.trim()) {
