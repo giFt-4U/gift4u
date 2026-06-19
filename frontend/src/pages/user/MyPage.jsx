@@ -235,8 +235,9 @@ const MyPage = () => {
                         title: `[따숨품] ${user.nickname || '친구'}님의 친구 초대`,
                         description: `친구 코드: ${user.friendCode}\n친구 추가 후 선물을 주고받아보세요!`,
                         buttonTitle: '친구 추가하기',
+                        linkGuide: true,
                     }}
-                    smsText={`[따숨품] 친구로 추가해주세요!\n친구 코드: ${user.friendCode}\n${friendInviteUrl}`}
+                    smsText={`[따숨품] 친구로 추가해주세요!\n친구 코드: ${user.friendCode}\n아래 링크를 클릭하세요\n${friendInviteUrl}`}
                 />
             )}
         </MyPageContainer>

@@ -1,9 +1,15 @@
 // LoginPage.jsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
 import { login, getMe } from '../../api/auth';
 import { getRoleFromToken, isAdminRole, resolveUserRole } from '../../utils/authUtils';
+import {
+    clearAuthRedirect,
+    getRedirectFromSearch,
+    resolvePostAuthPath,
+    stashAuthRedirect,
+} from '../../utils/authRedirect';
 import {
     AuthContainer,
     AuthHeader,
@@ -20,7 +26,7 @@ import {
 } from '../../styles/AuthStyle';
 
 const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY;
-const KAKAO_REDIRECT_URI = 'http://localhost:5173/kakao/auth-code';
+const KAKAO_REDIRECT_URI = `${window.location.origin}/kakao/auth-code`;
 
 const KakaoIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -30,6 +36,7 @@ const KakaoIcon = () => (
 
 const LoginPage = () => {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const { setToken, setUser } = useAuthStore();
 
     const [email, setEmail] = useState('');
@@ -58,6 +65,7 @@ const LoginPage = () => {
             alert('.env에 VITE_KAKAO_REST_API_KEY를 추가해주세요.');
             return;
         }
+        stashAuthRedirect(resolvePostAuthPath(searchParams));
         const url =
             `https://kauth.kakao.com/oauth/authorize` +
             `?client_id=${KAKAO_REST_API_KEY}` +
@@ -83,7 +91,9 @@ const LoginPage = () => {
             const meRes = await getMe();
             const role = res.data.role || resolveUserRole(meRes.data, accessToken);
             setUser({ ...meRes.data, role });
-            navigate(isAdminRole(role) ? '/admin' : '/', { replace: true });
+            const nextPath = isAdminRole(role) ? '/admin' : resolvePostAuthPath(searchParams);
+            clearAuthRedirect();
+            navigate(nextPath, { replace: true });
         } catch {
             setError('이메일 또는 비밀번호가 올바르지 않습니다.');
         } finally {
@@ -141,7 +151,14 @@ const LoginPage = () => {
 
             <BottomLink>
                 아직 회원이 아니신가요?
-                <span onClick={() => navigate('/signup')}>회원가입</span>
+                <span
+                    onClick={() => {
+                        const redirect = getRedirectFromSearch(searchParams);
+                        navigate(redirect ? `/signup?redirect=${encodeURIComponent(redirect)}` : '/signup');
+                    }}
+                >
+                    회원가입
+                </span>
             </BottomLink>
         </AuthContainer>
     );

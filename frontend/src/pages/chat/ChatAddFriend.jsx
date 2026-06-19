@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import styled from 'styled-components';
-import axiosInstance from '../../api/axiosInstance';
 import { sendFriendRequest } from '../../api/chatApi';
+import { buildAuthRedirectPath, getLoginPath } from '../../utils/authRedirect';
 import * as S from '../../styles/chat/ChatAddFriendStyle';
 
 /**
@@ -24,6 +23,14 @@ const ChatAddFriend = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [modal, setModal] = useState(null);
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            const redirectPath = buildAuthRedirectPath('/chat/add', window.location.search);
+            navigate(getLoginPath(redirectPath), { replace: true });
+        }
+    }, [navigate]);
 
     useEffect(() => {
         const codeFromUrl = searchParams.get('code');
