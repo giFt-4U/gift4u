@@ -22,11 +22,10 @@ const GiftAccept = () => {
 
             {/* 완료 안내 */}
             <S.Content>
-                <S.CheckIcon>✅</S.CheckIcon>
+                <S.CheckIcon><img src='/assets/icons/accept.svg' alt='완료' /></S.CheckIcon>
                 <S.CompleteText>수령이 완료되었습니다!</S.CompleteText>
                 <S.SubText>
                     배송지 정보가 저장되었습니다.{'\n'}
-                    배송이 시작되면 알림을 드릴게요.
                 </S.SubText>
             </S.Content>
 

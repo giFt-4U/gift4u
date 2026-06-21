@@ -8,13 +8,6 @@ export const Container = styled.div`
     background: #fff;
 `;
 
-export const Title = styled.h1`
-    font-size: 18px;
-    font-weight: 700;
-    color: #FF8C00;
-    margin: 0;
-`;
-
 export const Content = styled.div`
     flex: 1;
     display: flex;
@@ -26,7 +19,8 @@ export const Content = styled.div`
 `;
 
 export const CheckIcon = styled.div`
-    font-size: 72px;
+    padding-top: 130px;
+    width: 72px;
 `;
 
 export const CompleteText = styled.p`
@@ -34,6 +28,7 @@ export const CompleteText = styled.p`
     font-weight: 700;
     color: #222;
     margin: 0;
+    padding-top: 80px;
     text-align: center;
 `;
 
@@ -44,6 +39,7 @@ export const SubText = styled.p`
     text-align: center;
     line-height: 1.8;
     white-space: pre-line;
+    padding-bottom: 80px;
 `;
 
 export const ButtonRow = styled.div`
