@@ -173,8 +173,6 @@ const MyPageEdit = () => {
 
     return (
         <EditContainer>
-            <EditHeader>회원정보 수정</EditHeader>
-
             <AvatarWrap>
                 {previewUrl ? (
                     <AvatarImage src={previewUrl} alt="프로필 미리보기" />

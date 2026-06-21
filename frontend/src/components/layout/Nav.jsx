@@ -71,9 +71,11 @@ const Nav = () => {
     const getHeaderTitle = () => {
         if (path === '/mypage') return '마이페이지';
         if (path === '/mypage/edit') return '회원정보 수정';
+        if (path === '/wishlist') return '위시리스트';
         if (path === '/friends') return '친구 관리';
         if (path === '/friends/requestlist') return '친구 요청 목록';
         if (path === '/mypage/gifts') return '받은 선물함';
+        if (path === '/mypage/withdraw') return '회원탈퇴';
         if (path === '/gifts/') return;
         if (isChatList) return '메시지';
 
