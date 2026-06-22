@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ProductService {
 
+    private static final int ACTIVE = 1;
+
     private final ProductRepository productRepository;
 
     public Page<ProductResponse> getProducts(
@@ -23,98 +25,47 @@ public class ProductService {
     ) {
 
         int safePage = Math.max(page, 0);
-        int safeSize = size <= 0 ? 10 : size;
-
+        int safeSize = size <= 0
+                ? 10
+                : Math.min(size, 100);
+                
         Pageable pageable = PageRequest.of(
                 safePage,
                 safeSize,
                 getSort(sort)
         );
 
-        Page<Product> result;
+        String normalizedKeyword =
+                keyword != null && !keyword.trim().isEmpty()
+                        ? keyword.trim()
+                        : null;
 
-        boolean hasKeyword =
-                keyword != null && !keyword.trim().isEmpty();
+        Long normalizedCategoryId =
+                categoryId != null && categoryId != 0
+                        ? categoryId
+                        : null;
 
-        boolean hasCategory =
-                categoryId != null && categoryId != 0;
+        String normalizedBrandName =
+                brandName != null && !brandName.trim().isEmpty()
+                        ? brandName.trim()
+                        : null;
 
-        boolean hasBrand =
-                brandName != null && !brandName.trim().isEmpty();
-
-        if (hasKeyword && hasCategory && hasBrand) {
-
-            result = productRepository
-                    .findByNameContainingIgnoreCaseAndCategoryIdAndBrandName(
-                            keyword.trim(),
-                            categoryId,
-                            brandName.trim(),
-                            pageable
-                    );
-
-        } else if (hasKeyword && hasCategory) {
-
-            result = productRepository
-                    .findByNameContainingIgnoreCaseAndCategoryId(
-                            keyword.trim(),
-                            categoryId,
-                            pageable
-                    );
-
-        } else if (hasKeyword && hasBrand) {
-
-            result = productRepository
-                    .findByNameContainingIgnoreCaseAndBrandName(
-                            keyword.trim(),
-                            brandName.trim(),
-                            pageable
-                    );
-
-        } else if (hasCategory && hasBrand) {
-
-            result = productRepository
-                    .findByCategoryIdAndBrandName(
-                            categoryId,
-                            brandName.trim(),
-                            pageable
-                    );
-
-        } else if (hasKeyword) {
-
-            result = productRepository
-                    .findByNameContainingIgnoreCase(
-                            keyword.trim(),
-                            pageable
-                    );
-
-        } else if (hasCategory) {
-
-            result = productRepository
-                    .findByCategoryId(
-                            categoryId,
-                            pageable
-                    );
-
-        } else if (hasBrand) {
-
-            result = productRepository
-                    .findByBrandName(
-                            brandName.trim(),
-                            pageable
-                    );
-
-        } else {
-
-            result = productRepository.findAll(pageable);
-        }
+        // 일반 사용자 화면에서는 활성 상품만 조회
+        Page<Product> result = productRepository.findActiveProducts(
+                normalizedKeyword,
+                normalizedCategoryId,
+                normalizedBrandName,
+                pageable
+        );
 
         return result.map(ProductResponse::from);
     }
 
     public ProductResponse getProduct(Long id) {
 
+        // 일반 사용자 상세 화면에서도 비활성 상품 제외
         Product product = productRepository
-                .findById(id)
+                .findByIdAndIsActive(id, ACTIVE)
                 .orElseThrow(() ->
                         new RuntimeException("상품 없음")
                 );
@@ -125,13 +76,35 @@ public class ProductService {
     private Sort getSort(String sort) {
 
         if ("popular".equals(sort)) {
-            return Sort.by("salesCount").descending();
+            return Sort.by(
+                    Sort.Order.desc("salesCount"),
+                    Sort.Order.desc("id")
+            );
         }
 
         if ("latest".equals(sort)) {
-            return Sort.by("id").descending();
+            return Sort.by(
+                    Sort.Order.desc("id")
+            );
         }
 
-        return Sort.by("id").descending();
+        if ("priceAsc".equals(sort)) {
+            return Sort.by(
+                    Sort.Order.asc("price"),
+                    Sort.Order.desc("id")
+            );
+        }
+
+        if ("priceDesc".equals(sort)) {
+            return Sort.by(
+                    Sort.Order.desc("price"),
+                    Sort.Order.desc("id")
+            );
+        }
+
+        return Sort.by(
+                Sort.Order.desc("salesCount"),
+                Sort.Order.desc("id")
+        );
     }
 }

@@ -4,6 +4,10 @@ import com.gift4u.app.domain.Product.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
@@ -59,5 +63,36 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             Long categoryId,
             String brandName,
             Pageable pageable
+    );
+
+    // 일반 사용자용: 활성 상품만 조회
+    @Query("""
+            SELECT p
+            FROM Product p
+            WHERE p.isActive = 1
+              AND (
+                  :keyword IS NULL
+                  OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+              )
+              AND (
+                  :categoryId IS NULL
+                  OR p.categoryId = :categoryId
+              )
+              AND (
+                  :brandName IS NULL
+                  OR p.brandName = :brandName
+              )
+            """)
+    Page<Product> findActiveProducts(
+            @Param("keyword") String keyword,
+            @Param("categoryId") Long categoryId,
+            @Param("brandName") String brandName,
+            Pageable pageable
+    );
+
+    // 일반 사용자용: 활성 상품 상세 조회
+    Optional<Product> findByIdAndIsActive(
+            Long id,
+            int isActive
     );
 }
