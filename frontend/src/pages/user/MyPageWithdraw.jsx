@@ -86,10 +86,6 @@ const MyPageWithdraw = () => {
 
     return (
         <EditContainer>
-            <TopBar>
-                <BackButton onClick={() => navigate('/mypage')}>‹</BackButton>
-                <TopTitle>회원탈퇴</TopTitle>
-            </TopBar>
 
             <WarningBox>
                 <WarningTitle>탈퇴 전 꼭 확인해주세요</WarningTitle>

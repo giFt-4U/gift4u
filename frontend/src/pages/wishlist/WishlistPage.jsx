@@ -71,15 +71,6 @@ const WishlistPage = () => {
 
     return (
         <div style={{ padding: "20px" }}>
-            <h2
-                style={{
-                    fontSize: "20px",
-                    fontWeight: 600,
-                    marginBottom: "20px",
-                }}
-            >
-                위시리스트
-            </h2>
 
             {loading ? (
                 <p
