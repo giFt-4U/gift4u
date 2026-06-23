@@ -1,7 +1,6 @@
-// OrderPage.jsx
-
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { getFriends } from "../api/friendshipApi";
 
 import {
     PageWrapper,
@@ -33,7 +32,6 @@ import {
 } from "../styles/OrderStyle";
 
 const OrderPage = () => {
-
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -77,48 +75,87 @@ const OrderPage = () => {
         orderItems[0]?.fromFriendWishlist ||
         false;
 
-    const handleSelectFriend = (productId, productName) => {
+    const handleSelectFriend = (productId, productName, productImageUrl) => {
         navigate('/friends/select', {
             state: {
                 productId,
                 productName,
-                productPrice: finalPrice
+                productImageUrl,
+                productPrice: finalPrice,
             },
         });
     };
 
     // 선물할 친구 선택하기 버튼 클릭
-    const handleMessageButtonClick = () => {
+    const handleMessageButtonClick = async () => {
         if (orderItems.length === 0) {
             alert('주문할 상품이 없습니다.');
             return;
         }
 
         const item = orderItems[0];
+        const productImageUrl =
+            item.imageUrl ||
+            item.image_url ||
+            "/images/default.png";
 
-        // 이미 친구 위시리스트에서 넘어온 경우 친구 재선택 없이 친구 코드 전달
+        // 친구 위시리스트에서 온 경우 친구 선택 화면을 거치지 않고 바로 선물 카드로 이동
         if (receiverFriendCode) {
-            navigate('/friends/select', {
-                state: {
-                    productId: item.id,
-                    productName: item.name,
-                    productPrice: finalPrice,
-                    receiverFriendCode,
-                    fromFriendWishlist,
-                    skipSelect: true,
-                },
-            });
+            try {
+                const res = await getFriends();
+                const friendList = res.data || [];
+
+                const selectedFriend = friendList.find(
+                    (friend) =>
+                        (friend.friendCode || friend.friend_code) ===
+                        receiverFriendCode
+                );
+
+                if (!selectedFriend) {
+                    alert('선택된 친구 정보를 찾을 수 없습니다.');
+                    return;
+                }
+
+                const receiverId =
+                    selectedFriend.friendId ||
+                    selectedFriend.userId ||
+                    selectedFriend.friendUserId;
+
+                if (!receiverId) {
+                    alert('유효하지 않은 사용자입니다.');
+                    return;
+                }
+
+                navigate('/gifts/card', {
+                    state: {
+                        productId: item.id,
+                        productName: item.name,
+                        imageUrl: productImageUrl,
+                        productPrice: finalPrice,
+                        receiverId,
+                        receiverNickname: selectedFriend.nickname,
+                        receiverFriendCode,
+                        fromFriendWishlist,
+                    },
+                });
+            } catch (error) {
+                console.error('친구 정보 조회 실패:', error);
+                alert('친구 정보를 불러오지 못했습니다.');
+            }
 
             return;
         }
 
         // 일반 상품 상세페이지에서 온 경우 기존처럼 친구 선택
-        handleSelectFriend(item.id, item.name);
+        handleSelectFriend(
+            item.id,
+            item.name,
+            productImageUrl
+        );
     };
 
     return (
         <PageWrapper>
-
             <OrderHeader>
                 <BackButton
                     type="button"
@@ -131,9 +168,7 @@ const OrderPage = () => {
                     />
                 </BackButton>
 
-                <LogoText
-                    onClick={() => navigate("/")}
-                >
+                <LogoText onClick={() => navigate("/")}>
                     따숨품
                 </LogoText>
 
@@ -143,7 +178,6 @@ const OrderPage = () => {
             <Divider />
 
             <OrderListSection>
-
                 {orderItems.length === 0 ? (
                     <div
                         style={{
@@ -156,12 +190,14 @@ const OrderPage = () => {
                         주문할 상품이 없습니다.
                     </div>
                 ) : (
-                    orderItems.map(item => {
-                        const imageSrc = item.imageUrl || item.image_url || "/images/default.png";
+                    orderItems.map((item) => {
+                        const imageSrc =
+                            item.imageUrl ||
+                            item.image_url ||
+                            "/images/default.png";
 
                         return (
                             <OrderItem key={item.id}>
-
                                 <ProductImage
                                     src={imageSrc}
                                     alt={item.name}
@@ -180,8 +216,7 @@ const OrderPage = () => {
                                     </QuantityText>
 
                                     <PriceText>
-                                        상품구매금액:
-                                        {" "}
+                                        상품구매금액:{" "}
                                         <strong>
                                             {(
                                                 Number(item.price || 0) *
@@ -191,18 +226,14 @@ const OrderPage = () => {
                                         원
                                     </PriceText>
                                 </ProductInfo>
-
                             </OrderItem>
                         );
                     })
                 )}
-
             </OrderListSection>
 
             <DeliverySection>
-                <DeliveryTitle>
-                    기본배송
-                </DeliveryTitle>
+                <DeliveryTitle>기본배송</DeliveryTitle>
 
                 <DeliveryLine>
                     상품구매금액&nbsp;&nbsp;
@@ -211,8 +242,7 @@ const OrderPage = () => {
                 </DeliveryLine>
 
                 <DeliveryLine>
-                    합계 :
-                    {" "}
+                    합계 :{" "}
                     <strong>
                         {finalPrice.toLocaleString()}
                     </strong>
@@ -227,8 +257,7 @@ const OrderPage = () => {
                     </SelectedCount>
 
                     <BottomPrice>
-                        결제예정금액:
-                        {" "}
+                        결제예정금액:{" "}
                         <strong>
                             {finalPrice.toLocaleString()}
                         </strong>
@@ -245,7 +274,6 @@ const OrderPage = () => {
                         : "선물할 친구 선택하기"}
                 </MessageButton>
             </BottomOrderBox>
-
         </PageWrapper>
     );
 };
