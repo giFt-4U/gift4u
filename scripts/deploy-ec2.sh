@@ -9,8 +9,8 @@ sudo cp -r dist/* /var/www/gift4u/
 
 echo "==> Backend build & restart"
 cd ~/gift4u/backend/gift-4u
-chmod +x ./mvnw 2>/dev/null || true
-mvn package -DskipTests
+chmod +x ./mvnw
+./mvnw package -DskipTests
 
 JAR_PID=$(pgrep -f 'gift-4u-.*\.jar' || true)
 if [ -n "$JAR_PID" ]; then
