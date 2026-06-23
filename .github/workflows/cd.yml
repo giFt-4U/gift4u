@@ -33,8 +33,7 @@ jobs:
           set -e
           cd ~/gift4u
           git fetch origin
-          git restore backend/gift-4u/mvnw frontend/package-lock.json 2>/dev/null || true
-          git pull origin develop
+          git reset --hard origin/develop
           chmod +x scripts/deploy-ec2.sh
           bash scripts/deploy-ec2.sh
           ENDSSH
