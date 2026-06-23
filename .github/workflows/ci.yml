@@ -26,7 +26,7 @@ jobs:
           cache: maven
 
       - name: Build with Maven
-        run: chmod +x ./mvnw && ./mvnw package -DskipTests
+        run: mvn package -DskipTests
 
   frontend:
     name: Frontend Build
@@ -48,9 +48,9 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install and build
-        run: npm ci && npm run build
+        run: npm install && npm run build
