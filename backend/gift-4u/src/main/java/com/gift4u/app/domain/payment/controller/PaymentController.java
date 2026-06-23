@@ -1,0 +1,48 @@
+package com.gift4u.app.domain.payment.controller;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.gift4u.app.domain.gift.dto.GiftResponse;
+import com.gift4u.app.domain.gift.service.GiftManageService;
+import com.gift4u.app.domain.payment.dto.PaymentConfirmRequest;
+import com.gift4u.app.domain.payment.dto.PaymentReadyRequest;
+import com.gift4u.app.domain.payment.service.PaymentService;
+import com.gift4u.app.global.security.CustomUserDetails;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequestMapping("/api/v1/payments")
+@RequiredArgsConstructor
+public class PaymentController {
+
+    private final PaymentService paymentService;
+    private final GiftManageService giftManageService;
+
+    /**
+     * 1. 결제창 띄우기 전 임시 저장 (F12 금액 변조 원천 차단용)
+     */
+    @PostMapping("/ready")
+    public ResponseEntity<Void> readyPayment(@Valid @RequestBody PaymentReadyRequest request) {
+        paymentService.createReadyPayment(request.getOrderId(), request.getAmount());
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 2. 토스 승인 요청 + 결제 완료 + 선물 생성 원스톱 연동 API
+     */
+    @PostMapping("/confirm")
+    public ResponseEntity<GiftResponse> confirmPayment(@AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody PaymentConfirmRequest request) {
+		Long senderId = userDetails.getUser().getId();
+		GiftResponse response = giftManageService.confirmAndCreate(senderId, request);
+		return ResponseEntity.ok(response);
+    }
+    
+}

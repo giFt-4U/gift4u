@@ -20,6 +20,7 @@ const FriendsSelect = () => {
         productPrice,
         receiverFriendCode,
         skipSelect,
+        productImageUrl,
     } = location.state ?? {};
 
     useEffect(() => {
@@ -97,11 +98,11 @@ const FriendsSelect = () => {
             return;
         }
 
-        // GiftCard로 productId + receiverId + productName 전달
         navigate('/gifts/card', {
             state: {
                 productId,
                 productName,
+                imageUrl: productImageUrl,
                 receiverId,
                 receiverNickname: friend.nickname,
                 productPrice,
